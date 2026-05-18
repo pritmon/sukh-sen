@@ -90,7 +90,7 @@ function AppointmentForm({ onSave, onClose }) {
 
       <div>
         <label className="label">Services</label>
-        <div className="border border-gray-200 rounded-lg p-3 space-y-3 max-h-48 overflow-y-auto">
+        <div className="border border-gray-200 rounded-xl p-3 space-y-3 max-h-48 overflow-y-auto bg-gray-50/50">
           {categories.map(cat => (
             <div key={cat}>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">{cat}</p>
@@ -196,21 +196,21 @@ export default function Appointments() {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2 py-1.5">
-          <button onClick={() => shiftDate(-1)} className="p-1 text-gray-400 hover:text-gray-700">
+        <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl px-2 py-1.5 shadow-sm">
+          <button onClick={() => shiftDate(-1)} className="p-1 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
             <ChevronLeft className="w-4 h-4" />
           </button>
           <input
             type="date" value={date} onChange={e => setDate(e.target.value)}
-            className="text-sm border-none focus:outline-none bg-transparent"
+            className="text-sm border-none focus:outline-none bg-transparent font-medium text-gray-700"
           />
-          <button onClick={() => shiftDate(1)} className="p-1 text-gray-400 hover:text-gray-700">
+          <button onClick={() => shiftDate(1)} className="p-1 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
         <button onClick={() => setDate(todayISO())} className="btn-secondary text-xs px-3 py-2">Today</button>
         <div className="ml-auto flex gap-2">
-          <button onClick={handleWalkin} className="flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+          <button onClick={handleWalkin} className="flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97]">
             <Zap className="w-4 h-4" /> Walk-in
           </button>
           <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-1.5">

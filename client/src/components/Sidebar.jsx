@@ -4,15 +4,6 @@ import {
   ReceiptText, UserCog, Package, X, Settings,
 } from 'lucide-react';
 
-// Simple Facebook icon (lucide doesn't have one)
-function FacebookIcon({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-    </svg>
-  );
-}
-
 const links = [
   { to: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard'    },
   { to: '/appointments', icon: CalendarDays,    label: 'Appointments' },
@@ -25,58 +16,64 @@ const links = [
 ];
 
 export default function Sidebar({ open, onClose }) {
-
   return (
     <>
       {open && (
-        <div className="fixed inset-0 bg-black/40 z-20 lg:hidden" onClick={onClose} />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 lg:hidden" onClick={onClose} />
       )}
 
       <aside className={`
-        fixed top-0 left-0 h-full w-60 bg-white border-r border-gray-100 z-30 flex flex-col
-        transform transition-transform duration-200
+        fixed top-0 left-0 h-full w-64 z-30 flex flex-col
+        bg-slate-900 text-white
+        transform transition-transform duration-200 ease-in-out
         ${open ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:z-auto
       `}>
-        {/* Logo */}
-        <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-              <Scissors className="w-4 h-4 text-white" />
+        {/* Logo area */}
+        <div className="flex items-center justify-between px-5 py-5 border-b border-slate-700/60">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-900/30 flex-shrink-0">
+              <Scissors className="w-4.5 h-4.5 text-white" style={{ width: '18px', height: '18px' }} />
             </div>
-            <span className="font-bold text-gray-900 text-sm leading-tight">
-              Sukh&Sen<br />
-              <span className="font-normal text-gray-500 text-xs">Unisex Salon, Kakdwip</span>
-            </span>
+            <div>
+              <p className="font-bold text-white text-sm leading-tight">Sukh&Sen</p>
+              <p className="text-slate-400 text-xs">Unisex Salon · Kakdwip</p>
+            </div>
           </div>
-          <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="lg:hidden text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 py-4 px-3 overflow-y-auto">
+        {/* Nav links */}
+        <nav className="flex-1 py-4 px-3 overflow-y-auto space-y-0.5">
           {links.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
               to={to}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium mb-1 transition-colors ${
+                `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                   isActive
-                    ? 'bg-brand-50 text-brand-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-brand-500/20 text-brand-400 shadow-sm'
+                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`
               }
             >
-              <Icon className="w-4 h-4 flex-shrink-0" />
-              {label}
+              {({ isActive }) => (
+                <>
+                  <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-brand-400' : ''}`} />
+                  {label}
+                  {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-400" />}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
 
-        <div className="px-5 py-4 border-t border-gray-100">
-          <p className="text-xs text-gray-400">Salon Management v1.0</p>
+        {/* Footer */}
+        <div className="px-5 py-4 border-t border-slate-700/60">
+          <p className="text-xs text-slate-500">Salon Management · v1.0</p>
         </div>
       </aside>
     </>

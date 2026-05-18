@@ -41,14 +41,14 @@ function BillForm({ appointment, onSave, onClose }) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="bg-gray-50 rounded-lg p-3 text-sm">
-        <p className="font-medium text-gray-900">{appointment.customer_name}</p>
-        <p className="text-gray-500">{fmtDate(appointment.date)} at {appointment.time}</p>
+      <div className="bg-slate-50 rounded-xl p-3.5 text-sm border border-gray-100">
+        <p className="font-bold text-gray-900">{appointment.customer_name}</p>
+        <p className="text-gray-500 mt-0.5">{fmtDate(appointment.date)} at {appointment.time}</p>
       </div>
 
       <div>
         <label className="label">Services</label>
-        <div className="border border-gray-200 rounded-lg divide-y">
+        <div className="border border-gray-200 rounded-xl divide-y bg-gray-50/50">
           {items.map((item, idx) => (
             <label key={idx} className="flex items-center gap-3 px-3 py-2 cursor-pointer">
               <input type="checkbox" checked={item.selected} onChange={() => toggle(idx)}
@@ -75,7 +75,7 @@ function BillForm({ appointment, onSave, onClose }) {
       </div>
 
       {/* Total */}
-      <div className="flex items-center justify-between bg-brand-50 rounded-lg px-4 py-3">
+      <div className="flex items-center justify-between bg-brand-50 rounded-xl px-4 py-3.5 border border-brand-100">
         <span className="font-semibold text-gray-700">Total</span>
         <span className="text-xl font-bold text-brand-600">{fmtRupee(total)}</span>
       </div>
@@ -87,7 +87,7 @@ function BillForm({ appointment, onSave, onClose }) {
           <button
             type="button"
             onClick={() => setMethod('cash')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border text-sm font-medium transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97] ${
               method === 'cash' ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'
             }`}
           >
@@ -96,7 +96,7 @@ function BillForm({ appointment, onSave, onClose }) {
           <button
             type="button"
             onClick={() => setMethod('upi')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border text-sm font-medium transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97] ${
               method === 'upi' ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'
             }`}
           >
@@ -175,7 +175,7 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
           <div className="flex gap-2">
             {['cash', 'upi'].map(m => (
               <button key={m} type="button" onClick={() => setMethod(m)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97] ${
                   method === m ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'
                 }`}>
                 {m === 'cash' ? <><Banknote className="w-4 h-4" /> Cash</> : <><Smartphone className="w-4 h-4" /> UPI</>}
@@ -244,14 +244,14 @@ export default function Billing() {
         {summary && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Total Bills',   value: summary.billCount },
-              { label: 'Paid Revenue',  value: fmtRupee(summary.paidRevenue) },
-              { label: 'Cash',          value: fmtRupee(summary.cashRevenue) },
-              { label: 'UPI',           value: fmtRupee(summary.upiRevenue) },
-            ].map(({ label, value }) => (
-              <div key={label} className="bg-gray-50 rounded-lg p-3">
-                <p className="text-xs text-gray-500">{label}</p>
-                <p className="text-xl font-bold text-gray-900 mt-0.5">{value}</p>
+              { label: 'Total Bills',   value: summary.billCount,            color: 'text-gray-900' },
+              { label: 'Paid Revenue',  value: fmtRupee(summary.paidRevenue), color: 'text-brand-600' },
+              { label: 'Cash',          value: fmtRupee(summary.cashRevenue), color: 'text-emerald-600' },
+              { label: 'UPI',           value: fmtRupee(summary.upiRevenue),  color: 'text-blue-600' },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="bg-slate-50 rounded-xl p-3.5 border border-gray-100">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{label}</p>
+                <p className={`text-xl font-bold mt-1 ${color}`}>{value}</p>
               </div>
             ))}
           </div>
@@ -259,10 +259,10 @@ export default function Billing() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
         {[['unbilled', 'Generate Bill'], ['history', 'Bill History']].map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
               tab === key ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'
             }`}>
             {label} {key === 'unbilled' && unbilled.length > 0 && (
