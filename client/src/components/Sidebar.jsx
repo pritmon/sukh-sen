@@ -1,10 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, CalendarDays, Users, Scissors,
-  ReceiptText, UserCog, Package, X, Settings, Instagram,
+  ReceiptText, UserCog, Package, X, Settings,
 } from 'lucide-react';
-import { api } from '../api.js';
 
 // Simple Facebook icon (lucide doesn't have one)
 function FacebookIcon({ className }) {
@@ -27,14 +25,6 @@ const links = [
 ];
 
 export default function Sidebar({ open, onClose }) {
-  const [social, setSocial] = useState({ salon_instagram: '', salon_facebook: '' });
-
-  useEffect(() => {
-    api.settings().then(s => setSocial(s)).catch(() => {});
-  }, []);
-
-  const ig = social.salon_instagram?.replace('@', '');
-  const fb = social.salon_facebook?.replace('facebook.com/', '');
 
   return (
     <>
@@ -85,22 +75,7 @@ export default function Sidebar({ open, onClose }) {
           ))}
         </nav>
 
-        {/* Social footer */}
-        <div className="px-5 py-4 border-t border-gray-100 space-y-2">
-          {ig && (
-            <a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs text-pink-500 hover:text-pink-600 font-medium transition-colors">
-              <Instagram className="w-4 h-4" />
-              @{ig}
-            </a>
-          )}
-          {fb && (
-            <a href={`https://facebook.com/${fb}`} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors">
-              <FacebookIcon className="w-4 h-4" />
-              {fb}
-            </a>
-          )}
+        <div className="px-5 py-4 border-t border-gray-100">
           <p className="text-xs text-gray-400">Salon Management v1.0</p>
         </div>
       </aside>

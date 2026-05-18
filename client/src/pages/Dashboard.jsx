@@ -48,57 +48,36 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Date heading */}
-      <p className="text-sm text-gray-500">Today — {fmtDate(todayISO())}</p>
-
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={CalendarDays} label="Appointments" value={appointmentCount} sub="today"        color="bg-brand-500"   />
-        <StatCard icon={TrendingUp}   label="Revenue"      value={fmtRupee(revenue)} sub="paid bills" color="bg-emerald-500" />
-        <StatCard icon={UserPlus}     label="New Customers" value={newCustomers}     sub="today"       color="bg-blue-500"    />
-        <StatCard icon={Receipt}      label="Avg. Bill"    value={fmtRupee(avgBill)} sub="per bill"    color="bg-purple-500"  />
-      </div>
-
-      {/* Social media banner */}
-      {(ig || fb) && (
-        <div className="card p-4">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Follow Us</p>
-          <div className="flex flex-wrap gap-3">
+      {/* Date + social row */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500">Today — {fmtDate(todayISO())}</p>
+        {(ig || fb) && (
+          <div className="flex items-center gap-2">
             {ig && (
-              <a
-                href={`https://instagram.com/${ig}`}
-                target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-3 flex-1 min-w-[200px] rounded-xl px-4 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white hover:opacity-90 transition-opacity"
-              >
-                <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                  <Instagram className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-sm leading-tight truncate">@{ig}</p>
-                  <p className="text-xs text-white/70">Instagram</p>
-                </div>
-                <ExternalLink className="w-4 h-4 ml-auto opacity-70 flex-shrink-0" />
+              <a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white text-xs font-medium hover:opacity-90 transition-opacity">
+                <Instagram className="w-3.5 h-3.5" />
+                Instagram
               </a>
             )}
             {fb && (
-              <a
-                href={`https://facebook.com/${fb}`}
-                target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-3 flex-1 min-w-[200px] rounded-xl px-4 py-3 bg-[#1877F2] text-white hover:opacity-90 transition-opacity"
-              >
-                <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                  <FacebookIcon className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-sm leading-tight truncate">{fb}</p>
-                  <p className="text-xs text-white/70">Facebook</p>
-                </div>
-                <ExternalLink className="w-4 h-4 ml-auto opacity-70 flex-shrink-0" />
+              <a href={`https://facebook.com/${fb}`} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1877F2] text-white text-xs font-medium hover:opacity-90 transition-opacity">
+                <FacebookIcon className="w-3.5 h-3.5" />
+                Facebook
               </a>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={CalendarDays} label="Appointments"  value={appointmentCount}  sub="today"      color="bg-brand-500"   />
+        <StatCard icon={TrendingUp}   label="Revenue"       value={fmtRupee(revenue)} sub="paid bills" color="bg-emerald-500" />
+        <StatCard icon={UserPlus}     label="New Customers" value={newCustomers}       sub="today"      color="bg-blue-500"    />
+        <StatCard icon={Receipt}      label="Avg. Bill"     value={fmtRupee(avgBill)} sub="per bill"   color="bg-purple-500"  />
+      </div>
 
       {/* Today's appointments */}
       <div className="card">
