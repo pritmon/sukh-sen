@@ -11,6 +11,7 @@ const titles = {
   '/billing':      'Billing',
   '/staff':        'Staff',
   '/inventory':    'Inventory',
+  '/settings':     'Settings',
 };
 
 export default function Layout() {

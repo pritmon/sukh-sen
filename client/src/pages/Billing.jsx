@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { fmtDate, fmtRupee, todayISO } from '../utils.js';
-import { Plus, Check, Banknote, Smartphone, Eye } from 'lucide-react';
+import { fmtDate, fmtRupee, todayISO, openWhatsApp, whatsappBillMsg } from '../utils.js';
+import { Plus, Check, Banknote, Smartphone, Eye, MessageCircle } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
 function BillForm({ appointment, onSave, onClose }) {
@@ -115,7 +115,7 @@ function BillForm({ appointment, onSave, onClose }) {
   );
 }
 
-function BillDetail({ bill, onClose, onPay }) {
+function BillDetail({ bill, onClose, onPay, salonName }) {
   const [paying, setPaying] = useState(false);
   const [method, setMethod] = useState(bill.payment_method || 'cash');
 
@@ -125,12 +125,31 @@ function BillDetail({ bill, onClose, onPay }) {
     finally { setPaying(false); }
   }
 
+  function shareWhatsApp() {
+    openWhatsApp(
+      bill.customer_phone,
+      whatsappBillMsg(salonName || 'Sukh Sen Salon', bill.customer_name, bill.items || [], bill.total, bill.payment_method)
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="bg-gray-50 rounded-lg p-4 text-sm space-y-1">
-        <p className="font-medium text-gray-900 text-base">{bill.customer_name}</p>
-        <p className="text-gray-500">{fmtDate(bill.date)} at {bill.time}</p>
-        {bill.staff_name && <p className="text-gray-400">by {bill.staff_name}</p>}
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="font-medium text-gray-900 text-base">{bill.customer_name}</p>
+            <p className="text-gray-500">{fmtDate(bill.date)} at {bill.time}</p>
+            {bill.staff_name && <p className="text-gray-400">by {bill.staff_name}</p>}
+          </div>
+          {bill.customer_phone && (
+            <button
+              onClick={shareWhatsApp}
+              className="flex items-center gap-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-1">
@@ -178,13 +197,18 @@ function BillDetail({ bill, onClose, onPay }) {
 
 export default function Billing() {
   const [tab,      setTab]     = useState('unbilled');
-  const [unbilled, setUnbilled]= useState([]);
-  const [bills,    setBills]   = useState([]);
-  const [summary,  setSummary] = useState(null);
-  const [loading,  setLoading] = useState(true);
-  const [billModal,setBillModal] = useState(null);
-  const [detailModal,setDetailModal] = useState(null);
+  const [unbilled,    setUnbilled]    = useState([]);
+  const [bills,       setBills]       = useState([]);
+  const [summary,     setSummary]     = useState(null);
+  const [loading,     setLoading]     = useState(true);
+  const [billModal,   setBillModal]   = useState(null);
+  const [detailModal, setDetailModal] = useState(null);
   const [summaryDate, setSummaryDate] = useState(todayISO());
+  const [settings,    setSettings]    = useState({});
+
+  useEffect(() => {
+    api.settings().then(setSettings).catch(() => {});
+  }, []);
 
   async function loadAll() {
     setLoading(true);
@@ -309,7 +333,7 @@ export default function Billing() {
 
       {detailModal && (
         <Modal title="Bill Details" onClose={() => setDetailModal(null)}>
-          <BillDetail bill={detailModal} onClose={() => setDetailModal(null)} onPay={handlePay} />
+          <BillDetail bill={detailModal} onClose={() => setDetailModal(null)} onPay={handlePay} salonName={settings.salon_name} />
         </Modal>
       )}
     </div>

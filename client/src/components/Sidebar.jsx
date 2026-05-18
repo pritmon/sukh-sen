@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, CalendarDays, Users, Scissors,
-  ReceiptText, UserCog, Package, X,
+  ReceiptText, UserCog, Package, X, Settings, Instagram,
 } from 'lucide-react';
+import { api } from '../api.js';
 
 const links = [
   { to: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard'    },
@@ -12,39 +14,38 @@ const links = [
   { to: '/billing',      icon: ReceiptText,     label: 'Billing'      },
   { to: '/staff',        icon: UserCog,         label: 'Staff'        },
   { to: '/inventory',    icon: Package,         label: 'Inventory'    },
+  { to: '/settings',     icon: Settings,        label: 'Settings'     },
 ];
 
 export default function Sidebar({ open, onClose }) {
+  const [instagram, setInstagram] = useState('');
+
+  useEffect(() => {
+    api.settings().then(s => setInstagram(s.salon_instagram || '')).catch(() => {});
+  }, []);
+
   return (
     <>
-      {/* Overlay for mobile */}
       {open && (
-        <div
-          className="fixed inset-0 bg-black/40 z-20 lg:hidden"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/40 z-20 lg:hidden" onClick={onClose} />
       )}
 
-      <aside
-        className={`
-          fixed top-0 left-0 h-full w-60 bg-white border-r border-gray-100 z-30 flex flex-col
-          transform transition-transform duration-200
-          ${open ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:static lg:z-auto
-        `}
-      >
+      <aside className={`
+        fixed top-0 left-0 h-full w-60 bg-white border-r border-gray-100 z-30 flex flex-col
+        transform transition-transform duration-200
+        ${open ? 'translate-x-0' : '-translate-x-full'}
+        lg:translate-x-0 lg:static lg:z-auto
+      `}>
         {/* Logo */}
         <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-                <Scissors className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-gray-900 text-sm leading-tight">
-                Sukh Sen<br />
-                <span className="font-normal text-gray-500 text-xs">Salon, Kakdwip</span>
-              </span>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+              <Scissors className="w-4 h-4 text-white" />
             </div>
+            <span className="font-bold text-gray-900 text-sm leading-tight">
+              Sukh Sen<br />
+              <span className="font-normal text-gray-500 text-xs">Salon, Kakdwip</span>
+            </span>
           </div>
           <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
@@ -72,7 +73,19 @@ export default function Sidebar({ open, onClose }) {
           ))}
         </nav>
 
-        <div className="px-5 py-4 border-t border-gray-100">
+        {/* Footer */}
+        <div className="px-5 py-4 border-t border-gray-100 space-y-2">
+          {instagram && (
+            <a
+              href={`https://instagram.com/${instagram.replace('@', '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-pink-500 hover:text-pink-600 font-medium transition-colors"
+            >
+              <Instagram className="w-4 h-4" />
+              @{instagram.replace('@', '')}
+            </a>
+          )}
           <p className="text-xs text-gray-400">Salon Management v1.0</p>
         </div>
       </aside>

@@ -59,4 +59,8 @@ export const api = {
   updateInventory:  (id,d)   => put(`/inventory/${id}`, d),
   updateQty:        (id,qty) => patch(`/inventory/${id}/quantity`, { quantity: qty }),
   deleteInventory:  (id)     => del(`/inventory/${id}`),
+
+  // Settings
+  settings:        ()  => req('/settings'),
+  saveSettings:    (d) => put('/settings', d),
 };

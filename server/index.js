@@ -23,6 +23,7 @@ app.use('/api/services',     require('./routes/services'));
 app.use('/api/bills',        require('./routes/billing'));
 app.use('/api/staff',        require('./routes/staff'));
 app.use('/api/inventory',    require('./routes/inventory'));
+app.use('/api/settings',     require('./routes/settings'));
 
 // ─── Serve React build in production ────────────────────────────────────────
 if (process.env.NODE_ENV === 'production') {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { fmtDate, fmtRupee, todayISO, statusClass, statusLabel } from '../utils.js';
-import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { fmtDate, fmtRupee, todayISO, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
+import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
 function AppointmentForm({ onSave, onClose }) {
@@ -133,11 +133,16 @@ function AppointmentForm({ onSave, onClose }) {
 }
 
 export default function Appointments() {
-  const [appts,   setAppts]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [date,    setDate]    = useState(todayISO());
-  const [showNew, setShowNew] = useState(false);
-  const [error,   setError]   = useState(null);
+  const [appts,    setAppts]    = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [date,     setDate]     = useState(todayISO());
+  const [showNew,  setShowNew]  = useState(false);
+  const [error,    setError]    = useState(null);
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    api.settings().then(setSettings).catch(() => {});
+  }, []);
 
   async function load(d) {
     setLoading(true);
@@ -252,6 +257,24 @@ export default function Appointments() {
                 <span className="col-span-1 text-xs text-gray-500">{a.staff_name || '—'}</span>
                 <span className="col-span-1 text-sm text-right text-gray-700">{fmtRupee(a.total_price)}</span>
                 <div className="col-span-2 flex justify-end gap-1">
+                  {a.customer_phone && (
+                    <button
+                      title="Send WhatsApp confirmation"
+                      onClick={() => openWhatsApp(
+                        a.customer_phone,
+                        whatsappConfirmMsg(
+                          settings.salon_name || 'Sukh Sen Salon',
+                          a.customer_name,
+                          a.date,
+                          a.time,
+                          a.services?.map(s => s.name).join(', ')
+                        )
+                      )}
+                      className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                    </button>
+                  )}
                   {a.status === 'pending' && (
                     <>
                       <button

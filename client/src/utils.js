@@ -26,3 +26,25 @@ export function statusLabel(s) {
   if (s === 'cancelled') return 'Cancelled';
   return 'Pending';
 }
+
+// Open WhatsApp chat with a pre-filled message
+// phone: customer's number (10-digit Indian), message: string
+export function openWhatsApp(phone, message) {
+  if (!phone) {
+    alert('No phone number for this customer.');
+    return;
+  }
+  const num = phone.replace(/\D/g, '');
+  const e164 = num.startsWith('91') ? num : `91${num}`;
+  const url  = `https://wa.me/${e164}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+}
+
+export function whatsappConfirmMsg(salonName, customerName, date, time, services) {
+  return `Hello ${customerName},\n\nYour appointment at *${salonName}* is confirmed!\n\n📅 Date: ${fmtDate(date)}\n⏰ Time: ${time}\n✂️ Services: ${services || 'TBD'}\n\nSee you soon! 🙏`;
+}
+
+export function whatsappBillMsg(salonName, customerName, items, total, method) {
+  const list = items.map(i => `  • ${i.service_name}: ₹${i.price}`).join('\n');
+  return `Hello ${customerName},\n\nThank you for visiting *${salonName}*! 🙏\n\nHere is your bill:\n${list}\n\n💰 *Total: ₹${total}*\n💳 Payment: ${method === 'upi' ? 'UPI' : 'Cash'}\n\nHave a great day! 😊`;
+}
