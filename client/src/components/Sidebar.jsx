@@ -6,6 +6,15 @@ import {
 } from 'lucide-react';
 import { api } from '../api.js';
 
+// Simple Facebook icon (lucide doesn't have one)
+function FacebookIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
+}
+
 const links = [
   { to: '/dashboard',    icon: LayoutDashboard, label: 'Dashboard'    },
   { to: '/appointments', icon: CalendarDays,    label: 'Appointments' },
@@ -18,11 +27,14 @@ const links = [
 ];
 
 export default function Sidebar({ open, onClose }) {
-  const [instagram, setInstagram] = useState('');
+  const [social, setSocial] = useState({ salon_instagram: '', salon_facebook: '' });
 
   useEffect(() => {
-    api.settings().then(s => setInstagram(s.salon_instagram || '')).catch(() => {});
+    api.settings().then(s => setSocial(s)).catch(() => {});
   }, []);
+
+  const ig = social.salon_instagram?.replace('@', '');
+  const fb = social.salon_facebook?.replace('facebook.com/', '');
 
   return (
     <>
@@ -43,8 +55,8 @@ export default function Sidebar({ open, onClose }) {
               <Scissors className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-gray-900 text-sm leading-tight">
-              Sukh Sen<br />
-              <span className="font-normal text-gray-500 text-xs">Salon, Kakdwip</span>
+              Sukh&Sen<br />
+              <span className="font-normal text-gray-500 text-xs">Unisex Salon, Kakdwip</span>
             </span>
           </div>
           <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-gray-600">
@@ -73,17 +85,20 @@ export default function Sidebar({ open, onClose }) {
           ))}
         </nav>
 
-        {/* Footer */}
+        {/* Social footer */}
         <div className="px-5 py-4 border-t border-gray-100 space-y-2">
-          {instagram && (
-            <a
-              href={`https://instagram.com/${instagram.replace('@', '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs text-pink-500 hover:text-pink-600 font-medium transition-colors"
-            >
+          {ig && (
+            <a href={`https://instagram.com/${ig}`} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-pink-500 hover:text-pink-600 font-medium transition-colors">
               <Instagram className="w-4 h-4" />
-              @{instagram.replace('@', '')}
+              @{ig}
+            </a>
+          )}
+          {fb && (
+            <a href={`https://facebook.com/${fb}`} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors">
+              <FacebookIcon className="w-4 h-4" />
+              {fb}
             </a>
           )}
           <p className="text-xs text-gray-400">Salon Management v1.0</p>

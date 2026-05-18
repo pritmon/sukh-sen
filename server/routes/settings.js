@@ -7,6 +7,7 @@ const DEFAULTS = {
   salon_phone:      '',
   salon_whatsapp:   '',
   salon_instagram:  '',
+  salon_facebook:   '',
   salon_address:    'Kakdwip',
 };
 

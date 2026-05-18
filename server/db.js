@@ -304,6 +304,7 @@ function seed() {
     upsert.run('salon_name',      'Sukh&Sen Unisex Salon');
     upsert.run('salon_address',   'Kakdwip, West Bengal');
     upsert.run('salon_instagram', 'sukhandsenunisexsalon');
+    upsert.run('salon_facebook',  'sukhandsen');
     upsert.run('salon_phone',     '');
     upsert.run('salon_whatsapp',  '');
   }
