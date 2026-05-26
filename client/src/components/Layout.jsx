@@ -11,6 +11,8 @@ const titles = {
   '/billing':      'Billing',
   '/staff':        'Staff',
   '/inventory':    'Inventory',
+  '/reports':      'Reports',
+  '/engagement':   'Engagement',
   '/settings':     'Settings',
 };
 

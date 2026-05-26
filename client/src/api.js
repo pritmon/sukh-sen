@@ -29,9 +29,13 @@ export const api = {
   deleteAppointment:  (id)   => del(`/appointments/${id}`),
 
   // Customers
-  customers:     (q)    => req(`/customers${q ? `?q=${encodeURIComponent(q)}` : ''}`),
-  customer:      (id)   => req(`/customers/${id}`),
-  updateCustomer:(id,d) => put(`/customers/${id}`, d),
+  customers:        (q)    => req(`/customers${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  customer:         (id)   => req(`/customers/${id}`),
+  customerLookup:   (phone)=> req(`/customers/lookup?phone=${encodeURIComponent(phone)}`),
+  updateCustomer:   (id,d) => put(`/customers/${id}`, d),
+  addLoyaltyPoints: (id,d) => post(`/customers/${id}/loyalty`, d),
+  birthdays:        (days) => req(`/customers/birthdays?days=${days||7}`),
+  anniversaries:    (days) => req(`/customers/anniversaries?days=${days||7}`),
 
   // Services
   services:      ()     => req('/services'),
@@ -49,6 +53,7 @@ export const api = {
 
   // Staff
   staff:         ()     => req('/staff'),
+  staffMember:   (id)   => req(`/staff/${id}`),
   createStaff:   (d)    => post('/staff', d),
   updateStaff:   (id,d) => put(`/staff/${id}`, d),
   deleteStaff:   (id)   => del(`/staff/${id}`),
@@ -63,4 +68,8 @@ export const api = {
   // Settings
   settings:        ()  => req('/settings'),
   saveSettings:    (d) => put('/settings', d),
+
+  // Reports
+  staffPerformance: (date) => req(`/reports/staff-performance${date ? `?date=${date}` : ''}`),
+  monthlyReport:    (month)=> req(`/reports/monthly${month ? `?month=${month}` : ''}`),
 };

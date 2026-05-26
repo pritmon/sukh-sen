@@ -101,6 +101,45 @@ db.exec(`
   );
 `);
 
+// ─── Migrations (safe ALTER TABLE ADD COLUMN) ────────────────────────────
+function addCol(table, col, type) {
+  try { db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${type}`); } catch (_) {}
+}
+// customers
+addCol('customers', 'birthday',        'TEXT');
+addCol('customers', 'anniversary',     'TEXT');
+addCol('customers', 'membership_tier', "TEXT DEFAULT 'none'");
+addCol('customers', 'loyalty_points',  'INTEGER DEFAULT 0');
+addCol('customers', 'gender',          'TEXT');
+// staff CV & emergency
+addCol('staff', 'dob',                    'TEXT');
+addCol('staff', 'address',                'TEXT');
+addCol('staff', 'emergency_name',         'TEXT');
+addCol('staff', 'emergency_phone',        'TEXT');
+addCol('staff', 'emergency_relation',     'TEXT');
+addCol('staff', 'years_experience',       'INTEGER DEFAULT 0');
+addCol('staff', 'skills',                 'TEXT');
+addCol('staff', 'education',              'TEXT');
+addCol('staff', 'previous_work',          'TEXT');
+addCol('staff', 'family_details',         'TEXT');
+// bills GST
+addCol('bills', 'gst_applied', 'INTEGER DEFAULT 0');
+addCol('bills', 'gst_rate',    'REAL DEFAULT 0');
+addCol('bills', 'gst_amount',  'REAL DEFAULT 0');
+
+// loyalty_transactions table
+db.exec(`
+  CREATE TABLE IF NOT EXISTS loyalty_transactions (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER NOT NULL,
+    points      INTEGER NOT NULL,
+    type        TEXT NOT NULL,
+    note        TEXT,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+  );
+`);
+
 // ─── Seed ─────────────────────────────────────────────────────────────────
 function seed() {
   const svcCount = db.prepare('SELECT COUNT(*) as n FROM services').get().n;

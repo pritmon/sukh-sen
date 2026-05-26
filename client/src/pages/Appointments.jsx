@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { api } from '../api.js';
 import { fmtDate, fmtRupee, todayISO, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
-import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
+import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight, MessageCircle, UserCheck } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
 function AppointmentForm({ onSave, onClose }) {
-  const [services, setServices] = useState([]);
-  const [staff,    setStaff]    = useState([]);
-  const [saving,   setSaving]   = useState(false);
+  const [services,    setServices]    = useState([]);
+  const [staff,       setStaff]       = useState([]);
+  const [saving,      setSaving]      = useState(false);
+  const [recognized,  setRecognized]  = useState(null); // returning customer info
+  const [lookupTimer, setLookupTimer] = useState(null);
   const [form, setForm] = useState({
     customerName:  '',
     customerPhone: '',
@@ -26,6 +28,21 @@ function AppointmentForm({ onSave, onClose }) {
       if (st.length) setForm(f => ({ ...f, staffId: st[0].id }));
     });
   }, []);
+
+  function handlePhoneChange(phone) {
+    setForm(f => ({ ...f, customerPhone: phone }));
+    setRecognized(null);
+    clearTimeout(lookupTimer);
+    if (phone.replace(/\D/g, '').length >= 10) {
+      setLookupTimer(setTimeout(async () => {
+        const found = await api.customerLookup(phone.trim()).catch(() => null);
+        if (found) {
+          setRecognized(found);
+          setForm(f => ({ ...f, customerName: found.name }));
+        }
+      }, 400));
+    }
+  }
 
   function toggle(id) {
     setForm(f => ({
@@ -51,18 +68,28 @@ function AppointmentForm({ onSave, onClose }) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
+      {recognized && (
+        <div className="flex items-center gap-2 bg-brand-50 border border-brand-100 rounded-xl px-3.5 py-2.5">
+          <UserCheck className="w-4 h-4 text-brand-500 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-brand-700">Welcome back, {recognized.name}! 👋</p>
+            <p className="text-xs text-brand-500">{recognized.visitCount} visit{recognized.visitCount !== 1 ? 's' : ''} — no need to ask the name</p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="label">Phone</label>
+          <input className="input" value={form.customerPhone}
+            onChange={e => handlePhoneChange(e.target.value)}
+            placeholder="Mobile number" type="tel" />
+        </div>
         <div>
           <label className="label">Customer Name *</label>
           <input className="input" value={form.customerName}
             onChange={e => setForm(f => ({ ...f, customerName: e.target.value }))}
-            required placeholder="Full name" />
-        </div>
-        <div>
-          <label className="label">Phone</label>
-          <input className="input" value={form.customerPhone}
-            onChange={e => setForm(f => ({ ...f, customerPhone: e.target.value }))}
-            placeholder="Mobile number" type="tel" />
+            required placeholder={recognized ? recognized.name : 'Full name'} />
         </div>
       </div>
 

@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, CalendarDays, Users, Scissors,
   ReceiptText, UserCog, Package, X, Settings,
+  BarChart2, MessageCircle,
 } from 'lucide-react';
 
 const links = [
@@ -12,6 +13,9 @@ const links = [
   { to: '/billing',      icon: ReceiptText,     label: 'Billing'      },
   { to: '/staff',        icon: UserCog,         label: 'Staff'        },
   { to: '/inventory',    icon: Package,         label: 'Inventory'    },
+  { divider: true },
+  { to: '/reports',      icon: BarChart2,       label: 'Reports'      },
+  { to: '/engagement',   icon: MessageCircle,   label: 'Engagement'   },
   { to: '/settings',     icon: Settings,        label: 'Settings'     },
 ];
 
@@ -47,28 +51,32 @@ export default function Sidebar({ open, onClose }) {
 
         {/* Nav links */}
         <nav className="flex-1 py-4 px-3 overflow-y-auto space-y-0.5">
-          {links.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-brand-500/20 text-brand-400 shadow-sm'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-brand-400' : ''}`} />
-                  {label}
-                  {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-400" />}
-                </>
-              )}
-            </NavLink>
-          ))}
+          {links.map((item, i) => {
+            if (item.divider) return <div key={i} className="my-2 border-t border-slate-700/40" />;
+            const { to, icon: Icon, label } = item;
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                    isActive
+                      ? 'bg-brand-500/20 text-brand-400 shadow-sm'
+                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-brand-400' : ''}`} />
+                    {label}
+                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-400" />}
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
         </nav>
 
         {/* Footer */}

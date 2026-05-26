@@ -21,6 +21,62 @@ router.get('/', (req, res) => {
   }
 });
 
+// GET /api/customers/lookup?phone=  — auto-fill on appointment booking
+router.get('/lookup', (req, res) => {
+  try {
+    const { phone } = req.query;
+    if (!phone) return res.json(null);
+    const c = db.prepare('SELECT * FROM customers WHERE phone = ?').get(phone.trim());
+    if (!c) return res.json(null);
+    const visitCount = db.prepare('SELECT COUNT(*) as n FROM appointments WHERE customer_id = ?').get(c.id).n;
+    res.json({ ...c, visitCount });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/customers/birthdays?days=7  — upcoming birthdays
+router.get('/birthdays', (req, res) => {
+  try {
+    const days = Number(req.query.days) || 7;
+    const all = db.prepare('SELECT * FROM customers WHERE birthday IS NOT NULL AND birthday != ""').all();
+    const today = new Date();
+    const results = [];
+    for (const c of all) {
+      const [, mm, dd] = c.birthday.split('-');
+      const thisYear = new Date(today.getFullYear(), Number(mm) - 1, Number(dd));
+      let diff = Math.ceil((thisYear - today) / 86400000);
+      if (diff < 0) diff += 365;
+      if (diff <= days) results.push({ ...c, daysUntil: diff });
+    }
+    results.sort((a, b) => a.daysUntil - b.daysUntil);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/customers/anniversaries?days=7  — upcoming anniversaries
+router.get('/anniversaries', (req, res) => {
+  try {
+    const days = Number(req.query.days) || 7;
+    const all = db.prepare('SELECT * FROM customers WHERE anniversary IS NOT NULL AND anniversary != ""').all();
+    const today = new Date();
+    const results = [];
+    for (const c of all) {
+      const [, mm, dd] = c.anniversary.split('-');
+      const thisYear = new Date(today.getFullYear(), Number(mm) - 1, Number(dd));
+      let diff = Math.ceil((thisYear - today) / 86400000);
+      if (diff < 0) diff += 365;
+      if (diff <= days) results.push({ ...c, daysUntil: diff });
+    }
+    results.sort((a, b) => a.daysUntil - b.daysUntil);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/customers/:id  (with visit history)
 router.get('/:id', (req, res) => {
   try {
@@ -53,7 +109,11 @@ router.get('/:id', (req, res) => {
       WHERE a.customer_id = ? AND b.paid = 1
     `).get(req.params.id).total;
 
-    res.json({ ...customer, appointments, totalSpent, visitCount: appointments.length });
+    const loyaltyHistory = db.prepare(
+      'SELECT * FROM loyalty_transactions WHERE customer_id = ? ORDER BY created_at DESC LIMIT 20'
+    ).all(req.params.id);
+
+    res.json({ ...customer, appointments, totalSpent, visitCount: appointments.length, loyaltyHistory });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -62,10 +122,23 @@ router.get('/:id', (req, res) => {
 // PUT /api/customers/:id
 router.put('/:id', (req, res) => {
   try {
-    const { name, phone, email } = req.body;
-    db.prepare('UPDATE customers SET name=?, phone=?, email=? WHERE id=?')
-      .run(name, phone, email, req.params.id);
+    const { name, phone, email, birthday, anniversary, membership_tier, gender } = req.body;
+    db.prepare(`UPDATE customers SET name=?, phone=?, email=?, birthday=?, anniversary=?, membership_tier=?, gender=? WHERE id=?`)
+      .run(name, phone, email, birthday || null, anniversary || null, membership_tier || 'none', gender || null, req.params.id);
     res.json(db.prepare('SELECT * FROM customers WHERE id=?').get(req.params.id));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/customers/:id/loyalty  — add/deduct points
+router.post('/:id/loyalty', (req, res) => {
+  try {
+    const { points, type, note } = req.body; // type: 'earn' | 'redeem' | 'bonus'
+    const delta = type === 'redeem' ? -Math.abs(points) : Math.abs(points);
+    db.prepare('UPDATE customers SET loyalty_points = loyalty_points + ? WHERE id=?').run(delta, req.params.id);
+    db.prepare('INSERT INTO loyalty_transactions (customer_id, points, type, note) VALUES (?,?,?,?)').run(req.params.id, delta, type, note || null);
+    res.json(db.prepare('SELECT loyalty_points FROM customers WHERE id=?').get(req.params.id));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -5,14 +5,18 @@ import { Plus, Check, Banknote, Smartphone, Eye, MessageCircle } from 'lucide-re
 import Modal from '../components/Modal.jsx';
 
 function BillForm({ appointment, onSave, onClose }) {
-  const [items,   setItems]   = useState(
+  const [items,    setItems]    = useState(
     (appointment.services || []).map(s => ({ ...s, selected: true }))
   );
-  const [extra,   setExtra]   = useState({ name: '', price: '' });
-  const [method,  setMethod]  = useState('cash');
-  const [saving,  setSaving]  = useState(false);
+  const [extra,    setExtra]    = useState({ name: '', price: '' });
+  const [method,   setMethod]   = useState('cash');
+  const [applyGst, setApplyGst] = useState(false);
+  const [gstRate,  setGstRate]  = useState(18);
+  const [saving,   setSaving]   = useState(false);
 
-  const total = items.filter(i => i.selected).reduce((s, i) => s + Number(i.price), 0);
+  const subtotal = items.filter(i => i.selected).reduce((s, i) => s + Number(i.price), 0);
+  const gstAmt   = applyGst ? Math.round(subtotal * gstRate / 100 * 100) / 100 : 0;
+  const total    = subtotal + gstAmt;
 
   function toggle(idx) {
     setItems(prev => prev.map((item, i) => i === idx ? { ...item, selected: !item.selected } : item));
@@ -33,7 +37,7 @@ function BillForm({ appointment, onSave, onClose }) {
       price:       Number(i.price),
     }));
     try {
-      await onSave({ appointmentId: appointment.id, items: selectedItems, paymentMethod: method });
+      await onSave({ appointmentId: appointment.id, items: selectedItems, paymentMethod: method, applyGst, gstRate });
     } finally {
       setSaving(false);
     }
@@ -75,9 +79,42 @@ function BillForm({ appointment, onSave, onClose }) {
       </div>
 
       {/* Total */}
-      <div className="flex items-center justify-between bg-brand-50 rounded-xl px-4 py-3.5 border border-brand-100">
-        <span className="font-semibold text-gray-700">Total</span>
-        <span className="text-xl font-bold text-brand-600">{fmtRupee(total)}</span>
+      {/* GST toggle */}
+      <div className="space-y-2">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <div className={`w-9 h-5 rounded-full transition-colors ${applyGst ? 'bg-brand-500' : 'bg-gray-300'} relative`}
+            onClick={() => setApplyGst(g => !g)}>
+            <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${applyGst ? 'translate-x-4' : 'translate-x-0.5'}`} />
+          </div>
+          <span className="text-sm font-medium text-gray-700">Apply GST</span>
+          {applyGst && (
+            <div className="flex items-center gap-1 ml-2">
+              <input type="number" value={gstRate} min={0} max={28} step={0.5}
+                onChange={e => setGstRate(Number(e.target.value))}
+                className="input w-16 py-1 text-center text-sm" />
+              <span className="text-sm text-gray-500">%</span>
+            </div>
+          )}
+        </label>
+      </div>
+
+      {/* Total */}
+      <div className="bg-brand-50 rounded-xl px-4 py-3.5 border border-brand-100 space-y-1">
+        {applyGst && (
+          <>
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Subtotal</span><span>{fmtRupee(subtotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>GST ({gstRate}%)</span><span>{fmtRupee(gstAmt)}</span>
+            </div>
+            <div className="border-t border-brand-200 my-1" />
+          </>
+        )}
+        <div className="flex items-center justify-between">
+          <span className="font-bold text-gray-800">Total</span>
+          <span className="text-xl font-bold text-brand-600">{fmtRupee(total)}</span>
+        </div>
       </div>
 
       {/* Payment method */}
@@ -159,8 +196,19 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
             <span className="text-gray-700">{fmtRupee(item.price)}</span>
           </div>
         ))}
-        <div className="flex justify-between font-bold text-base pt-2">
-          <span>Total</span>
+        {bill.gst_applied === 1 && (
+          <>
+            <div className="flex justify-between text-sm py-1 text-gray-500">
+              <span>Subtotal</span><span>{fmtRupee(bill.subtotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm py-1 text-gray-500">
+              <span>GST ({bill.gst_rate}%)</span><span>{fmtRupee(bill.gst_amount)}</span>
+            </div>
+            <div className="border-t border-gray-100 my-1" />
+          </>
+        )}
+        <div className="flex justify-between font-bold text-base pt-1">
+          <span>Total{bill.gst_applied === 1 ? ' (incl. GST)' : ''}</span>
           <span className="text-brand-600">{fmtRupee(bill.total)}</span>
         </div>
       </div>

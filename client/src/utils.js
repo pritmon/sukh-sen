@@ -48,3 +48,15 @@ export function whatsappBillMsg(salonName, customerName, items, total, method) {
   const list = items.map(i => `  • ${i.service_name}: ₹${i.price}`).join('\n');
   return `Hello ${customerName},\n\nThank you for visiting *${salonName}*! 🙏\n\nHere is your bill:\n${list}\n\n💰 *Total: ₹${total}*\n💳 Payment: ${method === 'upi' ? 'UPI' : 'Cash'}\n\nHave a great day! 😊`;
 }
+
+export function whatsappBirthdayMsg(salonName, customerName) {
+  return `🎂 Happy Birthday ${customerName}! 🎉\n\nWishing you a wonderful day filled with joy! 🌸\n\nAs a birthday treat, visit *${salonName}* and enjoy a special discount on your next service.\n\nLooking forward to seeing you! 💕`;
+}
+
+export function whatsappAnniversaryMsg(salonName, customerName) {
+  return `💍 Happy Anniversary ${customerName}! 🥂\n\nWishing you both a beautiful celebration! 🌹\n\nTo make your special day even more memorable, *${salonName}* has a special offer waiting for you. Come in and let us pamper you! ✨`;
+}
+
+export function whatsappBroadcastMsg(salonName, customMessage) {
+  return `Hello from *${salonName}*! 🌸\n\n${customMessage}\n\nFor appointments, call or message us anytime. We look forward to seeing you! 💕`;
+}
