@@ -4,11 +4,10 @@ import { fmtRupee } from '../utils.js';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
-const EMPTY = { name: '', price: '', duration: 30, category: 'Hair' };
-const CATEGORIES = ['Hair', 'Skin', 'Wellness', 'General'];
+const EMPTY = { name: '', price: '', duration: 30, category: "Women's Styling" };
 
-function ServiceForm({ initial, onSave, onClose }) {
-  const [form,   setForm]   = useState(initial || EMPTY);
+function ServiceForm({ initial, categories, onSave, onClose }) {
+  const [form,   setForm]   = useState(initial || { ...EMPTY, category: categories[0] || EMPTY.category });
   const [saving, setSaving] = useState(false);
 
   async function submit(e) {
@@ -45,8 +44,13 @@ function ServiceForm({ initial, onSave, onClose }) {
         <label className="label">Category</label>
         <select className="input" value={form.category}
           onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
-          {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+          {categories.map(c => <option key={c}>{c}</option>)}
+          <option value="__new__">+ New category…</option>
         </select>
+        {form.category === '__new__' && (
+          <input className="input mt-2" placeholder="Type new category name"
+            onChange={e => setForm(f => ({ ...f, category: e.target.value === '__new__' ? '' : e.target.value }))} />
+        )}
       </div>
       <div className="flex justify-end gap-2 pt-2">
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
@@ -61,7 +65,7 @@ function ServiceForm({ initial, onSave, onClose }) {
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading,  setLoading]  = useState(true);
-  const [modal,    setModal]    = useState(null); // null | 'new' | service object
+  const [modal,    setModal]    = useState(null);
 
   async function load() {
     setLoading(true);
@@ -72,11 +76,8 @@ export default function Services() {
   useEffect(() => { load(); }, []);
 
   async function handleSave(form) {
-    if (modal === 'new') {
-      await api.createService(form);
-    } else {
-      await api.updateService(modal.id, form);
-    }
+    if (modal === 'new') await api.createService(form);
+    else                  await api.updateService(modal.id, form);
     setModal(null);
     load();
   }
@@ -87,7 +88,8 @@ export default function Services() {
     load();
   }
 
-  const grouped = CATEGORIES.reduce((acc, cat) => {
+  const categories = [...new Set(services.map(s => s.category))].sort();
+  const grouped = categories.reduce((acc, cat) => {
     acc[cat] = services.filter(s => s.category === cat);
     return acc;
   }, {});
@@ -101,55 +103,62 @@ export default function Services() {
       </div>
 
       {loading ? (
-        <p className="text-center text-gray-400 text-sm py-10">Loading…</p>
+        <div className="flex items-center justify-center h-32">
+          <div className="w-5 h-5 rounded-full animate-spin"
+            style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
+        </div>
+      ) : services.length === 0 ? (
+        <div className="text-center py-14" style={{ color: 'rgba(245,240,232,0.4)' }}>
+          <p className="text-sm">No services added yet</p>
+        </div>
       ) : (
         <div className="space-y-4">
-          {CATEGORIES.map(cat => {
-            const items = grouped[cat];
-            if (!items?.length) return null;
-            return (
-              <div key={cat} className="card overflow-hidden">
-                <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{cat}</h3>
-                </div>
-                <div className="divide-y divide-gray-50">
-                  {items.map(s => (
-                    <div key={s.id} className="px-5 py-3 flex items-center gap-4">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{s.name}</p>
-                        <p className="text-xs text-gray-400">{s.duration} min</p>
-                      </div>
-                      <span className="text-base font-semibold text-brand-600">{fmtRupee(s.price)}</span>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => setModal(s)}
-                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(s.id)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          {categories.map(cat => (
+            <div key={cat} className="rounded-xl overflow-hidden"
+              style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
+              <div className="px-5 py-3" style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D' }}>
+                <h3 className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.6)' }}>{cat}</h3>
               </div>
-            );
-          })}
+              <div>
+                {grouped[cat].map((s, idx) => (
+                  <div key={s.id} className="px-5 py-3 flex items-center gap-4 transition-colors"
+                    style={{ borderBottom: idx < grouped[cat].length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{s.name}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.duration} min</p>
+                    </div>
+                    <span className="text-base font-serif font-semibold" style={{ color: '#C9A84C' }}>{fmtRupee(s.price)}</span>
+                    <div className="flex gap-1">
+                      <button onClick={() => setModal(s)}
+                        className="p-1.5 rounded-lg transition-colors"
+                        style={{ color: 'rgba(201,168,76,0.5)' }}
+                        onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDelete(s.id)}
+                        className="p-1.5 rounded-lg transition-colors"
+                        style={{ color: 'rgba(239,68,68,0.5)' }}
+                        onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {modal && (
-        <Modal
-          title={modal === 'new' ? 'Add Service' : 'Edit Service'}
-          onClose={() => setModal(null)}
-        >
+        <Modal title={modal === 'new' ? 'Add Service' : 'Edit Service'} onClose={() => setModal(null)}>
           <ServiceForm
             initial={modal !== 'new' ? modal : null}
+            categories={categories}
             onSave={handleSave}
             onClose={() => setModal(null)}
           />

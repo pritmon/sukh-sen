@@ -15,7 +15,8 @@ const EMPTY = {
 function Section({ title, children }) {
   return (
     <div>
-      <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-3 pb-1 border-b border-gray-100">{title}</p>
+      <p className="text-xs font-medium uppercase tracking-widest mb-3 pb-1"
+        style={{ color: 'rgba(201,168,76,0.6)', borderBottom: '1px solid rgba(201,168,76,0.12)' }}>{title}</p>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -132,27 +133,39 @@ function StaffForm({ initial, onSave, onClose }) {
 function StaffProfile({ staff: s, onBack, onEdit }) {
   const infoRow = (label, val) => val ? (
     <div className="flex gap-2">
-      <span className="text-xs font-semibold text-gray-400 w-28 flex-shrink-0">{label}</span>
-      <span className="text-sm text-gray-800">{val}</span>
+      <span className="text-xs font-medium w-28 flex-shrink-0" style={{ color: 'rgba(201,168,76,0.5)' }}>{label}</span>
+      <span className="text-sm" style={{ color: '#F5F0E8' }}>{val}</span>
     </div>
   ) : null;
 
+  const cardStyle = { background: '#141414', border: '1px solid rgba(201,168,76,0.15)' };
+  const sectionLabel = (text, icon) => (
+    <p className="text-xs font-medium uppercase tracking-widest mb-3 flex items-center gap-1.5"
+      style={{ color: 'rgba(201,168,76,0.6)' }}>
+      {icon}{text}
+    </p>
+  );
+
   return (
     <div className="space-y-5">
-      <button onClick={onBack} className="flex items-center gap-1 text-sm text-brand-600 hover:underline">
-        <ArrowLeft className="w-4 h-4" /> Back
+      <button onClick={onBack} className="flex items-center gap-1.5 text-sm transition-colors"
+        style={{ color: 'rgba(201,168,76,0.6)' }}
+        onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.6)'}>
+        <ArrowLeft className="w-4 h-4" /> Back to Staff
       </button>
 
       {/* Header */}
-      <div className="card p-5 flex items-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-brand-500 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+      <div className="p-5 rounded-xl flex items-center gap-4" style={cardStyle}>
+        <div className="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-xl flex-shrink-0"
+          style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A' }}>
           {s.name[0]}
         </div>
         <div className="flex-1">
-          <h2 className="text-lg font-bold text-gray-900">{s.name}</h2>
-          <p className="text-sm font-semibold text-brand-600">{s.role}</p>
+          <h2 className="font-serif text-lg font-semibold" style={{ color: '#F5F0E8' }}>{s.name}</h2>
+          <p className="text-sm font-medium mt-0.5" style={{ color: '#C9A84C' }}>{s.role}</p>
           {s.years_experience > 0 && (
-            <p className="text-xs text-gray-400 mt-0.5">{s.years_experience} yr{s.years_experience !== 1 ? 's' : ''} experience</p>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.years_experience} yr{s.years_experience !== 1 ? 's' : ''} experience</p>
           )}
         </div>
         <button onClick={() => onEdit(s)} className="btn-secondary flex items-center gap-1.5">
@@ -162,47 +175,45 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Contact */}
-        <div className="card p-5 space-y-2">
-          <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-3">Contact</p>
+        <div className="p-5 rounded-xl space-y-2" style={cardStyle}>
+          {sectionLabel('Contact')}
           {infoRow('Phone', s.phone)}
           {infoRow('Date of Birth', s.dob)}
           {infoRow('Address', s.address)}
         </div>
 
         {/* Emergency */}
-        <div className="card p-5 space-y-2">
-          <p className="text-xs font-bold text-red-500 uppercase tracking-widest mb-3 flex items-center gap-1">
-            <AlertCircle className="w-3.5 h-3.5" /> Emergency Contact
-          </p>
+        <div className="p-5 rounded-xl space-y-2" style={cardStyle}>
+          {sectionLabel('Emergency Contact', <AlertCircle className="w-3.5 h-3.5" style={{ color: '#f87171' }} />)}
           {s.emergency_name ? (
             <>
               {infoRow('Name', s.emergency_name)}
               {infoRow('Relation', s.emergency_relation)}
               {s.emergency_phone && (
                 <a href={`tel:${s.emergency_phone}`}
-                  className="flex items-center gap-2 text-sm font-semibold text-brand-600 hover:underline mt-1">
+                  className="flex items-center gap-2 text-sm font-medium mt-1"
+                  style={{ color: '#C9A84C' }}>
                   <Phone className="w-3.5 h-3.5" /> {s.emergency_phone}
                 </a>
               )}
             </>
           ) : (
-            <p className="text-xs text-gray-400">Not set</p>
+            <p className="text-xs" style={{ color: 'rgba(245,240,232,0.3)' }}>Not set</p>
           )}
         </div>
 
         {/* Professional */}
-        <div className="card p-5 space-y-2">
-          <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-3 flex items-center gap-1">
-            <BookOpen className="w-3.5 h-3.5" /> Professional Profile
-          </p>
+        <div className="p-5 rounded-xl space-y-2" style={cardStyle}>
+          {sectionLabel('Professional Profile', <BookOpen className="w-3.5 h-3.5" />)}
           {infoRow('Experience', s.years_experience ? `${s.years_experience} years` : null)}
           {infoRow('Education', s.education)}
           {s.skills && (
             <div>
-              <p className="text-xs font-semibold text-gray-400 mb-1">Skills</p>
+              <p className="text-xs font-medium mb-2" style={{ color: 'rgba(201,168,76,0.5)' }}>Skills</p>
               <div className="flex flex-wrap gap-1.5">
                 {s.skills.split(',').map(sk => (
-                  <span key={sk} className="px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 text-xs font-medium border border-brand-100">
+                  <span key={sk} className="px-2 py-0.5 rounded-full text-xs font-medium"
+                    style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' }}>
                     {sk.trim()}
                   </span>
                 ))}
@@ -211,19 +222,17 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
           )}
           {s.previous_work && (
             <div>
-              <p className="text-xs font-semibold text-gray-400 mb-1">Previous Work</p>
-              <p className="text-sm text-gray-700 whitespace-pre-line">{s.previous_work}</p>
+              <p className="text-xs font-medium mb-1" style={{ color: 'rgba(201,168,76,0.5)' }}>Previous Work</p>
+              <p className="text-sm whitespace-pre-line" style={{ color: 'rgba(245,240,232,0.7)' }}>{s.previous_work}</p>
             </div>
           )}
         </div>
 
         {/* Family */}
         {s.family_details && (
-          <div className="card p-5">
-            <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-3 flex items-center gap-1">
-              <Users className="w-3.5 h-3.5" /> Family
-            </p>
-            <p className="text-sm text-gray-700 whitespace-pre-line">{s.family_details}</p>
+          <div className="p-5 rounded-xl" style={cardStyle}>
+            {sectionLabel('Family', <Users className="w-3.5 h-3.5" />)}
+            <p className="text-sm whitespace-pre-line" style={{ color: 'rgba(245,240,232,0.7)' }}>{s.family_details}</p>
           </div>
         )}
       </div>
@@ -272,33 +281,45 @@ export default function Staff() {
 
       {loading ? (
         <div className="flex items-center justify-center h-32">
-          <div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 rounded-full animate-spin"
+            style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
         </div>
       ) : staff.length === 0 ? (
-        <p className="text-center text-gray-400 text-sm py-10">No staff members added</p>
+        <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.4)' }}>No staff members added</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {staff.map(s => (
-            <div key={s.id} className="card-hover p-5 cursor-pointer" onClick={() => setSelected(s)}>
+            <div key={s.id} className="p-5 rounded-xl cursor-pointer transition-all duration-200"
+              style={{ background: '#141414', border: '1px solid rgba(201,168,76,0.15)' }}
+              onClick={() => setSelected(s)}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.35)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.15)'}>
               <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl bg-brand-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-lg flex-shrink-0"
+                  style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A' }}>
                   {s.name[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-gray-900">{s.name}</p>
-                  <p className="text-xs font-semibold text-brand-600">{s.role}</p>
+                  <p className="font-semibold" style={{ color: '#F5F0E8' }}>{s.name}</p>
+                  <p className="text-xs font-medium mt-0.5" style={{ color: '#C9A84C' }}>{s.role}</p>
                   {s.years_experience > 0 && (
-                    <p className="text-xs text-gray-400 mt-0.5">{s.years_experience} yr exp</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.years_experience} yr exp</p>
                   )}
-                  {s.phone && <p className="text-xs text-gray-400 mt-0.5">{s.phone}</p>}
+                  {s.phone && <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.phone}</p>}
                 </div>
                 <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                   <button onClick={() => setModal(s)}
-                    className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg">
+                    className="p-1.5 rounded-lg transition-colors"
+                    style={{ color: 'rgba(201,168,76,0.5)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => handleDelete(s.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg">
+                    className="p-1.5 rounded-lg transition-colors"
+                    style={{ color: 'rgba(239,68,68,0.5)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -306,14 +327,16 @@ export default function Staff() {
               {s.skills && (
                 <div className="flex flex-wrap gap-1 mt-3">
                   {s.skills.split(',').slice(0, 3).map(sk => (
-                    <span key={sk} className="px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 text-xs font-medium">
+                    <span key={sk} className="px-2 py-0.5 rounded-full text-xs font-medium"
+                      style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' }}>
                       {sk.trim()}
                     </span>
                   ))}
                 </div>
               )}
               {s.emergency_name && (
-                <div className="mt-3 flex items-center gap-1.5 text-xs text-red-500 bg-red-50 rounded-lg px-2.5 py-1.5">
+                <div className="mt-3 flex items-center gap-1.5 text-xs rounded-lg px-2.5 py-1.5"
+                  style={{ color: '#f87171', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
                   <AlertCircle className="w-3 h-3" />
                   Emergency: {s.emergency_name} · {s.emergency_phone}
                 </div>
