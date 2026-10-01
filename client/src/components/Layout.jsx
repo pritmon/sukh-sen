@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { Menu, Scissors } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import Sidebar from './Sidebar.jsx';
 
 const titles = {
@@ -22,19 +22,28 @@ export default function Layout() {
   const title = titles[location.pathname] || 'Sukh&Sen';
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div className="flex h-screen overflow-hidden" style={{ background: '#0A0A0A' }}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top bar */}
-        <header className="bg-white border-b border-gray-100 px-5 py-3.5 flex items-center gap-3 flex-shrink-0 shadow-sm">
+        <header className="px-5 py-4 flex items-center gap-3 flex-shrink-0"
+          style={{
+            background: '#0A0A0A',
+            borderBottom: '1px solid rgba(201, 168, 76, 0.1)',
+          }}>
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-gray-500 hover:text-gray-700 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-1.5 rounded-lg transition-colors"
+            style={{ color: 'rgba(201, 168, 76, 0.6)' }}
           >
             <Menu className="w-5 h-5" />
           </button>
-          <h1 className="text-base font-bold text-gray-900 tracking-tight">{title}</h1>
+          <h1 className="font-serif text-base font-semibold tracking-wide" style={{ color: '#F5F0E8' }}>{title}</h1>
+          <div className="ml-auto flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#C9A84C', boxShadow: '0 0 6px rgba(201, 168, 76, 0.8)' }} />
+            <span className="text-xs" style={{ color: 'rgba(201, 168, 76, 0.5)' }}>Live</span>
+          </div>
         </header>
 
         {/* Page content */}

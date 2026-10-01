@@ -1,50 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  * { font-family: 'Poppins', sans-serif; }
-  body { @apply bg-slate-50 text-gray-800 antialiased; }
-  h1, h2, h3 { @apply tracking-tight; }
+  * { font-family: 'Inter', system-ui, sans-serif; }
+  body {
+    background-color: #0A0A0A;
+    color: #F5F0E8;
+    @apply antialiased;
+  }
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    @apply tracking-tight;
+  }
 }
 
 @layer components {
   /* Buttons */
   .btn-primary {
-    @apply bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white px-4 py-2 rounded-xl
-           text-sm font-semibold transition-all duration-150 shadow-sm hover:shadow-md active:scale-[0.97]
-           focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-1;
+    @apply bg-gold-shimmer text-obsidian-900 px-4 py-2 rounded-lg
+           text-sm font-semibold transition-all duration-200 shadow-gold-sm
+           hover:shadow-gold hover:scale-[1.02] active:scale-[0.98]
+           focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-1 focus:ring-offset-obsidian-900;
+    background: linear-gradient(135deg, #C9A84C 0%, #E8C96D 50%, #C9A84C 100%);
   }
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 border border-gray-200
-           px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 shadow-sm
-           hover:shadow active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-gray-300;
+    @apply border border-gold-600/40 text-gold-300 px-4 py-2 rounded-lg
+           text-sm font-medium transition-all duration-200
+           hover:border-gold-500/70 hover:bg-gold-500/10 active:scale-[0.98]
+           focus:outline-none focus:ring-1 focus:ring-gold-600;
   }
   .btn-danger {
-    @apply bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 border border-red-200
-           px-4 py-2 rounded-xl text-sm font-medium transition-all duration-150 active:scale-[0.97];
+    @apply border border-red-800/50 text-red-400 px-4 py-2 rounded-lg
+           text-sm font-medium transition-all duration-200
+           hover:bg-red-900/20 active:scale-[0.98];
   }
   .btn-ghost {
-    @apply text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1.5 rounded-lg
+    @apply text-obsidian-300 hover:text-gold-300 hover:bg-obsidian-800 px-3 py-1.5 rounded-lg
            text-sm font-medium transition-all duration-150;
   }
 
   /* Cards */
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-100/80 overflow-hidden;
+    background: #141414;
+    border: 1px solid rgba(201, 168, 76, 0.15);
+    @apply rounded-xl overflow-hidden;
   }
   .card-hover {
-    @apply card hover:shadow-md hover:-translate-y-0.5 transition-all duration-200;
+    @apply card hover:border-gold-500/30 hover:shadow-gold transition-all duration-300;
   }
 
   /* Form elements */
   .input {
-    @apply w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-white
-           focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent
-           placeholder:text-gray-400 transition-shadow duration-150;
+    background: #1A1A1A;
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    color: #F5F0E8;
+    @apply w-full rounded-lg px-3.5 py-2.5 text-sm
+           focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500/50
+           placeholder:text-obsidian-400 transition-all duration-150;
   }
   .label {
-    @apply block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide;
+    @apply block text-xs font-medium text-gold-500/80 mb-1.5 uppercase tracking-widest;
   }
   select.input {
     @apply cursor-pointer;
@@ -53,33 +71,42 @@
     @apply resize-none;
   }
 
-  /* Badges / Status pills */
+  /* Badges */
   .badge-pending {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-           bg-amber-100 text-amber-700 border border-amber-200;
+           bg-amber-900/30 text-amber-400 border border-amber-700/40;
   }
   .badge-done {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-           bg-emerald-100 text-emerald-700 border border-emerald-200;
+           bg-emerald-900/30 text-emerald-400 border border-emerald-700/40;
   }
   .badge-cancelled {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-           bg-red-100 text-red-600 border border-red-200;
+           bg-red-900/30 text-red-400 border border-red-800/40;
   }
 
   /* Table */
   .table-header {
-    @apply text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3 text-left bg-gray-50/80;
+    @apply text-xs font-medium text-gold-600/70 uppercase tracking-widest px-4 py-3 text-left;
+    background: #111111;
   }
   .table-cell {
-    @apply px-4 py-3 text-sm text-gray-700;
+    @apply px-4 py-3 text-sm text-obsidian-100;
   }
   .table-row {
-    @apply border-b border-gray-50 hover:bg-gray-50/50 transition-colors duration-100;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.06);
+    @apply hover:bg-gold-500/5 transition-colors duration-100;
   }
 
-  /* Page section header */
+  /* Section title */
   .section-title {
-    @apply text-base font-bold text-gray-900;
+    font-family: 'Playfair Display', Georgia, serif;
+    @apply text-base font-semibold text-cream;
+  }
+
+  /* Gold divider */
+  .gold-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.4), transparent);
   }
 }
