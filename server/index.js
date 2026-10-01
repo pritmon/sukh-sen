@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
+const fs      = require('fs');
 
 // Init DB (runs migrations + seed)
 require('./db');
@@ -14,6 +15,19 @@ app.use(cors({
     : ['http://localhost:5173', 'http://localhost:3000'],
 }));
 app.use(express.json());
+
+// ─── Health check ────────────────────────────────────────────────────────────
+app.get('/api/health', (req, res) => {
+  const distPath = path.join(__dirname, '../client/dist');
+  const indexPath = path.join(distPath, 'index.html');
+  res.json({
+    status: 'ok',
+    env: process.env.NODE_ENV,
+    distExists: fs.existsSync(distPath),
+    indexExists: fs.existsSync(indexPath),
+    distPath,
+  });
+});
 
 // ─── API Routes ─────────────────────────────────────────────────────────────
 app.use('/api/dashboard',    require('./routes/dashboard'));
@@ -31,7 +45,13 @@ if (process.env.NODE_ENV === 'production') {
   const dist = path.join(__dirname, '../client/dist');
   app.use(express.static(dist));
   app.get('*', (req, res) => {
-    res.sendFile(path.join(dist, 'index.html'));
+    const indexPath = path.join(dist, 'index.html');
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('sendFile error:', err.message, '| path:', indexPath);
+        res.status(500).json({ error: 'Frontend not built', path: indexPath });
+      }
+    });
   });
 }
 
