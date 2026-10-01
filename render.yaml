@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: sukhandsen-salon
+    name: sukhandsen
     env: node
     buildCommand: npm install && npm run build
     startCommand: npm start
