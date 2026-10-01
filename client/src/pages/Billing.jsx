@@ -45,26 +45,26 @@ function BillForm({ appointment, onSave, onClose }) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="bg-slate-50 rounded-xl p-3.5 text-sm border border-gray-100">
-        <p className="font-bold text-gray-900">{appointment.customer_name}</p>
-        <p className="text-gray-500 mt-0.5">{fmtDate(appointment.date)} at {appointment.time}</p>
+      <div className="rounded-xl p-3.5 text-sm" style={{ background: '#0D0D0D', border: '1px solid rgba(201,168,76,0.12)' }}>
+        <p className="font-semibold font-serif" style={{ color: '#F5F0E8' }}>{appointment.customer_name}</p>
+        <p className="mt-0.5" style={{ color: 'rgba(245,240,232,0.4)' }}>{fmtDate(appointment.date)} at {appointment.time}</p>
       </div>
 
       <div>
         <label className="label">Services</label>
-        <div className="border border-gray-200 rounded-xl divide-y bg-gray-50/50">
+        <div className="rounded-xl divide-y" style={{ border: '1px solid rgba(201,168,76,0.12)', background: '#0D0D0D' }}>
           {items.map((item, idx) => (
-            <label key={idx} className="flex items-center gap-3 px-3 py-2 cursor-pointer">
+            <label key={idx} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer"
+              style={{ borderColor: 'rgba(201,168,76,0.06)' }}>
               <input type="checkbox" checked={item.selected} onChange={() => toggle(idx)}
-                className="rounded border-gray-300 text-brand-500" />
-              <span className="flex-1 text-sm text-gray-700">{item.name}</span>
-              <span className="text-sm text-gray-700">{fmtRupee(item.price)}</span>
+                className="rounded" style={{ accentColor: '#C9A84C' }} />
+              <span className="flex-1 text-sm" style={{ color: item.selected ? '#F5F0E8' : 'rgba(245,240,232,0.4)' }}>{item.name}</span>
+              <span className="text-sm font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(item.price)}</span>
             </label>
           ))}
         </div>
       </div>
 
-      {/* Add extra item */}
       <div>
         <label className="label">Add Extra Item</label>
         <div className="flex gap-2">
@@ -78,42 +78,43 @@ function BillForm({ appointment, onSave, onClose }) {
         </div>
       </div>
 
-      {/* Total */}
       {/* GST toggle */}
       <div className="space-y-2">
         <label className="flex items-center gap-3 cursor-pointer">
-          <div className={`w-9 h-5 rounded-full transition-colors ${applyGst ? 'bg-brand-500' : 'bg-gray-300'} relative`}
+          <div className="w-9 h-5 rounded-full relative cursor-pointer transition-colors"
+            style={{ background: applyGst ? '#C9A84C' : 'rgba(255,255,255,0.15)' }}
             onClick={() => setApplyGst(g => !g)}>
-            <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${applyGst ? 'translate-x-4' : 'translate-x-0.5'}`} />
+            <div className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform"
+              style={{ transform: applyGst ? 'translateX(16px)' : 'translateX(2px)' }} />
           </div>
-          <span className="text-sm font-medium text-gray-700">Apply GST</span>
+          <span className="text-sm font-medium" style={{ color: '#F5F0E8' }}>Apply GST</span>
           {applyGst && (
             <div className="flex items-center gap-1 ml-2">
               <input type="number" value={gstRate} min={0} max={28} step={0.5}
                 onChange={e => setGstRate(Number(e.target.value))}
                 className="input w-16 py-1 text-center text-sm" />
-              <span className="text-sm text-gray-500">%</span>
+              <span className="text-sm" style={{ color: 'rgba(245,240,232,0.4)' }}>%</span>
             </div>
           )}
         </label>
       </div>
 
       {/* Total */}
-      <div className="bg-brand-50 rounded-xl px-4 py-3.5 border border-brand-100 space-y-1">
+      <div className="rounded-xl px-4 py-3.5 space-y-1" style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.2)' }}>
         {applyGst && (
           <>
-            <div className="flex justify-between text-sm text-gray-600">
+            <div className="flex justify-between text-sm" style={{ color: 'rgba(245,240,232,0.5)' }}>
               <span>Subtotal</span><span>{fmtRupee(subtotal)}</span>
             </div>
-            <div className="flex justify-between text-sm text-gray-600">
+            <div className="flex justify-between text-sm" style={{ color: 'rgba(245,240,232,0.5)' }}>
               <span>GST ({gstRate}%)</span><span>{fmtRupee(gstAmt)}</span>
             </div>
-            <div className="border-t border-brand-200 my-1" />
+            <div className="my-1" style={{ borderTop: '1px solid rgba(201,168,76,0.15)' }} />
           </>
         )}
         <div className="flex items-center justify-between">
-          <span className="font-bold text-gray-800">Total</span>
-          <span className="text-xl font-bold text-brand-600">{fmtRupee(total)}</span>
+          <span className="font-semibold" style={{ color: '#F5F0E8' }}>Total</span>
+          <span className="text-xl font-bold font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(total)}</span>
         </div>
       </div>
 
@@ -121,24 +122,15 @@ function BillForm({ appointment, onSave, onClose }) {
       <div>
         <label className="label">Payment Method</label>
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setMethod('cash')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97] ${
-              method === 'cash' ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'
-            }`}
-          >
-            <Banknote className="w-4 h-4" /> Cash
-          </button>
-          <button
-            type="button"
-            onClick={() => setMethod('upi')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97] ${
-              method === 'upi' ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'
-            }`}
-          >
-            <Smartphone className="w-4 h-4" /> UPI
-          </button>
+          {['cash', 'upi'].map(m => (
+            <button key={m} type="button" onClick={() => setMethod(m)}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97]"
+              style={method === m
+                ? { background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A', borderColor: '#C9A84C' }
+                : { background: '#1A1A1A', color: 'rgba(245,240,232,0.5)', borderColor: 'rgba(201,168,76,0.15)' }}>
+              {m === 'cash' ? <><Banknote className="w-4 h-4" /> Cash</> : <><Smartphone className="w-4 h-4" /> UPI</>}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -171,50 +163,51 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-50 rounded-lg p-4 text-sm space-y-1">
+      <div className="rounded-xl p-4 text-sm" style={{ background: '#0D0D0D', border: '1px solid rgba(201,168,76,0.12)' }}>
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-medium text-gray-900 text-base">{bill.customer_name}</p>
-            <p className="text-gray-500">{fmtDate(bill.date)} at {bill.time}</p>
-            {bill.staff_name && <p className="text-gray-400">by {bill.staff_name}</p>}
+            <p className="font-semibold font-serif text-base" style={{ color: '#F5F0E8' }}>{bill.customer_name}</p>
+            <p className="mt-0.5" style={{ color: 'rgba(245,240,232,0.4)' }}>{fmtDate(bill.date)} at {bill.time}</p>
+            {bill.staff_name && <p style={{ color: 'rgba(245,240,232,0.3)' }}>by {bill.staff_name}</p>}
           </div>
           {bill.customer_phone && (
-            <button
-              onClick={shareWhatsApp}
-              className="flex items-center gap-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-            >
+            <button onClick={shareWhatsApp}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+              style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.2)' }}>
               <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
             </button>
           )}
         </div>
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-0">
         {(bill.items || []).map((item, i) => (
-          <div key={i} className="flex justify-between text-sm py-1.5 border-b border-gray-50">
-            <span className="text-gray-700">{item.service_name}</span>
-            <span className="text-gray-700">{fmtRupee(item.price)}</span>
+          <div key={i} className="flex justify-between text-sm py-2"
+            style={{ borderBottom: '1px solid rgba(201,168,76,0.06)' }}>
+            <span style={{ color: 'rgba(245,240,232,0.7)' }}>{item.service_name}</span>
+            <span className="font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(item.price)}</span>
           </div>
         ))}
         {bill.gst_applied === 1 && (
           <>
-            <div className="flex justify-between text-sm py-1 text-gray-500">
+            <div className="flex justify-between text-sm py-1.5" style={{ color: 'rgba(245,240,232,0.4)' }}>
               <span>Subtotal</span><span>{fmtRupee(bill.subtotal)}</span>
             </div>
-            <div className="flex justify-between text-sm py-1 text-gray-500">
+            <div className="flex justify-between text-sm py-1.5" style={{ color: 'rgba(245,240,232,0.4)' }}>
               <span>GST ({bill.gst_rate}%)</span><span>{fmtRupee(bill.gst_amount)}</span>
             </div>
-            <div className="border-t border-gray-100 my-1" />
+            <div className="my-1" style={{ borderTop: '1px solid rgba(201,168,76,0.15)' }} />
           </>
         )}
-        <div className="flex justify-between font-bold text-base pt-1">
-          <span>Total{bill.gst_applied === 1 ? ' (incl. GST)' : ''}</span>
-          <span className="text-brand-600">{fmtRupee(bill.total)}</span>
+        <div className="flex justify-between font-bold text-base pt-2">
+          <span style={{ color: '#F5F0E8' }}>Total{bill.gst_applied === 1 ? ' (incl. GST)' : ''}</span>
+          <span className="font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(bill.total)}</span>
         </div>
       </div>
 
       {bill.paid ? (
-        <div className="flex items-center gap-2 bg-green-50 text-green-700 rounded-lg px-4 py-3 text-sm font-medium">
+        <div className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium"
+          style={{ background: 'rgba(34,197,94,0.08)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.15)' }}>
           <Check className="w-4 h-4" />
           Paid via {bill.payment_method === 'upi' ? 'UPI' : 'Cash'}
         </div>
@@ -223,9 +216,10 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
           <div className="flex gap-2">
             {['cash', 'upi'].map(m => (
               <button key={m} type="button" onClick={() => setMethod(m)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97] ${
-                  method === m ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200'
-                }`}>
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97]"
+                style={method === m
+                  ? { background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A', borderColor: '#C9A84C' }
+                  : { background: '#1A1A1A', color: 'rgba(245,240,232,0.5)', borderColor: 'rgba(201,168,76,0.15)' }}>
                 {m === 'cash' ? <><Banknote className="w-4 h-4" /> Cash</> : <><Smartphone className="w-4 h-4" /> UPI</>}
               </button>
             ))}
@@ -280,26 +274,30 @@ export default function Billing() {
     loadAll();
   }
 
+  const cardStyle = { background: '#111111', border: '1px solid rgba(201,168,76,0.15)' };
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 max-w-3xl">
       {/* Summary */}
-      <div className="card p-5">
+      <div className="p-5 rounded-xl" style={cardStyle}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-900 text-sm">Daily Revenue</h2>
+          <h2 className="font-serif font-semibold" style={{ color: '#F5F0E8' }}>Daily Revenue</h2>
           <input type="date" value={summaryDate} onChange={e => setSummaryDate(e.target.value)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            className="text-sm rounded-lg px-3 py-1.5 focus:outline-none"
+            style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)', color: '#F5F0E8', colorScheme: 'dark' }} />
         </div>
         {summary && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: 'Total Bills',   value: summary.billCount,            color: 'text-gray-900' },
-              { label: 'Paid Revenue',  value: fmtRupee(summary.paidRevenue), color: 'text-brand-600' },
-              { label: 'Cash',          value: fmtRupee(summary.cashRevenue), color: 'text-emerald-600' },
-              { label: 'UPI',           value: fmtRupee(summary.upiRevenue),  color: 'text-blue-600' },
-            ].map(({ label, value, color }) => (
-              <div key={label} className="bg-slate-50 rounded-xl p-3.5 border border-gray-100">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{label}</p>
-                <p className={`text-xl font-bold mt-1 ${color}`}>{value}</p>
+              { label: 'Total Bills',  value: summary.billCount },
+              { label: 'Paid Revenue', value: fmtRupee(summary.paidRevenue) },
+              { label: 'Cash',         value: fmtRupee(summary.cashRevenue) },
+              { label: 'UPI',          value: fmtRupee(summary.upiRevenue) },
+            ].map(({ label, value }) => (
+              <div key={label} className="rounded-xl p-3.5"
+                style={{ background: '#0D0D0D', border: '1px solid rgba(201,168,76,0.1)' }}>
+                <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.5)' }}>{label}</p>
+                <p className="text-xl font-serif font-semibold mt-1" style={{ color: '#C9A84C' }}>{value}</p>
               </div>
             ))}
           </div>
@@ -307,34 +305,41 @@ export default function Billing() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 rounded-xl p-1 w-fit" style={{ background: '#161616', border: '1px solid rgba(201,168,76,0.12)' }}>
         {[['unbilled', 'Generate Bill'], ['history', 'Bill History']].map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              tab === key ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'
-            }`}>
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            style={tab === key
+              ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.25)' }
+              : { color: 'rgba(245,240,232,0.4)', border: '1px solid transparent' }}>
             {label} {key === 'unbilled' && unbilled.length > 0 && (
-              <span className="ml-1 bg-brand-500 text-white rounded-full px-1.5 py-0.5 text-xs">{unbilled.length}</span>
+              <span className="ml-1 rounded-full px-1.5 py-0.5 text-xs"
+                style={{ background: '#C9A84C', color: '#0A0A0A' }}>{unbilled.length}</span>
             )}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <p className="text-center text-gray-400 text-sm py-10">Loading…</p>
+        <div className="flex items-center justify-center py-10">
+          <div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
+        </div>
       ) : tab === 'unbilled' ? (
-        <div className="card overflow-hidden">
+        <div className="rounded-xl overflow-hidden" style={cardStyle}>
           {unbilled.length === 0 ? (
-            <p className="text-center text-gray-400 text-sm py-10">No unbilled appointments</p>
+            <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.35)' }}>No unbilled appointments</p>
           ) : (
-            <div className="divide-y divide-gray-50">
-              {unbilled.map(a => (
-                <div key={a.id} className="px-5 py-3 flex items-center gap-4">
+            <div>
+              {unbilled.map((a, idx) => (
+                <div key={a.id} className="px-5 py-3 flex items-center gap-4 transition-colors"
+                  style={{ borderBottom: idx < unbilled.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{a.customer_name}</p>
-                    <p className="text-xs text-gray-400">{fmtDate(a.date)} at {a.time} · {a.services?.map(s => s.name).join(', ') || '—'}</p>
+                    <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
+                    <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{fmtDate(a.date)} at {a.time} · {a.services?.map(s => s.name).join(', ') || '—'}</p>
                   </div>
-                  <span className="text-sm text-gray-700">{fmtRupee(a.total_price)}</span>
+                  <span className="text-sm font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(a.total_price)}</span>
                   <button onClick={() => setBillModal(a)} className="btn-primary flex items-center gap-1.5">
                     <Plus className="w-4 h-4" /> Bill
                   </button>
@@ -344,26 +349,31 @@ export default function Billing() {
           )}
         </div>
       ) : (
-        <div className="card overflow-hidden">
+        <div className="rounded-xl overflow-hidden" style={cardStyle}>
           {bills.length === 0 ? (
-            <p className="text-center text-gray-400 text-sm py-10">No bills yet</p>
+            <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.35)' }}>No bills yet</p>
           ) : (
-            <div className="divide-y divide-gray-50">
-              {bills.map(b => (
-                <div key={b.id} className="px-5 py-3 flex items-center gap-4">
+            <div>
+              {bills.map((b, idx) => (
+                <div key={b.id} className="px-5 py-3 flex items-center gap-4 transition-colors"
+                  style={{ borderBottom: idx < bills.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{b.customer_name}</p>
-                    <p className="text-xs text-gray-400">{fmtDate(b.date)} · {b.staff_name || 'Unassigned'}</p>
+                    <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{b.customer_name}</p>
+                    <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{fmtDate(b.date)} · {b.staff_name || 'Unassigned'}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-gray-900">{fmtRupee(b.total)}</p>
-                    <p className="text-xs text-gray-400">{b.payment_method?.toUpperCase()}</p>
+                    <p className="text-sm font-serif font-semibold" style={{ color: '#C9A84C' }}>{fmtRupee(b.total)}</p>
+                    <p className="text-xs" style={{ color: 'rgba(245,240,232,0.3)' }}>{b.payment_method?.toUpperCase()}</p>
                   </div>
                   <span className={b.paid ? 'badge-done' : 'badge-pending'}>
                     {b.paid ? 'Paid' : 'Unpaid'}
                   </span>
                   <button onClick={async () => setDetailModal(await api.bill(b.id))}
-                    className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg">
+                    className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(201,168,76,0.5)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
                     <Eye className="w-4 h-4" />
                   </button>
                 </div>

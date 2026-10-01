@@ -6,6 +6,8 @@ import Modal from '../components/Modal.jsx';
 const EMPTY = { name: '', quantity: 0, threshold: 5, unit: 'pcs', category: 'General' };
 const CATEGORIES = ['Hair Care', 'Hair Colour', 'Skin Care', 'Shaving', 'General'];
 
+const cardStyle = { background: '#111111', border: '1px solid rgba(201,168,76,0.15)' };
+
 function InventoryForm({ initial, onSave, onClose }) {
   const [form,   setForm]   = useState(initial || EMPTY);
   const [saving, setSaving] = useState(false);
@@ -14,11 +16,7 @@ function InventoryForm({ initial, onSave, onClose }) {
     e.preventDefault();
     setSaving(true);
     try {
-      await onSave({
-        ...form,
-        quantity:  Number(form.quantity),
-        threshold: Number(form.threshold),
-      });
+      await onSave({ ...form, quantity: Number(form.quantity), threshold: Number(form.threshold) });
     } finally { setSaving(false); }
   }
 
@@ -57,9 +55,7 @@ function InventoryForm({ initial, onSave, onClose }) {
       </div>
       <div className="flex justify-end gap-2 pt-2">
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
-        <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? 'Saving…' : 'Save'}
-        </button>
+        <button type="submit" className="btn-primary" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
       </div>
     </form>
   );
@@ -72,21 +68,23 @@ function QtyButton({ item, onUpdate }) {
   async function adjust(delta) {
     const next = Math.max(0, qty + delta);
     setBusy(true);
-    try {
-      await onUpdate(item.id, next);
-      setQty(next);
-    } finally { setBusy(false); }
+    try { await onUpdate(item.id, next); setQty(next); }
+    finally { setBusy(false); }
   }
+
+  const btnStyle = {
+    padding: '4px', borderRadius: '6px',
+    border: '1px solid rgba(201,168,76,0.2)',
+    background: '#1A1A1A', color: 'rgba(245,240,232,0.5)',
+  };
 
   return (
     <div className="flex items-center gap-1.5">
-      <button onClick={() => adjust(-1)} disabled={busy || qty <= 0}
-        className="p-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-40">
+      <button onClick={() => adjust(-1)} disabled={busy || qty <= 0} style={{ ...btnStyle, opacity: qty <= 0 ? 0.3 : 1 }}>
         <Minus className="w-3 h-3" />
       </button>
-      <span className="text-sm font-medium w-8 text-center">{qty}</span>
-      <button onClick={() => adjust(1)} disabled={busy}
-        className="p-1 rounded-md border border-gray-200 hover:bg-gray-50 disabled:opacity-40">
+      <span className="text-sm font-medium w-8 text-center" style={{ color: '#F5F0E8' }}>{qty}</span>
+      <button onClick={() => adjust(1)} disabled={busy} style={btnStyle}>
         <Plus className="w-3 h-3" />
       </button>
     </div>
@@ -131,10 +129,11 @@ export default function Inventory() {
   }, {});
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-3xl">
       <div className="flex items-center gap-3">
         {lowStockCount > 0 && (
-          <div className="flex items-center gap-2 bg-red-50 text-red-600 border border-red-200 rounded-lg px-3 py-2 text-sm">
+          <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm"
+            style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
             <AlertTriangle className="w-4 h-4" />
             {lowStockCount} item{lowStockCount > 1 ? 's' : ''} low on stock
           </div>
@@ -145,45 +144,57 @@ export default function Inventory() {
       </div>
 
       {loading ? (
-        <p className="text-center text-gray-400 text-sm py-10">Loading…</p>
+        <div className="flex items-center justify-center py-10">
+          <div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
+        </div>
       ) : items.length === 0 ? (
-        <p className="text-center text-gray-400 text-sm py-10">No inventory items</p>
+        <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.35)' }}>No inventory items</p>
       ) : (
         <div className="space-y-4">
           {CATEGORIES.map(cat => {
             const catItems = grouped[cat];
             if (!catItems?.length) return null;
             return (
-              <div key={cat} className="card overflow-hidden">
-                <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">{cat}</h3>
+              <div key={cat} className="rounded-xl overflow-hidden" style={cardStyle}>
+                <div className="px-5 py-3" style={{ background: '#0D0D0D', borderBottom: '1px solid rgba(201,168,76,0.1)' }}>
+                  <h3 className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.6)' }}>{cat}</h3>
                 </div>
-                <div className="divide-y divide-gray-50">
-                  {catItems.map(item => (
-                    <div key={item.id}
-                      className={`px-5 py-3 flex items-center gap-4 ${item.low_stock ? 'bg-red-50/40' : ''}`}>
+                <div>
+                  {catItems.map((item, idx) => (
+                    <div key={item.id} className="px-5 py-3 flex items-center gap-4 transition-colors"
+                      style={{
+                        borderBottom: idx < catItems.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none',
+                        background: item.low_stock ? 'rgba(239,68,68,0.04)' : 'transparent',
+                      }}
+                      onMouseEnter={e => !item.low_stock && (e.currentTarget.style.background = 'rgba(201,168,76,0.04)')}
+                      onMouseLeave={e => !item.low_stock && (e.currentTarget.style.background = 'transparent')}>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                          <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{item.name}</p>
                           {item.low_stock ? (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-600">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium"
+                              style={{ background: 'rgba(239,68,68,0.12)', color: '#ef4444' }}>
                               <AlertTriangle className="w-3 h-3" /> Low
                             </span>
                           ) : null}
                         </div>
-                        <p className="text-xs text-gray-400">Alert at {item.threshold} {item.unit}</p>
+                        <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.3)' }}>Alert at {item.threshold} {item.unit}</p>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <div className="flex items-center gap-1">
                         <QtyButton item={item} onUpdate={handleQty} />
-                        <span className="ml-1 text-xs text-gray-400">{item.unit}</span>
+                        <span className="ml-1 text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{item.unit}</span>
                       </div>
                       <div className="flex gap-1">
                         <button onClick={() => setModal(item)}
-                          className="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg">
+                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(201,168,76,0.5)' }}
+                          onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleDelete(item.id)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg">
+                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.5)' }}
+                          onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
