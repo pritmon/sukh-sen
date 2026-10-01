@@ -5,11 +5,15 @@ import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight, MessageCircle, 
 import Modal from '../components/Modal.jsx';
 
 function AppointmentForm({ onSave, onClose }) {
-  const [services,    setServices]    = useState([]);
-  const [staff,       setStaff]       = useState([]);
-  const [saving,      setSaving]      = useState(false);
-  const [recognized,  setRecognized]  = useState(null); // returning customer info
-  const [lookupTimer, setLookupTimer] = useState(null);
+  const [services,      setServices]      = useState([]);
+  const [staff,         setStaff]         = useState([]);
+  const [saving,        setSaving]        = useState(false);
+  const [recognized,    setRecognized]    = useState(null);
+  const [nameSuggests,  setNameSuggests]  = useState([]);
+  const [showSuggests,  setShowSuggests]  = useState(false);
+  const [nameTimer,     setNameTimer]     = useState(null);
+  const [phoneTimer,    setPhoneTimer]    = useState(null);
+  const nameRef = useRef(null);
   const [form, setForm] = useState({
     customerName:  '',
     customerPhone: '',
@@ -29,12 +33,45 @@ function AppointmentForm({ onSave, onClose }) {
     });
   }, []);
 
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    function handler(e) {
+      if (nameRef.current && !nameRef.current.contains(e.target)) setShowSuggests(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  function handleNameChange(name) {
+    setForm(f => ({ ...f, customerName: name }));
+    setRecognized(null);
+    clearTimeout(nameTimer);
+    if (name.trim().length >= 2) {
+      setNameTimer(setTimeout(async () => {
+        const results = await api.customers(name.trim()).catch(() => []);
+        setNameSuggests(results.slice(0, 6));
+        setShowSuggests(results.length > 0);
+      }, 300));
+    } else {
+      setNameSuggests([]);
+      setShowSuggests(false);
+    }
+  }
+
+  function selectCustomer(c) {
+    setRecognized({ ...c, visitCount: c.visit_count || 0 });
+    setForm(f => ({ ...f, customerName: c.name, customerPhone: c.phone || '' }));
+    setShowSuggests(false);
+    setNameSuggests([]);
+  }
+
   function handlePhoneChange(phone) {
     setForm(f => ({ ...f, customerPhone: phone }));
+    if (!recognized) return; // already selected by name, don't override
     setRecognized(null);
-    clearTimeout(lookupTimer);
+    clearTimeout(phoneTimer);
     if (phone.replace(/\D/g, '').length >= 10) {
-      setLookupTimer(setTimeout(async () => {
+      setPhoneTimer(setTimeout(async () => {
         const found = await api.customerLookup(phone.trim()).catch(() => null);
         if (found) {
           setRecognized(found);
@@ -69,27 +106,57 @@ function AppointmentForm({ onSave, onClose }) {
   return (
     <form onSubmit={submit} className="space-y-4">
       {recognized && (
-        <div className="flex items-center gap-2 bg-brand-50 border border-brand-100 rounded-xl px-3.5 py-2.5">
-          <UserCheck className="w-4 h-4 text-brand-500 flex-shrink-0" />
+        <div className="flex items-center gap-2 rounded-xl px-3.5 py-2.5"
+          style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)' }}>
+          <UserCheck className="w-4 h-4 flex-shrink-0" style={{ color: '#C9A84C' }} />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-brand-700">Welcome back, {recognized.name}! 👋</p>
-            <p className="text-xs text-brand-500">{recognized.visitCount} visit{recognized.visitCount !== 1 ? 's' : ''} — no need to ask the name</p>
+            <p className="text-sm font-semibold" style={{ color: '#E8C96D' }}>
+              Welcome back, {recognized.name}!
+            </p>
+            <p className="text-xs" style={{ color: 'rgba(201,168,76,0.6)' }}>
+              {recognized.visitCount || recognized.visit_count || 0} visit{(recognized.visitCount || recognized.visit_count) !== 1 ? 's' : ''} · returning guest
+            </p>
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-3">
+        {/* Name with autocomplete */}
+        <div className="relative" ref={nameRef}>
+          <label className="label">Customer Name *</label>
+          <input className="input" value={form.customerName}
+            onChange={e => handleNameChange(e.target.value)}
+            onFocus={() => nameSuggests.length > 0 && setShowSuggests(true)}
+            required placeholder="Type name to search…" autoComplete="off" />
+          {showSuggests && nameSuggests.length > 0 && (
+            <div className="absolute z-50 w-full mt-1 rounded-lg overflow-hidden shadow-xl"
+              style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.25)' }}>
+              {nameSuggests.map(c => (
+                <button key={c.id} type="button"
+                  onMouseDown={() => selectCustomer(c)}
+                  className="w-full px-4 py-2.5 text-left flex items-center justify-between transition-colors"
+                  style={{ borderBottom: '1px solid rgba(201,168,76,0.08)' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.08)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{c.name}</p>
+                    <p className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>{c.phone || 'No phone'}</p>
+                  </div>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ color: 'rgba(201,168,76,0.7)', background: 'rgba(201,168,76,0.1)' }}>
+                    {c.visit_count || 0} visits
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Phone */}
         <div>
           <label className="label">Phone</label>
           <input className="input" value={form.customerPhone}
             onChange={e => handlePhoneChange(e.target.value)}
-            placeholder="Mobile number" type="tel" />
-        </div>
-        <div>
-          <label className="label">Customer Name *</label>
-          <input className="input" value={form.customerName}
-            onChange={e => setForm(f => ({ ...f, customerName: e.target.value }))}
-            required placeholder={recognized ? recognized.name : 'Full name'} />
+            placeholder="Auto-filled or enter number" type="tel" />
         </div>
       </div>
 

@@ -7,13 +7,14 @@ router.get('/', (req, res) => {
   try {
     const { q } = req.query;
     let rows;
+    const visitCountSql = '(SELECT COUNT(*) FROM appointments WHERE customer_id = customers.id) as visit_count';
     if (q) {
       const like = `%${q}%`;
       rows = db.prepare(
-        'SELECT * FROM customers WHERE name LIKE ? OR phone LIKE ? ORDER BY name ASC'
+        `SELECT *, ${visitCountSql} FROM customers WHERE name LIKE ? OR phone LIKE ? ORDER BY name ASC`
       ).all(like, like);
     } else {
-      rows = db.prepare('SELECT * FROM customers ORDER BY created_at DESC').all();
+      rows = db.prepare(`SELECT *, ${visitCountSql} FROM customers ORDER BY created_at DESC`).all();
     }
     res.json(rows);
   } catch (err) {
