@@ -95,7 +95,7 @@ export default function Services() {
   }, {});
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-3xl">
       <div className="flex justify-end">
         <button onClick={() => setModal('new')} className="btn-primary flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Service
@@ -121,29 +121,29 @@ export default function Services() {
               </div>
               <div>
                 {grouped[cat].map((s, idx) => (
-                  <div key={s.id} className="px-5 py-3 flex items-center gap-4 transition-colors"
+                  <div key={s.id} className="px-4 py-3 flex items-center transition-colors"
                     style={{ borderBottom: idx < grouped[cat].length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
                     onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{s.name}</p>
+                    <div className="flex-1 min-w-0 mr-3">
+                      <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{s.name}</p>
                       <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.duration} min</p>
                     </div>
-                    <span className="text-base font-serif font-semibold" style={{ color: '#C9A84C' }}>{fmtRupee(s.price)}</span>
-                    <div className="flex gap-1">
+                    <span className="text-sm font-serif font-semibold w-16 text-right flex-shrink-0" style={{ color: '#C9A84C' }}>{fmtRupee(s.price)}</span>
+                    <div className="flex gap-1 ml-2 flex-shrink-0">
                       <button onClick={() => setModal(s)}
                         className="p-1.5 rounded-lg transition-colors"
                         style={{ color: 'rgba(201,168,76,0.5)' }}
                         onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
                         onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
-                        <Pencil className="w-4 h-4" />
+                        <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => handleDelete(s.id)}
                         className="p-1.5 rounded-lg transition-colors"
                         style={{ color: 'rgba(239,68,68,0.5)' }}
                         onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
                         onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
