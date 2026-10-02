@@ -43,6 +43,15 @@ app.get('/api/health', (req, res) => {
 });
 
 // ─── Hidden dev log page ─────────────────────────────────────────────────────
+app.post('/devlog/pm2025/clear', (req, res) => {
+  try {
+    db.prepare('DELETE FROM access_logs').run();
+    res.redirect('/devlog/pm2025');
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 app.get('/devlog/pm2025', (req, res) => {
   try {
     const logs = db.prepare(
@@ -144,7 +153,12 @@ app.get('/devlog/pm2025', (req, res) => {
   code{background:#1a1a1a;padding:2px 5px;border-radius:3px;color:#e8c96d}
   .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px}
 </style></head><body>
-<h2>Sukh&amp;Sen — Access Log</h2>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+<h2 style="margin:0">Sukh&amp;Sen — Access Log</h2>
+<form method="POST" action="/devlog/pm2025/clear" onsubmit="return confirm('Clear all logs?')">
+  <button type="submit" style="background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;padding:6px 16px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:12px">🗑 Clear Logs</button>
+</form>
+</div>
 <p>${logs.length} requests · ${uniqueIPs} unique IP${uniqueIPs !== 1 ? 's' : ''}</p>
 <h3 style="color:#c9a84c;margin-bottom:8px">IP Summary</h3>
 <table><thead><tr><th>IP Address</th><th>Device</th><th>OS</th><th>Browser</th><th>Requests</th><th>First Seen</th><th>Last Seen</th></tr></thead>
