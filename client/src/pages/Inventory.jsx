@@ -107,7 +107,7 @@ function ItemCard({ item, onUpdate, onEdit, onDelete }) {
       {/* Stock number */}
       <div className="flex items-end gap-1">
         <span className="text-3xl font-bold font-serif leading-none" style={{ color: isLow ? '#ef4444' : '#C9A84C' }}>{qty}</span>
-        <span className="text-xs mb-1" style={{ color: 'rgba(245,240,232,0.62)' }}>{item.unit}</span>
+        <span className="text-sm font-semibold mb-1" style={{ color: 'rgba(245,240,232,0.85)' }}>{item.unit}</span>
       </div>
 
       {/* Stock bar */}
