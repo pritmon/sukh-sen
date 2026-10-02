@@ -282,7 +282,7 @@ export default function Billing() {
           style={{ borderBottom: '1px solid rgba(201,168,76,0.1)' }}>
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" style={{ color: '#C9A84C' }} />
-            <h2 className="font-serif font-semibold text-sm" style={{ color: '#F5F0E8' }}>Daily Revenue</h2>
+            <h2 className="font-serif font-bold text-sm" style={{ color: '#E8C96D' }}>Daily Revenue</h2>
           </div>
           <input type="date" value={summaryDate} onChange={e => setSummaryDate(e.target.value)}
             className="text-sm rounded-lg px-3 py-1.5 focus:outline-none"
@@ -300,12 +300,12 @@ export default function Billing() {
             ].map(({ icon: Icon, label, value, plain }) => (
               <div key={label} className="px-5 py-4 flex flex-col gap-2">
                 <div className="flex items-center gap-1.5">
-                  <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(201,168,76,0.78)' }} />
-                  <span className="text-xs font-medium uppercase tracking-widest"
-                    style={{ color: 'rgba(201,168,76,0.78)' }}>{label}</span>
+                  <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#C9A84C' }} />
+                  <span className="text-xs font-bold uppercase tracking-widest"
+                    style={{ color: '#C9A84C' }}>{label}</span>
                 </div>
                 <p className="text-2xl font-serif font-bold leading-none"
-                  style={{ color: plain ? '#F5F0E8' : '#C9A84C' }}>{value}</p>
+                  style={{ color: '#E8C96D' }}>{value}</p>
               </div>
             ))}
           </div>
