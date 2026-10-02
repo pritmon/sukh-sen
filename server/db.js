@@ -347,23 +347,91 @@ function seed() {
 
   const apptCount = db.prepare('SELECT COUNT(*) as n FROM appointments').get().n;
   if (apptCount === 0) {
-    const today = new Date().toISOString().split('T')[0];
+    const d = new Date();
+    const dateOf = n => { const x = new Date(d); x.setDate(x.getDate() + n); return x.toISOString().split('T')[0]; };
+    const today = dateOf(0);
+    const yday1 = dateOf(-1);
+    const yday2 = dateOf(-2);
+    const yday3 = dateOf(-3);
 
-    db.prepare("INSERT INTO customers (name, phone) VALUES (?, ?)").run('Rahul Das',     '9876543210');
-    db.prepare("INSERT INTO customers (name, phone) VALUES (?, ?)").run('Suresh Mondal', '9123456789');
-    db.prepare("INSERT INTO customers (name, phone) VALUES (?, ?)").run('Amit Kumar',    '8765432109');
+    // Look up staff IDs by name (safe if seed order ever changes)
+    const staffId = name => db.prepare('SELECT id FROM staff WHERE name=?').get(name)?.id ?? 1;
+    const sOwner   = 1; // Owner is always id=1 (inserted first)
+    const sPriya   = staffId('Priya Mandal');
+    const sSuchitra = staffId('Suchitra Das');
+    const sRekha   = staffId('Rekha Ghosh');
+    const sSourav  = staffId('Sourav Naskar');
+    const sMita    = staffId('Mita Roy');
+
+    // Look up customer IDs by phone
+    const custId = phone => db.prepare('SELECT id FROM customers WHERE phone=?').get(phone)?.id;
+    const cRima     = custId('9831111001'); // Rima Biswas
+    const cKakoli   = custId('9732222002'); // Kakoli Mondal
+    const cSunita   = custId('9051333003'); // Sunita Bera
+    const cPuja     = custId('8420444004'); // Puja Das
+    const cAnanya   = custId('7001555005'); // Ananya Roy
+    const cDebasree = custId('9831666006'); // Debasree Halder
+    const cSubhash  = custId('9831000011'); // Subhash Halder
+    const cTapan    = custId('9732000022'); // Tapan Mondal
+    const cBikash   = custId('9051000033'); // Bikash Roy
+    const cMitaS    = custId('9051888008'); // Mita Sen
+    const cPriti    = custId('8420999009'); // Priti Ghosh
 
     const insA  = db.prepare('INSERT INTO appointments (customer_id, staff_id, date, time, status) VALUES (?,?,?,?,?)');
     const insAS = db.prepare('INSERT INTO appointment_services (appointment_id, service_id) VALUES (?,?)');
 
-    const a1 = insA.run(1, 1, today, '10:00', 'done');
-    insAS.run(Number(a1.lastInsertRowid), 1);
+    // Helper to add an appointment with one service
+    const addAppt = (cid, sid, date, time, status, svcId) => {
+      const r = insA.run(cid, sid, date, time, status);
+      insAS.run(Number(r.lastInsertRowid), svcId);
+    };
 
-    const a2 = insA.run(2, 1, today, '11:30', 'pending');
-    insAS.run(Number(a2.lastInsertRowid), 10);
+    // Look up a service id by name prefix (returns 1 as fallback)
+    const svcByName = prefix => db.prepare("SELECT id FROM services WHERE name LIKE ? LIMIT 1").get(`${prefix}%`)?.id ?? 1;
+    const svcWomCut   = svcByName("Women's Cut");
+    const svcMenCut   = svcByName("Men's Cut");
+    const svcBlowDry  = svcByName('Blow Dry');
+    const svcThreading = svcByName('Threading');
+    const svcFacial   = svcByName('Facial');
+    const svcMehndi   = svcByName('Mehndi');
+    const svcWax      = svcByName('Wax');
+    const svcColour   = svcByName('Colour') || svcByName('Hair Colour');
+    const svcBeard    = svcByName('Beard');
+    const svcManicure = svcByName('Manicure');
+    const svcHeadMassage = svcByName('Head Massage');
 
-    const a3 = insA.run(3, 1, today, '14:00', 'pending');
-    insAS.run(Number(a3.lastInsertRowid), 62);
+    // ── Today ───────────────────────────────────────────────────────────────────
+    addAppt(cRima,    sOwner,    today, '09:30', 'done',    svcWomCut);
+    addAppt(cTapan,   sSourav,   today, '10:00', 'done',    svcMenCut);
+    addAppt(cKakoli,  sPriya,    today, '10:30', 'done',    svcColour);
+    addAppt(cSunita,  sRekha,    today, '11:00', 'done',    svcThreading);
+    addAppt(cSubhash, sSourav,   today, '11:30', 'pending', svcBeard);
+    addAppt(cPuja,    sSuchitra, today, '12:00', 'pending', svcBlowDry);
+    addAppt(cAnanya,  sMita,     today, '13:00', 'pending', svcFacial);
+    addAppt(cDebasree,sPriya,    today, '14:00', 'pending', svcWomCut);
+    addAppt(cBikash,  sOwner,    today, '14:30', 'pending', svcMenCut);
+    addAppt(cPriti,   sMita,     today, '15:30', 'pending', svcManicure);
+
+    // ── Yesterday ──────────────────────────────────────────────────────────────
+    addAppt(cMitaS,   sRekha,    yday1, '09:00', 'done', svcWax);
+    addAppt(cRima,    sPriya,    yday1, '10:00', 'done', svcBlowDry);
+    addAppt(cTapan,   sSourav,   yday1, '11:00', 'done', svcMenCut);
+    addAppt(cPuja,    sMita,     yday1, '12:30', 'done', svcFacial);
+    addAppt(cSubhash, sOwner,    yday1, '14:00', 'done', svcHeadMassage);
+    addAppt(cKakoli,  sSuchitra, yday1, '15:00', 'done', svcThreading);
+
+    // ── 2 days ago ─────────────────────────────────────────────────────────────
+    addAppt(cDebasree, sMita,    yday2, '09:30', 'done', svcMehndi);
+    addAppt(cAnanya,   sRekha,   yday2, '10:30', 'done', svcThreading);
+    addAppt(cBikash,   sSourav,  yday2, '11:00', 'done', svcMenCut);
+    addAppt(cSunita,   sPriya,   yday2, '13:00', 'done', svcColour);
+    addAppt(cPriti,    sOwner,   yday2, '14:30', 'done', svcWomCut);
+
+    // ── 3 days ago ─────────────────────────────────────────────────────────────
+    addAppt(cMitaS,   sSuchitra, yday3, '10:00', 'done', svcBlowDry);
+    addAppt(cRima,    sMita,     yday3, '11:30', 'done', svcFacial);
+    addAppt(cTapan,   sSourav,   yday3, '13:00', 'done', svcBeard);
+    addAppt(cKakoli,  sRekha,    yday3, '14:00', 'done', svcWax);
 
     const insInv = db.prepare('INSERT INTO inventory (name, quantity, threshold, unit, category) VALUES (?,?,?,?,?)');
     [
