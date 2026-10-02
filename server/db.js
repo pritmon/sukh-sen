@@ -101,6 +101,13 @@ db.exec(`
   );
 `);
 
+// Track seed customers/staff deleted by the owner so they aren't re-seeded
+db.exec(`
+  CREATE TABLE IF NOT EXISTS deleted_seeds (
+    phone TEXT PRIMARY KEY
+  );
+`);
+
 // ─── Migrations (safe ALTER TABLE ADD COLUMN) ────────────────────────────
 function addCol(table, col, type) {
   try { db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${type}`); } catch (_) {}
@@ -345,10 +352,13 @@ function seed() {
     { name: 'Subhash Halder',  phone: '9831000011', gender: 'male',   birthday: mmdd(10), anniversary: null,   membership_tier: 'none',   loyalty_points: 30  },
     { name: 'Bikash Roy',      phone: '9051000033', gender: 'male',   birthday: mmdd(18), anniversary: null,   membership_tier: 'none',   loyalty_points: 50  },
   ];
+  const deletedPhones = new Set(db.prepare('SELECT phone FROM deleted_seeds').all().map(r => r.phone));
   const insCustDemo = db.prepare(
     'INSERT OR IGNORE INTO customers (name, phone, gender, birthday, anniversary, membership_tier, loyalty_points) VALUES (?,?,?,?,?,?,?)'
   );
-  for (const c of demoCustomers) insCustDemo.run(c.name, c.phone, c.gender, c.birthday, c.anniversary, c.membership_tier, c.loyalty_points);
+  for (const c of demoCustomers) {
+    if (!deletedPhones.has(c.phone)) insCustDemo.run(c.name, c.phone, c.gender, c.birthday, c.anniversary, c.membership_tier, c.loyalty_points);
+  }
 
   const apptCount = db.prepare('SELECT COUNT(*) as n FROM appointments').get().n;
   if (apptCount === 0) {

@@ -136,7 +136,7 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   try {
     const { reason, notes } = req.body || {};
-    const customer = db.prepare('SELECT id, name FROM customers WHERE id=?').get(req.params.id);
+    const customer = db.prepare('SELECT id, name, phone FROM customers WHERE id=?').get(req.params.id);
     if (!customer) return res.status(404).json({ error: 'Not found' });
 
     // cascade delete in dependency order
@@ -148,6 +148,9 @@ router.delete('/:id', (req, res) => {
     db.prepare('DELETE FROM appointments WHERE customer_id=?').run(req.params.id);
     db.prepare('DELETE FROM loyalty_transactions WHERE customer_id=?').run(req.params.id);
     db.prepare('DELETE FROM customers WHERE id=?').run(req.params.id);
+
+    // Remember this phone so the seed never re-inserts this customer
+    if (customer.phone) db.prepare('INSERT OR IGNORE INTO deleted_seeds (phone) VALUES (?)').run(customer.phone);
 
     res.json({ deleted: true, name: customer.name, reason: reason || null, notes: notes || null });
   } catch (err) {
