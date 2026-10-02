@@ -15,30 +15,30 @@ function StatCard({ icon: Icon, label, value, sub }) {
   return (
     <div className="rounded-xl p-5 relative overflow-hidden transition-all duration-300 hover:scale-[1.02]"
       style={{
-        background: 'linear-gradient(145deg, #161616, #111111)',
-        border: '1px solid rgba(201, 168, 76, 0.2)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+        background: 'linear-gradient(145deg, #191919, #111111)',
+        border: '1px solid rgba(201, 168, 76, 0.35)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4), 0 0 0 0px rgba(201,168,76,0.1)',
       }}>
-      {/* subtle gold corner glow */}
-      <div className="absolute top-0 right-0 w-24 h-24 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle at top right, rgba(201,168,76,0.08) 0%, transparent 70%)' }} />
+      {/* gold corner glow */}
+      <div className="absolute top-0 right-0 w-28 h-28 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle at top right, rgba(201,168,76,0.15) 0%, transparent 70%)' }} />
 
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-xs font-medium uppercase tracking-widest"
-            style={{ color: 'rgba(201, 168, 76, 0.85)' }}>{label}</span>
+          <span className="text-xs font-bold uppercase tracking-widest"
+            style={{ color: '#C9A84C' }}>{label}</span>
           <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
-            <Icon className="w-4 h-4" style={{ color: '#C9A84C' }} />
+            style={{ background: 'rgba(201, 168, 76, 0.15)', border: '1px solid rgba(201, 168, 76, 0.35)' }}>
+            <Icon className="w-4 h-4" style={{ color: '#E8C96D' }} />
           </div>
         </div>
-        <p className="text-3xl font-serif font-semibold leading-none" style={{ color: '#F5F0E8' }}>{value}</p>
-        {sub && <p className="text-xs mt-2" style={{ color: 'rgba(245, 240, 232, 0.62)' }}>{sub}</p>}
+        <p className="text-3xl font-serif font-bold leading-none" style={{ color: '#E8C96D' }}>{value}</p>
+        {sub && <p className="text-xs mt-2 font-medium" style={{ color: 'rgba(245, 240, 232, 0.7)' }}>{sub}</p>}
       </div>
 
       {/* bottom gold line */}
       <div className="absolute bottom-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)' }} />
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.6), transparent)' }} />
     </div>
   );
 }
@@ -78,7 +78,7 @@ export default function Dashboard() {
       {/* Date + social row */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'rgba(201, 168, 76, 0.78)' }}>Today</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#C9A84C' }}>Today</p>
           <p className="font-serif text-xl font-semibold" style={{ color: '#F5F0E8' }}>{fmtDate(todayISO())}</p>
         </div>
         {(ig || fb) && (
