@@ -217,7 +217,8 @@ function AppointmentForm({ onSave, onClose }) {
         <span className="text-sm" style={{ color: 'rgba(245,240,232,0.7)' }}>Walk-in</span>
       </label>
 
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
+        style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)', marginTop: 8 }}>
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-primary" disabled={saving}>
           {saving ? 'Saving…' : 'Book Appointment'}

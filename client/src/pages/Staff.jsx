@@ -287,7 +287,7 @@ export default function Staff() {
       ) : staff.length === 0 ? (
         <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.4)' }}>No staff members added</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {staff.map(s => (
             <div key={s.id} className="p-5 rounded-xl cursor-pointer transition-all duration-200"
               style={{ background: '#141414', border: '1px solid rgba(201,168,76,0.15)' }}
