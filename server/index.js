@@ -49,45 +49,88 @@ app.get('/devlog/pm2025', (req, res) => {
       'SELECT * FROM access_logs ORDER BY created_at DESC LIMIT 1000'
     ).all();
 
-    const parseDevice = ua => {
-      if (!ua) return 'Unknown';
-      if (/Mobile|Android|iPhone/.test(ua)) return '📱 Mobile';
-      if (/Tablet|iPad/.test(ua)) return '📟 Tablet';
-      return '💻 Desktop';
-    };
-    const parseBrowser = ua => {
-      if (!ua) return '—';
-      if (/Edg\//.test(ua)) return 'Edge';
-      if (/OPR\//.test(ua)) return 'Opera';
-      if (/Chrome\//.test(ua)) return 'Chrome';
-      if (/Firefox\//.test(ua)) return 'Firefox';
-      if (/Safari\//.test(ua) && !/Chrome/.test(ua)) return 'Safari';
-      return 'Other';
+    const parseUA = ua => {
+      if (!ua) return { device: '❓ Unknown', os: '—', browser: '—' };
+
+      // Device
+      let device = '💻 Desktop';
+      if (/iPhone/.test(ua))                        device = '📱 iPhone';
+      else if (/iPad/.test(ua))                     device = '📟 iPad';
+      else if (/Android.*Mobile/.test(ua))          device = '📱 Android Phone';
+      else if (/Android/.test(ua))                  device = '📟 Android Tablet';
+
+      // OS
+      let os = '—';
+      const iosV   = ua.match(/iPhone OS ([\d_]+)/);
+      const ipadV  = ua.match(/iPad.*OS ([\d_]+)/);
+      const andV   = ua.match(/Android ([\d.]+)/);
+      const macV   = ua.match(/Mac OS X ([\d_.]+)/);
+      if (iosV)                                     os = 'iOS ' + iosV[1].replace(/_/g, '.');
+      else if (ipadV)                               os = 'iPadOS ' + ipadV[1].replace(/_/g, '.');
+      else if (andV)                                os = 'Android ' + andV[1];
+      else if (/Windows NT 10\.0/.test(ua))         os = 'Windows 10/11';
+      else if (/Windows NT 6\.3/.test(ua))          os = 'Windows 8.1';
+      else if (/Windows NT 6\.1/.test(ua))          os = 'Windows 7';
+      else if (/Windows/.test(ua))                  os = 'Windows';
+      else if (macV && !/iPhone|iPad/.test(ua))     os = 'macOS ' + macV[1].replace(/_/g, '.');
+      else if (/Linux/.test(ua))                    os = 'Linux';
+
+      // Browser + version
+      let browser = '—';
+      const edgeV  = ua.match(/Edg\/([\d.]+)/);
+      const oprV   = ua.match(/OPR\/([\d.]+)/);
+      const chrV   = ua.match(/Chrome\/([\d.]+)/);
+      const ffV    = ua.match(/Firefox\/([\d.]+)/);
+      const safV   = ua.match(/Version\/([\d.]+).*Safari/);
+      if (edgeV)                                    browser = 'Edge ' + edgeV[1].split('.')[0];
+      else if (oprV)                                browser = 'Opera ' + oprV[1].split('.')[0];
+      else if (chrV)                                browser = 'Chrome ' + chrV[1].split('.')[0];
+      else if (ffV)                                 browser = 'Firefox ' + ffV[1].split('.')[0];
+      else if (safV)                                browser = 'Safari ' + safV[1].split('.')[0];
+      else if (/Safari/.test(ua))                   browser = 'Safari';
+
+      return { device, os, browser };
     };
 
     // group by IP for summary
     const ipMap = {};
     for (const l of logs) {
-      if (!ipMap[l.ip]) ipMap[l.ip] = { count: 0, first: l.created_at, last: l.created_at };
+      const { device, os, browser } = parseUA(l.user_agent);
+      if (!ipMap[l.ip]) ipMap[l.ip] = { count: 0, first: l.created_at, last: l.created_at, device, os, browser };
       ipMap[l.ip].count++;
-      if (l.created_at > ipMap[l.ip].last) ipMap[l.ip].last = l.created_at;
+      if (l.created_at > ipMap[l.ip].last) {
+        ipMap[l.ip].last = l.created_at;
+        ipMap[l.ip].device  = device;
+        ipMap[l.ip].os      = os;
+        ipMap[l.ip].browser = browser;
+      }
     }
     const uniqueIPs = Object.keys(ipMap).length;
 
     const summaryRows = Object.entries(ipMap)
       .sort((a, b) => b[1].last.localeCompare(a[1].last))
-      .map(([ip, d]) => `<tr><td>${ip}</td><td>${d.count}</td><td>${d.first.slice(0,16)}</td><td>${d.last.slice(0,16)}</td></tr>`)
-      .join('');
+      .map(([ip, d]) => `<tr>
+        <td><code>${ip}</code></td>
+        <td>${d.device}</td>
+        <td>${d.os}</td>
+        <td>${d.browser}</td>
+        <td>${d.count}</td>
+        <td>${d.first.slice(0,16)}</td>
+        <td>${d.last.slice(0,16)}</td>
+      </tr>`).join('');
 
-    const detailRows = logs.map(l => `
-      <tr>
+    const detailRows = logs.map(l => {
+      const { device, os, browser } = parseUA(l.user_agent);
+      return `<tr>
         <td>${l.created_at.slice(0,16)}</td>
         <td><code>${l.ip}</code></td>
-        <td>${parseDevice(l.user_agent)} ${parseBrowser(l.user_agent)}</td>
+        <td>${device}</td>
+        <td>${os}</td>
+        <td>${browser}</td>
         <td>${l.method}</td>
-        <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis">${l.path}</td>
-        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;font-size:11px">${l.referer || '—'}</td>
-      </tr>`).join('');
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis">${l.path}</td>
+      </tr>`;
+    }).join('');
 
     res.send(`<!DOCTYPE html><html><head><meta charset="utf-8">
 <title>Access Log</title>
@@ -104,10 +147,10 @@ app.get('/devlog/pm2025', (req, res) => {
 <h2>Sukh&amp;Sen — Access Log</h2>
 <p>${logs.length} requests · ${uniqueIPs} unique IP${uniqueIPs !== 1 ? 's' : ''}</p>
 <h3 style="color:#c9a84c;margin-bottom:8px">IP Summary</h3>
-<table><thead><tr><th>IP Address</th><th>Requests</th><th>First Seen</th><th>Last Seen</th></tr></thead>
+<table><thead><tr><th>IP Address</th><th>Device</th><th>OS</th><th>Browser</th><th>Requests</th><th>First Seen</th><th>Last Seen</th></tr></thead>
 <tbody>${summaryRows}</tbody></table>
 <h3 style="color:#c9a84c;margin-bottom:8px">Full Log (latest 1000)</h3>
-<table><thead><tr><th>Time</th><th>IP</th><th>Device</th><th>Method</th><th>Path</th><th>Referer</th></tr></thead>
+<table><thead><tr><th>Time</th><th>IP</th><th>Device</th><th>OS</th><th>Browser</th><th>Method</th><th>Path</th></tr></thead>
 <tbody>${detailRows}</tbody></table>
 </body></html>`);
   } catch (err) {
