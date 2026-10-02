@@ -116,9 +116,11 @@ app.get('/devlog/pm2025', (req, res) => {
     }
     const uniqueIPs = Object.keys(ipMap).length;
 
+    const deviceKey = d => d.includes('iPhone') ? 'iphone' : d.includes('Android Phone') ? 'android' : d.includes('iPad') || d.includes('Android Tablet') ? 'tablet' : 'desktop';
+
     const summaryRows = Object.entries(ipMap)
       .sort((a, b) => b[1].last.localeCompare(a[1].last))
-      .map(([ip, d]) => `<tr>
+      .map(([ip, d]) => `<tr data-device="${deviceKey(d.device)}">
         <td><code>${ip}</code></td>
         <td>${d.device}</td>
         <td>${d.os}</td>
@@ -130,7 +132,7 @@ app.get('/devlog/pm2025', (req, res) => {
 
     const detailRows = logs.map(l => {
       const { device, os, browser } = parseUA(l.user_agent);
-      return `<tr>
+      return `<tr data-device="${deviceKey(device)}">
         <td>${l.created_at.slice(0,16)}</td>
         <td><code>${l.ip}</code></td>
         <td>${device}</td>
@@ -152,7 +154,19 @@ app.get('/devlog/pm2025', (req, res) => {
   tr:hover td{background:#161616}
   code{background:#1a1a1a;padding:2px 5px;border-radius:3px;color:#e8c96d}
   .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px}
-</style></head><body>
+  .filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .filter-btn{padding:5px 14px;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:#888;cursor:pointer;font-family:monospace;font-size:12px;transition:all .15s}
+  .filter-btn.active{background:rgba(201,168,76,0.15);border-color:#c9a84c;color:#c9a84c}
+</style>
+<script>
+  function filter(type) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === type));
+    document.querySelectorAll('tr[data-device]').forEach(r => {
+      r.style.display = (type === 'all' || r.dataset.device === type) ? '' : 'none';
+    });
+  }
+</script>
+</head><body>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
 <h2 style="margin:0">Sukh&amp;Sen — Access Log</h2>
 <form method="POST" action="/devlog/pm2025/clear" onsubmit="return confirm('Clear all logs?')">
@@ -160,6 +174,13 @@ app.get('/devlog/pm2025', (req, res) => {
 </form>
 </div>
 <p>${logs.length} requests · ${uniqueIPs} unique IP${uniqueIPs !== 1 ? 's' : ''}</p>
+<div class="filters">
+  <button class="filter-btn active" data-filter="all" onclick="filter('all')">All</button>
+  <button class="filter-btn" data-filter="iphone" onclick="filter('iphone')">📱 iPhone</button>
+  <button class="filter-btn" data-filter="android" onclick="filter('android')">📱 Android</button>
+  <button class="filter-btn" data-filter="tablet" onclick="filter('tablet')">📟 Tablet</button>
+  <button class="filter-btn" data-filter="desktop" onclick="filter('desktop')">💻 Desktop</button>
+</div>
 <h3 style="color:#c9a84c;margin-bottom:8px">IP Summary</h3>
 <table><thead><tr><th>IP Address</th><th>Device</th><th>OS</th><th>Browser</th><th>Requests</th><th>First Seen</th><th>Last Seen</th></tr></thead>
 <tbody>${summaryRows}</tbody></table>
