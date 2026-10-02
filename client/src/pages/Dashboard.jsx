@@ -143,28 +143,41 @@ export default function Dashboard() {
           <div>
             {appointments.map((a, idx) => (
               <div key={a.id}
-                className="px-6 py-3.5 flex items-center gap-3 transition-colors duration-100"
-                style={{
-                  borderBottom: idx < appointments.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none',
-                }}
+                className="px-4 sm:px-6 py-3 sm:py-3.5 transition-colors duration-100"
+                style={{ borderBottom: idx < appointments.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
-                {/* Time */}
-                <span className="text-xs font-mono flex-shrink-0 text-center py-1.5 rounded-lg"
-                  style={{ width: 56, color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
-                  {fmtTime(a.time)}
-                </span>
-                {/* Customer */}
-                <p className="text-sm font-medium truncate flex-shrink-0" style={{ width: 150, color: '#F5F0E8' }}>{a.customer_name}</p>
-                {/* Service */}
-                <p className="text-xs truncate flex-1 min-w-0" style={{ color: 'rgba(245,240,232,0.68)' }}>{a.services || '—'}</p>
-                {/* Staff */}
-                <p className="text-xs font-medium truncate flex-shrink-0" style={{ width: 120, color: 'rgba(245,240,232,0.55)' }}>{a.staff_name || '—'}</p>
-                {/* Amount */}
-                <span className="text-sm font-semibold font-serif flex-shrink-0 text-right" style={{ width: 64, color: '#C9A84C' }}>{fmtRupee(a.total_price)}</span>
-                {/* Status */}
-                <span className={`${statusClass(a.status)} flex-shrink-0`} style={{ width: 72, textAlign: 'center' }}>{statusLabel(a.status)}</span>
+                {/* Mobile layout */}
+                <div className="flex items-start gap-2.5 sm:hidden">
+                  <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0 mt-0.5"
+                    style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>
+                    {fmtTime(a.time)}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
+                      <span className="text-sm font-serif font-semibold flex-shrink-0" style={{ color: '#C9A84C' }}>{fmtRupee(a.total_price)}</span>
+                    </div>
+                    <p className="text-xs truncate mt-0.5" style={{ color: 'rgba(245,240,232,0.55)' }}>{a.services || '—'}</p>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.45)' }}>{a.staff_name || '—'}</p>
+                      <span className={statusClass(a.status)}>{statusLabel(a.status)}</span>
+                    </div>
+                  </div>
+                </div>
+                {/* Desktop layout */}
+                <div className="hidden sm:flex items-center gap-3">
+                  <span className="text-xs font-mono flex-shrink-0 text-center py-1.5 rounded-lg"
+                    style={{ width: 56, color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
+                    {fmtTime(a.time)}
+                  </span>
+                  <p className="text-sm font-medium truncate flex-shrink-0" style={{ width: 150, color: '#F5F0E8' }}>{a.customer_name}</p>
+                  <p className="text-xs truncate flex-1 min-w-0" style={{ color: 'rgba(245,240,232,0.68)' }}>{a.services || '—'}</p>
+                  <p className="text-xs font-medium truncate flex-shrink-0" style={{ width: 120, color: 'rgba(245,240,232,0.55)' }}>{a.staff_name || '—'}</p>
+                  <span className="text-sm font-semibold font-serif flex-shrink-0 text-right" style={{ width: 64, color: '#C9A84C' }}>{fmtRupee(a.total_price)}</span>
+                  <span className={`${statusClass(a.status)} flex-shrink-0`} style={{ width: 72, textAlign: 'center' }}>{statusLabel(a.status)}</span>
+                </div>
               </div>
             ))}
           </div>
