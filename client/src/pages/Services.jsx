@@ -170,10 +170,10 @@ export default function Services() {
         <div className="flex flex-wrap gap-2">
           {allTabs.map(tab => (
             <button key={tab} onClick={() => setFilter(tab)}
-              className="px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
               style={filter === tab
-                ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.3)' }
-                : { background: '#111111', color: 'rgba(245,240,232,0.72)', border: '1px solid rgba(201,168,76,0.1)' }}>
+                ? { background: 'rgba(201,168,76,0.18)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.4)' }
+                : { background: '#111111', color: '#F5F0E8', border: '1px solid rgba(201,168,76,0.2)' }}>
               {tab}
             </button>
           ))}
@@ -199,10 +199,10 @@ export default function Services() {
           {categories.map(cat => (
             <div key={cat}>
               <div className="flex items-center gap-3 mb-3">
-                <h3 className="text-xs font-medium uppercase tracking-widest"
-                  style={{ color: 'rgba(201,168,76,0.82)' }}>{cat}</h3>
-                <div className="flex-1 h-px" style={{ background: 'rgba(201,168,76,0.08)' }} />
-                <span className="text-xs" style={{ color: 'rgba(245,240,232,0.75)' }}>
+                <h3 className="text-sm font-bold uppercase tracking-widest"
+                  style={{ color: '#C9A84C' }}>{cat}</h3>
+                <div className="flex-1 h-px" style={{ background: 'rgba(201,168,76,0.15)' }} />
+                <span className="text-xs font-semibold" style={{ color: '#C9A84C' }}>
                   {services.filter(s => s.category === cat).length}
                 </span>
               </div>
