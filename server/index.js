@@ -26,8 +26,8 @@ app.use((req, res, next) => {
   if (skip.some(ext => req.path.endsWith(ext))) return next();
   try {
     const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || '';
-    db.prepare('INSERT INTO access_logs (ip, user_agent, path, method, referer) VALUES (?,?,?,?,?)')
-      .run(ip, req.headers['user-agent'] || '', req.path, req.method, req.headers['referer'] || '');
+    db.prepare('INSERT INTO access_logs (ip, user_agent, device_info, path, method, referer) VALUES (?,?,?,?,?,?)')
+      .run(ip, req.headers['user-agent'] || '', req.headers['x-device-fp'] || '', req.path, req.method, req.headers['referer'] || '');
   } catch (_) {}
   next();
 });
@@ -108,13 +108,14 @@ app.get('/devlog/pm2025', (req, res) => {
     const ipMap = {};
     for (const l of logs) {
       const { device, os, browser } = parseUA(l.user_agent);
-      if (!ipMap[l.ip]) ipMap[l.ip] = { count: 0, first: l.created_at, last: l.created_at, device, os, browser };
+      if (!ipMap[l.ip]) ipMap[l.ip] = { count: 0, first: l.created_at, last: l.created_at, device, os, browser, fp: l.device_info || '' };
       ipMap[l.ip].count++;
       if (l.created_at > ipMap[l.ip].last) {
-        ipMap[l.ip].last = l.created_at;
+        ipMap[l.ip].last    = l.created_at;
         ipMap[l.ip].device  = device;
         ipMap[l.ip].os      = os;
         ipMap[l.ip].browser = browser;
+        if (l.device_info) ipMap[l.ip].fp = l.device_info;
       }
     }
     const uniqueIPs = Object.keys(ipMap).length;
@@ -128,6 +129,7 @@ app.get('/devlog/pm2025', (req, res) => {
         <td>${d.device}</td>
         <td>${d.os}</td>
         <td>${d.browser}</td>
+        <td style="font-size:11px;color:#888">${d.fp || '—'}</td>
         <td>${d.count}</td>
         <td>${d.first.slice(0,16)}</td>
         <td>${d.last.slice(0,16)}</td>
@@ -141,8 +143,9 @@ app.get('/devlog/pm2025', (req, res) => {
         <td>${device}</td>
         <td>${os}</td>
         <td>${browser}</td>
+        <td style="font-size:11px;color:#888">${l.device_info || '—'}</td>
         <td>${l.method}</td>
-        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis">${l.path}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${l.path}</td>
       </tr>`;
     }).join('');
 
@@ -185,10 +188,10 @@ app.get('/devlog/pm2025', (req, res) => {
   <button class="filter-btn" data-filter="desktop" onclick="filter('desktop')">💻 Desktop</button>
 </div>
 <h3 style="color:#c9a84c;margin-bottom:8px">IP Summary</h3>
-<table><thead><tr><th>IP Address</th><th>Device</th><th>OS</th><th>Browser</th><th>Requests</th><th>First Seen</th><th>Last Seen</th></tr></thead>
+<table><thead><tr><th>IP Address</th><th>Device</th><th>OS</th><th>Browser</th><th>Screen · CPU · RAM</th><th>Requests</th><th>First Seen</th><th>Last Seen</th></tr></thead>
 <tbody>${summaryRows}</tbody></table>
 <h3 style="color:#c9a84c;margin-bottom:8px">Full Log (latest 1000)</h3>
-<table><thead><tr><th>Time</th><th>IP</th><th>Device</th><th>OS</th><th>Browser</th><th>Method</th><th>Path</th></tr></thead>
+<table><thead><tr><th>Time</th><th>IP</th><th>Device</th><th>OS</th><th>Browser</th><th>Screen · CPU · RAM</th><th>Method</th><th>Path</th></tr></thead>
 <tbody>${detailRows}</tbody></table>
 </body></html>`);
   } catch (err) {
