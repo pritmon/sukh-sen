@@ -45,6 +45,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+const toIST = utc => {
+  if (!utc) return '—';
+  const d = new Date(utc.replace(' ', 'T') + 'Z');
+  return d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false })
+    .replace(',', '').slice(0, 16);
+};
+
 // ─── Hidden dev log page ─────────────────────────────────────────────────────
 app.post('/devlog/pm2025/clear', (req, res) => {
   try {
@@ -131,14 +138,14 @@ app.get('/devlog/pm2025', (req, res) => {
         <td>${d.browser}</td>
         <td style="font-size:11px;color:#888">${d.fp || '—'}</td>
         <td>${d.count}</td>
-        <td>${d.first.slice(0,16)}</td>
-        <td>${d.last.slice(0,16)}</td>
+        <td>${toIST(d.first)}</td>
+        <td>${toIST(d.last)}</td>
       </tr>`).join('');
 
     const detailRows = logs.map(l => {
       const { device, os, browser } = parseUA(l.user_agent);
       return `<tr data-device="${deviceKey(device)}">
-        <td>${l.created_at.slice(0,16)}</td>
+        <td>${toIST(l.created_at)}</td>
         <td><code>${l.ip}</code></td>
         <td>${device}</td>
         <td>${os}</td>
@@ -179,7 +186,7 @@ app.get('/devlog/pm2025', (req, res) => {
   <button type="submit" style="background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;padding:6px 16px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:12px">🗑 Clear Logs</button>
 </form>
 </div>
-<p>${logs.length} requests · ${uniqueIPs} unique IP${uniqueIPs !== 1 ? 's' : ''}</p>
+<p>${logs.length} requests · ${uniqueIPs} unique IP${uniqueIPs !== 1 ? 's' : ''} · Times in IST</p>
 <div class="filters">
   <button class="filter-btn active" data-filter="all" onclick="filter('all')">All</button>
   <button class="filter-btn" data-filter="iphone" onclick="filter('iphone')">📱 iPhone</button>
