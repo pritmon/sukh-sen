@@ -330,9 +330,10 @@ export default function Appointments() {
           <span style={{ width: 52, flexShrink: 0 }}>Time</span>
           <span style={{ width: 140, flexShrink: 0 }}>Customer</span>
           <span className="flex-1 min-w-0">Services</span>
-          <span style={{ width: 72, flexShrink: 0 }}>Staff</span>
-          <span style={{ width: 64, flexShrink: 0, textAlign: 'right' }}>Amount</span>
-          <span style={{ width: 96, flexShrink: 0 }}></span>
+          <span style={{ width: 110, flexShrink: 0 }}>Staff</span>
+          <span style={{ width: 60, flexShrink: 0, textAlign: 'right' }}>Amount</span>
+          <span style={{ width: 100, flexShrink: 0 }}></span>
+          <span style={{ width: 72, flexShrink: 0 }}></span>
         </div>
 
         {loading ? (
@@ -373,15 +374,15 @@ export default function Appointments() {
                   {a.staff_name || '—'}
                 </span>
                 {/* Amount */}
-                <span className="text-sm flex-shrink-0 font-serif font-semibold text-right" style={{ width: 64, color: '#C9A84C' }}>
+                <span className="text-sm flex-shrink-0 font-serif font-semibold text-right" style={{ width: 60, color: '#C9A84C' }}>
                   {fmtRupee(a.total_price)}
                 </span>
-                {/* Actions */}
-                <div className="flex-shrink-0 flex items-center justify-end gap-1" style={{ width: 140 }}>
+                {/* WhatsApp — own column so it never overlaps */}
+                <div className="flex-shrink-0" style={{ width: 100 }}>
                   {a.customer_phone && (
-                    <button title="Send WhatsApp"
+                    <button
                       onClick={() => openWhatsApp(a.customer_phone, whatsappConfirmMsg(settings.salon_name || 'Sukh Sen Salon', a.customer_name, a.date, a.time, a.services?.map(s => s.name).join(', ')))}
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0"
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors w-full justify-center"
                       style={{ color: '#22c55e', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
                       onMouseEnter={e => e.currentTarget.style.background = 'rgba(34,197,94,0.16)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'rgba(34,197,94,0.08)'}>
@@ -389,6 +390,9 @@ export default function Appointments() {
                       WhatsApp
                     </button>
                   )}
+                </div>
+                {/* Status actions — own column */}
+                <div className="flex-shrink-0 flex items-center justify-end gap-0.5" style={{ width: 72 }}>
                   {a.status === 'pending' && (
                     <>
                       <button onClick={() => setStatus(a.id, 'done')} title="Mark done"

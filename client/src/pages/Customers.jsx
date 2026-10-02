@@ -167,46 +167,53 @@ function CustomerProfile({ id, onBack }) {
 
   useEffect(() => { load(); }, [id]);
 
-  if (loading) return <div className="flex items-center justify-center h-32"><div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" /></div>;
-  if (!data)   return <div className="text-red-500 text-sm">Not found</div>;
+  if (loading) return <div className="flex items-center justify-center h-32"><div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} /></div>;
+  if (!data)   return <div className="text-sm" style={{ color: '#f87171' }}>Not found</div>;
+
+  const cardStyle = { background: '#141414', border: '1px solid rgba(201,168,76,0.15)' };
 
   return (
     <div className="space-y-5 max-w-2xl">
-      <button onClick={onBack} className="flex items-center gap-1 text-sm text-brand-600 hover:underline">
+      <button onClick={onBack} className="flex items-center gap-1.5 text-sm transition-colors"
+        style={{ color: 'rgba(201,168,76,0.6)' }}
+        onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.6)'}>
         <ArrowLeft className="w-4 h-4" /> Back
       </button>
 
       {/* Header */}
-      <div className="card p-5">
+      <div className="p-5 rounded-xl" style={cardStyle}>
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-brand-100 flex items-center justify-center text-brand-600 font-bold text-2xl flex-shrink-0">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-2xl flex-shrink-0"
+            style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A' }}>
             {data.name[0]}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="font-bold text-gray-900 text-lg">{data.name}</h2>
+              <h2 className="font-serif font-semibold text-lg" style={{ color: '#F5F0E8' }}>{data.name}</h2>
               <MembershipBadge tier={data.membership_tier} />
             </div>
-            <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
+            <p className="text-sm flex items-center gap-1 mt-0.5" style={{ color: 'rgba(245,240,232,0.45)' }}>
               <Phone className="w-3 h-3" /> {data.phone || 'No phone'}
             </p>
-            {data.birthday && <p className="text-xs text-gray-400 mt-0.5">🎂 {fmtDate(data.birthday)}</p>}
-            {data.anniversary && <p className="text-xs text-gray-400">💍 Anniversary: {fmtDate(data.anniversary)}</p>}
+            {data.birthday && <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>🎂 {fmtDate(data.birthday)}</p>}
+            {data.anniversary && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>💍 {fmtDate(data.anniversary)}</p>}
           </div>
           <div className="text-right flex-shrink-0">
-            <p className="text-2xl font-bold text-brand-600">{fmtRupee(data.totalSpent)}</p>
-            <p className="text-xs text-gray-400">{data.visitCount} visit{data.visitCount !== 1 ? 's' : ''}</p>
+            <p className="text-2xl font-serif font-semibold" style={{ color: '#C9A84C' }}>{fmtRupee(data.totalSpent)}</p>
+            <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{data.visitCount} visit{data.visitCount !== 1 ? 's' : ''}</p>
           </div>
         </div>
 
         {/* Loyalty points */}
-        <div className="mt-4 flex items-center justify-between bg-amber-50 rounded-xl px-4 py-3 border border-amber-100">
+        <div className="mt-4 flex items-center justify-between rounded-xl px-4 py-3"
+          style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)' }}>
           <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-amber-500" />
-            <span className="text-sm font-semibold text-gray-700">Loyalty Points</span>
+            <Star className="w-4 h-4" style={{ color: '#C9A84C' }} />
+            <span className="text-sm font-medium" style={{ color: '#F5F0E8' }}>Loyalty Points</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xl font-bold text-amber-600">{data.loyalty_points ?? 0} pts</span>
+            <span className="text-xl font-serif font-semibold" style={{ color: '#C9A84C' }}>{data.loyalty_points ?? 0} pts</span>
             <button onClick={() => setLoyaltyOpen(true)} className="btn-secondary text-xs px-3 py-1.5">Manage</button>
           </div>
         </div>
@@ -219,27 +226,31 @@ function CustomerProfile({ id, onBack }) {
       </div>
 
       {/* Visit history */}
-      <div className="card">
-        <div className="px-5 py-3.5 border-b border-gray-100">
+      <div className="rounded-xl overflow-hidden" style={cardStyle}>
+        <div className="px-5 py-3.5" style={{ borderBottom: '1px solid rgba(201,168,76,0.1)' }}>
           <h3 className="section-title">Visit History</h3>
         </div>
         {data.appointments.length === 0 ? (
-          <p className="text-center text-gray-400 text-sm py-8">No visits yet</p>
+          <p className="text-center text-sm py-8" style={{ color: 'rgba(245,240,232,0.35)' }}>No visits yet</p>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {data.appointments.map(a => (
-              <div key={a.id} className="px-5 py-3.5 flex items-start justify-between gap-3 hover:bg-slate-50/50">
+          <div>
+            {data.appointments.map((a, idx) => (
+              <div key={a.id} className="px-5 py-3.5 flex items-start justify-between gap-3 transition-colors"
+                style={{ borderBottom: idx < data.appointments.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{fmtDate(a.date)} · {a.time}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{a.services || 'No services'}</p>
-                  {a.staff_name && <p className="text-xs text-gray-400">by {a.staff_name}</p>}
+                  <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{fmtDate(a.date)} · {a.time}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.4)' }}>{a.services || 'No services'}</p>
+                  {a.staff_name && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.3)' }}>by {a.staff_name}</p>}
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="text-sm font-bold text-gray-800">{fmtRupee(a.bill_total || a.total_price)}</p>
+                  <p className="text-sm font-serif font-semibold" style={{ color: '#C9A84C' }}>{fmtRupee(a.bill_total || a.total_price)}</p>
                   <div className="flex items-center gap-1 justify-end mt-0.5">
                     <span className={statusClass(a.status)}>{statusLabel(a.status)}</span>
                     {a.bill_paid === 1 && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-700">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                        style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' }}>
                         {a.payment_method === 'upi' ? 'UPI' : 'Cash'}
                       </span>
                     )}
@@ -291,42 +302,47 @@ export default function Customers() {
   return (
     <div className="space-y-4 max-w-2xl">
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(201,168,76,0.4)' }} />
         <input className="input pl-10" placeholder="Search by name or phone…"
           value={q} onChange={e => setQ(e.target.value)} />
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="rounded-xl overflow-hidden" style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
         {loading ? (
           <div className="flex items-center justify-center h-24">
-            <div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
           </div>
         ) : customers.length === 0 ? (
-          <p className="text-center text-gray-400 text-sm py-10">No customers found</p>
+          <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.35)' }}>No customers found</p>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {customers.map(c => (
+          <div>
+            {customers.map((c, idx) => (
               <button key={c.id} onClick={() => setSelected(c.id)}
-                className="w-full px-5 py-3.5 flex items-center gap-3 hover:bg-slate-50/60 text-left transition-colors">
-                <div className="w-9 h-9 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 font-bold text-sm flex-shrink-0">
+                className="w-full px-5 py-3.5 flex items-center gap-3 text-left transition-colors"
+                style={{ borderBottom: idx < customers.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
+                  style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A' }}>
                   {c.name[0]}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-gray-900">{c.name}</p>
+                    <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{c.name}</p>
                     <MembershipBadge tier={c.membership_tier} />
                   </div>
-                  <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                  <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>
                     <Phone className="w-3 h-3" /> {c.phone || 'No phone'}
                   </p>
                 </div>
                 {(c.loyalty_points > 0) && (
-                  <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 rounded-lg px-2 py-1">
+                  <span className="flex items-center gap-1 text-xs font-semibold rounded-lg px-2 py-1"
+                    style={{ color: '#C9A84C', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
                     <Star className="w-3 h-3" /> {c.loyalty_points}
                   </span>
                 )}
-                <p className="text-xs text-gray-400">{fmtDate(c.created_at?.split('T')[0])}</p>
-                <ChevronRight className="w-4 h-4 text-gray-300" />
+                <p className="text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>{fmtDate(c.created_at?.split('T')[0])}</p>
+                <ChevronRight className="w-4 h-4" style={{ color: 'rgba(201,168,76,0.3)' }} />
               </button>
             ))}
           </div>
