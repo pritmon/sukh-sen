@@ -369,7 +369,7 @@ export default function Appointments() {
                   </div>
                 </div>
                 {/* Staff */}
-                <span className="text-xs flex-shrink-0 truncate" style={{ width: 72, color: 'rgba(245,240,232,0.4)' }}>
+                <span className="text-xs flex-shrink-0 truncate" style={{ width: 110, color: 'rgba(245,240,232,0.55)' }}>
                   {a.staff_name || '—'}
                 </span>
                 {/* Amount */}
@@ -379,12 +379,13 @@ export default function Appointments() {
                 {/* Actions */}
                 <div className="flex-shrink-0 flex justify-end gap-0.5" style={{ width: 96 }}>
                   {a.customer_phone && (
-                    <button title="WhatsApp"
+                    <button title="Send WhatsApp"
                       onClick={() => openWhatsApp(a.customer_phone, whatsappConfirmMsg(settings.salon_name || 'Sukh Sen Salon', a.customer_name, a.date, a.time, a.services?.map(s => s.name).join(', ')))}
-                      className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(74,222,128,0.6)' }}
-                      onMouseEnter={e => { e.currentTarget.style.color = '#4ade80'; e.currentTarget.style.background = 'rgba(74,222,128,0.08)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.color = 'rgba(74,222,128,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
-                      <MessageCircle className="w-3.5 h-3.5" />
+                      className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-colors flex-shrink-0"
+                      style={{ color: '#22c55e', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(34,197,94,0.16)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(34,197,94,0.08)'}>
+                      WA
                     </button>
                   )}
                   {a.status === 'pending' && (
