@@ -14,9 +14,9 @@ function Field({ icon: Icon, iconColor, label, sub, children }) {
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-1.5">
-        <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: iconColor || 'rgba(201,168,76,0.6)' }} />
-        <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(245,240,232,0.5)' }}>{label}</label>
-        {sub && <span className="text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>{sub}</span>}
+        <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: iconColor || '#C9A84C' }} />
+        <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#C9A84C' }}>{label}</label>
+        {sub && <span className="text-xs font-medium" style={{ color: 'rgba(245,240,232,0.65)' }}>{sub}</span>}
       </div>
       {children}
     </div>
@@ -55,7 +55,7 @@ export default function SalonSettings() {
   const waNumber = form.salon_whatsapp?.replace(/\D/g, '') || '';
   const waE164   = waNumber.startsWith('91') ? waNumber : `91${waNumber}`;
 
-  if (loading) return <div className="text-sm" style={{ color: 'rgba(245,240,232,0.4)' }}>Loading…</div>;
+  if (loading) return <div className="text-sm" style={{ color: 'rgba(245,240,232,0.68)' }}>Loading…</div>;
 
   return (
     <div className="max-w-5xl">
@@ -102,7 +102,7 @@ export default function SalonSettings() {
               <Field icon={MessageCircle} iconColor="#22c55e" label="WhatsApp" sub="(for customer messages)">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm select-none"
-                    style={{ color: 'rgba(245,240,232,0.35)' }}>+91</span>
+                    style={{ color: 'rgba(245,240,232,0.62)' }}>+91</span>
                   <input className="input pl-10" value={form.salon_whatsapp} type="tel"
                     onChange={e => setForm(f => ({ ...f, salon_whatsapp: e.target.value }))}
                     placeholder="98765 43210" />
@@ -118,7 +118,7 @@ export default function SalonSettings() {
               <Field icon={Instagram} iconColor="#ec4899" label="Instagram Handle">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm select-none"
-                    style={{ color: 'rgba(245,240,232,0.35)' }}>@</span>
+                    style={{ color: 'rgba(245,240,232,0.62)' }}>@</span>
                   <input className="input pl-7" value={igHandle}
                     onChange={e => setForm(f => ({ ...f, salon_instagram: e.target.value.replace('@', '') }))}
                     placeholder="sukhandsenunisexsalon" />
@@ -134,7 +134,7 @@ export default function SalonSettings() {
               <Field icon={p => <FacebookIcon {...p} />} iconColor="#3b82f6" label="Facebook Page">
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs select-none"
-                    style={{ color: 'rgba(245,240,232,0.35)' }}>fb.com/</span>
+                    style={{ color: 'rgba(245,240,232,0.62)' }}>fb.com/</span>
                   <input className="input pl-16" value={fbHandle}
                     onChange={e => setForm(f => ({ ...f, salon_facebook: e.target.value.replace('facebook.com/', '') }))}
                     placeholder="sukhandsen" />
@@ -176,7 +176,7 @@ export default function SalonSettings() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>@{igHandle}</p>
-                      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>Instagram</p>
+                      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>Instagram</p>
                     </div>
                     <a href={`https://instagram.com/${igHandle}`} target="_blank" rel="noopener noreferrer"
                       className="btn-primary text-xs px-3 py-1.5 flex items-center gap-1 flex-shrink-0">
@@ -193,7 +193,7 @@ export default function SalonSettings() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{fbHandle}</p>
-                      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>Facebook</p>
+                      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>Facebook</p>
                     </div>
                     <a href={`https://facebook.com/${fbHandle}`} target="_blank" rel="noopener noreferrer"
                       className="btn-primary text-xs px-3 py-1.5 flex items-center gap-1 flex-shrink-0">
@@ -201,7 +201,7 @@ export default function SalonSettings() {
                     </a>
                   </div>
                 )}
-                <p className="text-xs px-1" style={{ color: 'rgba(245,240,232,0.3)' }}>
+                <p className="text-xs px-1" style={{ color: 'rgba(245,240,232,0.55)' }}>
                   Both links appear in the sidebar for quick access.
                 </p>
               </div>
@@ -217,7 +217,7 @@ export default function SalonSettings() {
                 <h3 className="font-serif font-semibold text-sm" style={{ color: '#F5F0E8' }}>WhatsApp Quick Actions</h3>
               </div>
               <div className="p-4 space-y-2.5">
-                <p className="text-xs px-1" style={{ color: 'rgba(245,240,232,0.4)' }}>
+                <p className="text-xs px-1" style={{ color: 'rgba(245,240,232,0.68)' }}>
                   These buttons open WhatsApp with a pre-filled message.
                 </p>
                 {[
@@ -229,7 +229,7 @@ export default function SalonSettings() {
                     <MessageCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#22c55e' }} />
                     <div className="min-w-0">
                       <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{label}</p>
-                      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{desc}</p>
+                      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>{desc}</p>
                     </div>
                   </div>
                 ))}
@@ -240,7 +240,7 @@ export default function SalonSettings() {
           {!igHandle && !fbHandle && !form.salon_whatsapp && (
             <div className="rounded-xl p-6 text-center"
               style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.12)' }}>
-              <p className="text-sm" style={{ color: 'rgba(245,240,232,0.3)' }}>
+              <p className="text-sm" style={{ color: 'rgba(245,240,232,0.55)' }}>
                 Add WhatsApp or social handles to see previews here.
               </p>
             </div>
