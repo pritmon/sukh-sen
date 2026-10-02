@@ -377,15 +377,16 @@ export default function Appointments() {
                   {fmtRupee(a.total_price)}
                 </span>
                 {/* Actions */}
-                <div className="flex-shrink-0 flex justify-end gap-0.5" style={{ width: 96 }}>
+                <div className="flex-shrink-0 flex items-center justify-end gap-1" style={{ width: 140 }}>
                   {a.customer_phone && (
                     <button title="Send WhatsApp"
                       onClick={() => openWhatsApp(a.customer_phone, whatsappConfirmMsg(settings.salon_name || 'Sukh Sen Salon', a.customer_name, a.date, a.time, a.services?.map(s => s.name).join(', ')))}
-                      className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold transition-colors flex-shrink-0"
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0"
                       style={{ color: '#22c55e', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
                       onMouseEnter={e => e.currentTarget.style.background = 'rgba(34,197,94,0.16)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'rgba(34,197,94,0.08)'}>
-                      WA
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      WhatsApp
                     </button>
                   )}
                   {a.status === 'pending' && (
