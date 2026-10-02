@@ -122,6 +122,12 @@ addCol('staff', 'skills',                 'TEXT');
 addCol('staff', 'education',              'TEXT');
 addCol('staff', 'previous_work',          'TEXT');
 addCol('staff', 'family_details',         'TEXT');
+// staff ID documents
+addCol('staff', 'pan_number',             'TEXT');
+addCol('staff', 'aadhar_number',          'TEXT');
+addCol('staff', 'driving_license',        'TEXT');
+addCol('staff', 'voter_id',               'TEXT');
+addCol('staff', 'photo',                  'TEXT');
 // bills GST
 addCol('bills', 'gst_applied', 'INTEGER DEFAULT 0');
 addCol('bills', 'gst_rate',    'REAL DEFAULT 0');

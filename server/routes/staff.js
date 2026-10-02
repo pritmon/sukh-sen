@@ -4,7 +4,8 @@ const router  = express.Router();
 
 const FIELDS = `id, name, phone, role, active, dob, address,
   emergency_name, emergency_phone, emergency_relation,
-  years_experience, skills, education, previous_work, family_details, created_at`;
+  years_experience, skills, education, previous_work, family_details,
+  pan_number, aadhar_number, driving_license, voter_id, photo, created_at`;
 
 // GET /api/staff
 router.get('/', (req, res) => {
@@ -35,19 +36,23 @@ router.post('/', (req, res) => {
       dob, address,
       emergency_name, emergency_phone, emergency_relation,
       years_experience, skills, education, previous_work, family_details,
+      pan_number, aadhar_number, driving_license, voter_id, photo,
     } = req.body;
     if (!name) return res.status(400).json({ error: 'name required' });
     const r = db.prepare(`
       INSERT INTO staff (name, phone, role, dob, address,
         emergency_name, emergency_phone, emergency_relation,
-        years_experience, skills, education, previous_work, family_details)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+        years_experience, skills, education, previous_work, family_details,
+        pan_number, aadhar_number, driving_license, voter_id, photo)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `).run(
       name, phone || null, role || 'Stylist',
       dob || null, address || null,
       emergency_name || null, emergency_phone || null, emergency_relation || null,
       years_experience || null, skills || null, education || null,
       previous_work || null, family_details || null,
+      pan_number || null, aadhar_number || null, driving_license || null,
+      voter_id || null, photo || null,
     );
     res.status(201).json(db.prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(r.lastInsertRowid));
   } catch (err) {
@@ -63,19 +68,22 @@ router.put('/:id', (req, res) => {
       dob, address,
       emergency_name, emergency_phone, emergency_relation,
       years_experience, skills, education, previous_work, family_details,
+      pan_number, aadhar_number, driving_license, voter_id, photo,
     } = req.body;
     db.prepare(`
       UPDATE staff SET
         name=?, phone=?, role=?,
         dob=?, address=?,
         emergency_name=?, emergency_phone=?, emergency_relation=?,
-        years_experience=?, skills=?, education=?, previous_work=?, family_details=?
+        years_experience=?, skills=?, education=?, previous_work=?, family_details=?,
+        pan_number=?, aadhar_number=?, driving_license=?, voter_id=?, photo=?
       WHERE id=?
     `).run(
       name, phone || null, role || 'Stylist',
       dob || null, address || null,
       emergency_name || null, emergency_phone || null, emergency_relation || null,
       years_experience || 0, skills || null, education || null, previous_work || null, family_details || null,
+      pan_number || null, aadhar_number || null, driving_license || null, voter_id || null, photo || null,
       req.params.id
     );
     res.json(db.prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(req.params.id));

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { api } from '../api.js';
-import { Plus, Pencil, Trash2, Phone, AlertCircle, BookOpen, ArrowLeft, Users } from 'lucide-react';
+import { Plus, Pencil, Trash2, Phone, AlertCircle, BookOpen, ArrowLeft, Users, CreditCard, Camera, X } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
 const ROLES = ['Owner', 'Top Stylist', 'Senior Stylist', 'Stylist', 'Assistant', 'Receptionist', 'Trainee'];
@@ -52,8 +52,17 @@ function StaffForm({ initial, onSave, onClose }) {
   const [form,   setForm]   = useState(initial || EMPTY);
   const [family, setFamily] = useState(() => parseFamily(initial?.family_details));
   const [saving, setSaving] = useState(false);
+  const photoRef = useRef(null);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const setFam = (k, v) => setFamily(f => ({ ...f, [k]: v }));
+
+  function handlePhoto(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => set('photo', ev.target.result);
+    reader.readAsDataURL(file);
+  }
 
   const toggleStyle = (active) => active
     ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.35)' }
@@ -187,6 +196,59 @@ function StaffForm({ initial, onSave, onClose }) {
         </div>
       </Section>
 
+      <Section title="ID Documents">
+        {/* Passport photo */}
+        <div className="flex items-start gap-4">
+          <div>
+            <p className="label mb-2">Passport Photo</p>
+            <div className="w-20 h-24 rounded-xl overflow-hidden flex items-center justify-center relative"
+              style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)' }}>
+              {form.photo
+                ? <img src={form.photo} alt="photo" className="w-full h-full object-cover" />
+                : <Camera className="w-6 h-6" style={{ color: 'rgba(201,168,76,0.3)' }} />}
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button type="button" onClick={() => photoRef.current?.click()}
+                className="text-xs px-2 py-1 rounded-lg"
+                style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' }}>
+                {form.photo ? 'Change' : 'Upload'}
+              </button>
+              {form.photo && (
+                <button type="button" onClick={() => set('photo', '')}
+                  className="text-xs px-2 py-1 rounded-lg"
+                  style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.15)' }}>
+                  Remove
+                </button>
+              )}
+            </div>
+            <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="PAN Number">
+            <input className="input" value={form.pan_number || ''}
+              onChange={e => set('pan_number', e.target.value.toUpperCase())}
+              placeholder="ABCDE1234F" maxLength={10} />
+          </Field>
+          <Field label="Aadhar Number">
+            <input className="input" value={form.aadhar_number || ''}
+              onChange={e => set('aadhar_number', e.target.value)}
+              placeholder="XXXX XXXX XXXX" maxLength={14} />
+          </Field>
+          <Field label="Driving License">
+            <input className="input" value={form.driving_license || ''}
+              onChange={e => set('driving_license', e.target.value.toUpperCase())}
+              placeholder="DL number" />
+          </Field>
+          <Field label="Voter ID">
+            <input className="input" value={form.voter_id || ''}
+              onChange={e => set('voter_id', e.target.value.toUpperCase())}
+              placeholder="Voter ID number" />
+          </Field>
+        </div>
+      </Section>
+
       <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
         style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
@@ -295,6 +357,27 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
             </div>
           )}
         </div>
+
+        {/* ID Documents */}
+        {(s.pan_number || s.aadhar_number || s.driving_license || s.voter_id || s.photo) && (
+          <div className="p-5 rounded-xl" style={cardStyle}>
+            {sectionLabel('ID Documents', <CreditCard className="w-3.5 h-3.5" />)}
+            <div className="flex items-start gap-5">
+              {s.photo && (
+                <div className="w-20 h-24 rounded-xl overflow-hidden flex-shrink-0"
+                  style={{ border: '1px solid rgba(201,168,76,0.2)' }}>
+                  <img src={s.photo} alt="Passport" className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="space-y-2 flex-1">
+                {infoRow('PAN', s.pan_number)}
+                {infoRow('Aadhar', s.aadhar_number)}
+                {infoRow('Driving Lic.', s.driving_license)}
+                {infoRow('Voter ID', s.voter_id)}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Family */}
         {s.family_details && (() => {
