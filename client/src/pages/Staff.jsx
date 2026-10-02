@@ -53,15 +53,16 @@ function StaffForm({ initial, onSave, onClose }) {
   const [form,   setForm]   = useState(initial || EMPTY);
   const [family, setFamily] = useState(() => parseFamily(initial?.family_details));
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
   const photoRef = useRef(null);
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErrors(e => ({ ...e, [k]: false })); };
   const setFam = (k, v) => setFamily(f => ({ ...f, [k]: v }));
 
   function handlePhoto(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => set('photo', ev.target.result);
+    reader.onload = ev => { set('photo', ev.target.result); setErrors(e => ({ ...e, photo: false })); };
     reader.readAsDataURL(file);
   }
 
@@ -71,6 +72,12 @@ function StaffForm({ initial, onSave, onClose }) {
 
   async function submit(e) {
     e.preventDefault();
+    const errs = {};
+    if (!form.name?.trim())         errs.name    = 'Name is required';
+    if (!form.phone?.trim())        errs.phone   = 'Phone number is required';
+    if (!form.photo)                errs.photo   = 'Passport photo is required';
+    if (!form.aadhar_number?.trim()) errs.aadhar_number = 'Aadhar number is required';
+    if (Object.keys(errs).length) { setErrors(errs); return; }
     setSaving(true);
     try {
       await onSave({ ...form, family_details: serializeFamily(family) });
@@ -82,8 +89,10 @@ function StaffForm({ initial, onSave, onClose }) {
       <Section title="Basic Info">
         <div className="grid grid-cols-2 gap-3">
           <Field label="Name *">
-            <input className="input" value={form.name} required
-              onChange={e => set('name', e.target.value)} placeholder="Full name" />
+            <input className={`input${errors.name ? ' border-red-500' : ''}`} value={form.name} required
+              onChange={e => set('name', e.target.value)} placeholder="Full name"
+              style={errors.name ? { borderColor: '#ef4444' } : {}} />
+            {errors.name && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.name}</p>}
           </Field>
           <Field label="Role">
             <select className="input" value={form.role} onChange={e => set('role', e.target.value)}>
@@ -92,9 +101,11 @@ function StaffForm({ initial, onSave, onClose }) {
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Phone">
+          <Field label="Phone *">
             <input className="input" value={form.phone || ''} type="tel"
-              onChange={e => set('phone', e.target.value)} placeholder="Mobile number" />
+              onChange={e => set('phone', e.target.value)} placeholder="Mobile number"
+              style={errors.phone ? { borderColor: '#ef4444' } : {}} />
+            {errors.phone && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.phone}</p>}
           </Field>
           <Field label="Date of Birth">
             <input className="input" type="date" value={form.dob || ''}
@@ -209,13 +220,14 @@ function StaffForm({ initial, onSave, onClose }) {
         {/* Passport photo */}
         <div className="flex items-start gap-4">
           <div>
-            <p className="label mb-2">Passport Photo</p>
+            <p className="label mb-2">Passport Photo *</p>
             <div className="w-20 h-24 rounded-xl overflow-hidden flex items-center justify-center relative"
-              style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)' }}>
+              style={{ background: '#1A1A1A', border: `1px solid ${errors.photo ? '#ef4444' : 'rgba(201,168,76,0.2)'}` }}>
               {form.photo
                 ? <img src={form.photo} alt="photo" className="w-full h-full object-cover" />
-                : <Camera className="w-6 h-6" style={{ color: 'rgba(201,168,76,0.3)' }} />}
+                : <Camera className="w-6 h-6" style={{ color: errors.photo ? '#f87171' : 'rgba(201,168,76,0.3)' }} />}
             </div>
+            {errors.photo && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.photo}</p>}
             <div className="flex gap-2 mt-2">
               <button type="button" onClick={() => photoRef.current?.click()}
                 className="text-xs px-2 py-1 rounded-lg"
@@ -223,7 +235,7 @@ function StaffForm({ initial, onSave, onClose }) {
                 {form.photo ? 'Change' : 'Upload'}
               </button>
               {form.photo && (
-                <button type="button" onClick={() => set('photo', '')}
+                <button type="button" onClick={() => { set('photo', ''); setErrors(e => ({ ...e, photo: 'Passport photo is required' })); }}
                   className="text-xs px-2 py-1 rounded-lg"
                   style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.15)' }}>
                   Remove
@@ -240,10 +252,12 @@ function StaffForm({ initial, onSave, onClose }) {
               onChange={e => set('pan_number', e.target.value.toUpperCase())}
               placeholder="ABCDE1234F" maxLength={10} />
           </Field>
-          <Field label="Aadhar Number">
+          <Field label="Aadhar Number *">
             <input className="input" value={form.aadhar_number || ''}
               onChange={e => set('aadhar_number', e.target.value)}
-              placeholder="XXXX XXXX XXXX" maxLength={14} />
+              placeholder="XXXX XXXX XXXX" maxLength={14}
+              style={errors.aadhar_number ? { borderColor: '#ef4444' } : {}} />
+            {errors.aadhar_number && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.aadhar_number}</p>}
           </Field>
           <Field label="Driving License">
             <input className="input" value={form.driving_license || ''}
