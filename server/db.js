@@ -14,6 +14,16 @@ const db = new DatabaseSync(DB_PATH);
 db.exec('PRAGMA journal_mode = WAL');
 db.exec('PRAGMA foreign_keys = ON');
 
+db.exec(`CREATE TABLE IF NOT EXISTS access_logs (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  ip         TEXT,
+  user_agent TEXT,
+  path       TEXT,
+  method     TEXT,
+  referer    TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);`);
+
 // ─── Schema ───────────────────────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS staff (
