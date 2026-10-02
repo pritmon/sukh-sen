@@ -12,6 +12,23 @@ const EMPTY = {
   years_experience: '', skills: '', education: '', previous_work: '', family_details: '',
 };
 
+const EMPTY_FAMILY = {
+  marital_status: '', spouse: '',
+  mother: '', father: '', brother: '', sister: '',
+  grandfather: '', grandmother: '',
+};
+
+function parseFamily(raw) {
+  if (!raw) return { ...EMPTY_FAMILY };
+  try { return { ...EMPTY_FAMILY, ...JSON.parse(raw) }; }
+  catch { return { ...EMPTY_FAMILY, notes: raw }; }
+}
+
+function serializeFamily(fam) {
+  const clean = Object.fromEntries(Object.entries(fam).filter(([, v]) => v));
+  return Object.keys(clean).length ? JSON.stringify(clean) : '';
+}
+
 function Section({ title, children }) {
   return (
     <div>
@@ -33,14 +50,21 @@ function Field({ label, children }) {
 
 function StaffForm({ initial, onSave, onClose }) {
   const [form,   setForm]   = useState(initial || EMPTY);
+  const [family, setFamily] = useState(() => parseFamily(initial?.family_details));
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const setFam = (k, v) => setFamily(f => ({ ...f, [k]: v }));
+
+  const toggleStyle = (active) => active
+    ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.35)' }
+    : { background: '#1A1A1A', color: 'rgba(245,240,232,0.45)', border: '1px solid rgba(201,168,76,0.12)' };
 
   async function submit(e) {
     e.preventDefault();
     setSaving(true);
-    try { await onSave(form); }
-    finally { setSaving(false); }
+    try {
+      await onSave({ ...form, family_details: serializeFamily(family) });
+    } finally { setSaving(false); }
   }
 
   return (
@@ -113,14 +137,58 @@ function StaffForm({ initial, onSave, onClose }) {
       </Section>
 
       <Section title="Family Details">
-        <Field label="Family Members">
-          <textarea className="input" rows={2} value={form.family_details || ''}
-            onChange={e => set('family_details', e.target.value)}
-            placeholder="e.g. Wife: Priya, Son: Rahul (age 5)" />
+        {/* Marital status */}
+        <Field label="Marital Status">
+          <div className="flex gap-2">
+            {['Unmarried', 'Married'].map(s => (
+              <button type="button" key={s}
+                onClick={() => setFam('marital_status', family.marital_status === s ? '' : s)}
+                className="px-4 py-1.5 rounded-lg text-sm font-medium transition-all"
+                style={toggleStyle(family.marital_status === s)}>
+                {s}
+              </button>
+            ))}
+          </div>
         </Field>
+
+        {/* Spouse — only if married */}
+        {family.marital_status === 'Married' && (
+          <Field label="Wife / Husband">
+            <input className="input" value={family.spouse || ''}
+              onChange={e => setFam('spouse', e.target.value)} placeholder="Spouse name" />
+          </Field>
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Father">
+            <input className="input" value={family.father || ''}
+              onChange={e => setFam('father', e.target.value)} placeholder="Father's name" />
+          </Field>
+          <Field label="Mother">
+            <input className="input" value={family.mother || ''}
+              onChange={e => setFam('mother', e.target.value)} placeholder="Mother's name" />
+          </Field>
+          <Field label="Brother">
+            <input className="input" value={family.brother || ''}
+              onChange={e => setFam('brother', e.target.value)} placeholder="Brother's name(s)" />
+          </Field>
+          <Field label="Sister">
+            <input className="input" value={family.sister || ''}
+              onChange={e => setFam('sister', e.target.value)} placeholder="Sister's name(s)" />
+          </Field>
+          <Field label="Grandfather">
+            <input className="input" value={family.grandfather || ''}
+              onChange={e => setFam('grandfather', e.target.value)} placeholder="Grandfather's name" />
+          </Field>
+          <Field label="Grandmother">
+            <input className="input" value={family.grandmother || ''}
+              onChange={e => setFam('grandmother', e.target.value)} placeholder="Grandmother's name" />
+          </Field>
+        </div>
       </Section>
 
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
+        style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-primary" disabled={saving}>
           {saving ? 'Saving…' : 'Save Staff Profile'}
@@ -147,7 +215,7 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
   );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 max-w-5xl">
       <button onClick={onBack} className="flex items-center gap-1.5 text-sm transition-colors"
         style={{ color: 'rgba(201,168,76,0.6)' }}
         onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
@@ -161,14 +229,14 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
           style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A' }}>
           {s.name[0]}
         </div>
-        <div className="flex-1">
-          <h2 className="font-serif text-lg font-semibold" style={{ color: '#F5F0E8' }}>{s.name}</h2>
+        <div className="flex-1 min-w-0">
+          <h2 className="font-serif text-lg font-semibold truncate" style={{ color: '#F5F0E8' }}>{s.name}</h2>
           <p className="text-sm font-medium mt-0.5" style={{ color: '#C9A84C' }}>{s.role}</p>
           {s.years_experience > 0 && (
             <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.years_experience} yr{s.years_experience !== 1 ? 's' : ''} experience</p>
           )}
         </div>
-        <button onClick={() => onEdit(s)} className="btn-secondary flex items-center gap-1.5">
+        <button onClick={() => onEdit(s)} className="btn-secondary flex items-center gap-1.5 flex-shrink-0">
           <Pencil className="w-3.5 h-3.5" /> Edit
         </button>
       </div>
@@ -229,12 +297,26 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
         </div>
 
         {/* Family */}
-        {s.family_details && (
-          <div className="p-5 rounded-xl" style={cardStyle}>
-            {sectionLabel('Family', <Users className="w-3.5 h-3.5" />)}
-            <p className="text-sm whitespace-pre-line" style={{ color: 'rgba(245,240,232,0.7)' }}>{s.family_details}</p>
-          </div>
-        )}
+        {s.family_details && (() => {
+          const fam = parseFamily(s.family_details);
+          const rows = [
+            fam.marital_status && ['Status', fam.marital_status],
+            fam.spouse && ['Wife / Husband', fam.spouse],
+            fam.father && ['Father', fam.father],
+            fam.mother && ['Mother', fam.mother],
+            fam.brother && ['Brother', fam.brother],
+            fam.sister && ['Sister', fam.sister],
+            fam.grandfather && ['Grandfather', fam.grandfather],
+            fam.grandmother && ['Grandmother', fam.grandmother],
+            fam.notes && ['Notes', fam.notes],
+          ].filter(Boolean);
+          return rows.length > 0 ? (
+            <div className="p-5 rounded-xl space-y-2" style={cardStyle}>
+              {sectionLabel('Family', <Users className="w-3.5 h-3.5" />)}
+              {rows.map(([label, val]) => infoRow(label, val))}
+            </div>
+          ) : null;
+        })()}
       </div>
     </div>
   );
