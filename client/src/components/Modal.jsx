@@ -14,7 +14,7 @@ export default function Modal({ title, onClose, children, wide }) {
           <h2 className="font-serif font-semibold text-base" style={{ color: '#F5F0E8' }}>{title}</h2>
           <button onClick={onClose}
             className="p-1.5 rounded-lg transition-colors"
-            style={{ color: 'rgba(245,240,232,0.4)' }}
+            style={{ color: 'rgba(245,240,232,0.68)' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#F5F0E8'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.4)'; e.currentTarget.style.background = 'transparent'; }}>
             <X className="w-4 h-4" />

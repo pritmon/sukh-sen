@@ -50,11 +50,11 @@ export default function Sidebar({ open, onClose }) {
               </div>
               <div>
                 <p className="font-serif font-semibold text-cream text-sm leading-tight tracking-wide">Sukh&Sen</p>
-                <p className="text-xs mt-0.5" style={{ color: 'rgba(201, 168, 76, 0.6)' }}>Unisex Salon · Kakdwip</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(201, 168, 76, 0.85)' }}>Unisex Salon · Kakdwip</p>
               </div>
             </div>
             <button onClick={onClose} className="lg:hidden p-1 rounded-lg transition-colors"
-              style={{ color: 'rgba(245, 240, 232, 0.4)' }}>
+              style={{ color: 'rgba(245, 240, 232, 0.68)' }}>
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -82,7 +82,7 @@ export default function Sidebar({ open, onClose }) {
                   color: '#E8C96D',
                   border: '1px solid rgba(201, 168, 76, 0.2)',
                 } : {
-                  color: 'rgba(245, 240, 232, 0.45)',
+                  color: 'rgba(245, 240, 232, 0.72)',
                   border: '1px solid transparent',
                 }}
               >
@@ -103,7 +103,7 @@ export default function Sidebar({ open, onClose }) {
 
         {/* Footer */}
         <div className="px-6 py-4" style={{ borderTop: '1px solid rgba(201, 168, 76, 0.12)' }}>
-          <p className="text-xs" style={{ color: 'rgba(201, 168, 76, 0.35)' }}>Salon Management · v1.0</p>
+          <p className="text-xs" style={{ color: 'rgba(201, 168, 76, 0.65)' }}>Salon Management · v1.0</p>
         </div>
       </aside>
     </>

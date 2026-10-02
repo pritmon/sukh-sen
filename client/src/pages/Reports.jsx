@@ -8,11 +8,11 @@ function SummaryCard({ icon: Icon, label, value, sub, gold }) {
     <div className="flex flex-col gap-1.5 px-4 py-4 rounded-xl"
       style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.12)' }}>
       <div className="flex items-center gap-1.5">
-        <Icon className="w-3.5 h-3.5" style={{ color: 'rgba(201,168,76,0.5)' }} />
-        <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.5)' }}>{label}</span>
+        <Icon className="w-3.5 h-3.5" style={{ color: 'rgba(201,168,76,0.78)' }} />
+        <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.78)' }}>{label}</span>
       </div>
       <p className="text-2xl font-bold font-serif" style={{ color: gold ? '#C9A84C' : '#F5F0E8' }}>{value}</p>
-      {sub && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{sub}</p>}
+      {sub && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>{sub}</p>}
     </div>
   );
 }
@@ -49,7 +49,7 @@ function StaffPerformance() {
       <div className="flex items-center gap-2">
         <button onClick={() => shiftDate(-1)}
           className="p-2 rounded-xl transition-colors"
-          style={{ border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.5)', background: '#161616' }}
+          style={{ border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.75)', background: '#161616' }}
           onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.08)'}
           onMouseLeave={e => e.currentTarget.style.background = '#161616'}>
           <ChevronLeft className="w-4 h-4" />
@@ -58,7 +58,7 @@ function StaffPerformance() {
           className="input flex-1 max-w-[160px]" style={{ colorScheme: 'dark' }} />
         <button onClick={() => shiftDate(1)}
           className="p-2 rounded-xl transition-colors"
-          style={{ border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.5)', background: '#161616' }}
+          style={{ border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.75)', background: '#161616' }}
           onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.08)'}
           onMouseLeave={e => e.currentTarget.style.background = '#161616'}>
           <ChevronRight className="w-4 h-4" />
@@ -87,7 +87,7 @@ function StaffPerformance() {
           {active.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <Users className="w-10 h-10" style={{ color: 'rgba(201,168,76,0.2)' }} />
-              <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>
+              <p className="text-sm" style={{ color: 'rgba(245,240,232,0.62)' }}>
                 {staff.length ? 'No appointments on this date' : 'No staff data for this date'}
               </p>
             </div>
@@ -120,19 +120,19 @@ function StaffPerformance() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{s.name}</p>
-                        <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.role}</p>
+                        <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>{s.role}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-lg font-bold font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(s.revenue)}</p>
                         {s.avg_bill > 0 && (
-                          <p className="text-xs" style={{ color: 'rgba(245,240,232,0.3)' }}>avg {fmtRupee(Math.round(s.avg_bill))}</p>
+                          <p className="text-xs" style={{ color: 'rgba(245,240,232,0.55)' }}>avg {fmtRupee(Math.round(s.avg_bill))}</p>
                         )}
                       </div>
                     </div>
 
                     {/* Stats row */}
                     <div className="flex items-center gap-3 mb-2.5 ml-12 flex-wrap">
-                      <span className="flex items-center gap-1 text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>
+                      <span className="flex items-center gap-1 text-xs" style={{ color: 'rgba(245,240,232,0.68)' }}>
                         <CalendarDays className="w-3 h-3" /> {s.appointments} appointment{s.appointments !== 1 ? 's' : ''}
                       </span>
                       <span className="flex items-center gap-1 text-xs"
@@ -157,7 +157,7 @@ function StaffPerformance() {
                           </span>
                         ))}
                         {services.length > 6 && (
-                          <span className="text-xs self-center" style={{ color: 'rgba(245,240,232,0.3)' }}>+{services.length - 6} more</span>
+                          <span className="text-xs self-center" style={{ color: 'rgba(245,240,232,0.55)' }}>+{services.length - 6} more</span>
                         )}
                       </div>
                     )}
@@ -181,7 +181,7 @@ function StaffPerformance() {
               {/* Idle staff footer */}
               {idle.length > 0 && (
                 <div className="px-5 py-3" style={{ borderTop: '1px solid rgba(201,168,76,0.06)', background: 'rgba(0,0,0,0.25)' }}>
-                  <p className="text-xs" style={{ color: 'rgba(245,240,232,0.2)' }}>
+                  <p className="text-xs" style={{ color: 'rgba(245,240,232,0.42)' }}>
                     No appointments: {idle.map(s => s.name).join(', ')}
                   </p>
                 </div>
@@ -237,12 +237,12 @@ function MonthlyReport() {
           <div className="rounded-xl overflow-hidden"
             style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
             <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
-              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.5)' }}>Daily Breakdown</p>
+              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.78)' }}>Daily Breakdown</p>
             </div>
             {days.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 gap-3">
                 <BarChart2 className="w-8 h-8" style={{ color: 'rgba(201,168,76,0.2)' }} />
-                <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>No data for this month</p>
+                <p className="text-sm" style={{ color: 'rgba(245,240,232,0.62)' }}>No data for this month</p>
               </div>
             ) : (
               <div className="px-5 py-4 space-y-2.5">
@@ -250,7 +250,7 @@ function MonthlyReport() {
                   const isBest = bestDay && d.date === bestDay.date && bestDay.revenue > 0;
                   return (
                     <div key={d.date} className="flex items-center gap-3">
-                      <span className="text-xs font-mono flex-shrink-0 w-20" style={{ color: 'rgba(245,240,232,0.4)' }}>{fmtDate(d.date)}</span>
+                      <span className="text-xs font-mono flex-shrink-0 w-20" style={{ color: 'rgba(245,240,232,0.68)' }}>{fmtDate(d.date)}</span>
                       <div className="flex-1 rounded-full h-2.5" style={{ background: 'rgba(255,255,255,0.05)' }}>
                         <div className="h-2.5 rounded-full transition-all duration-500"
                           style={{
@@ -263,7 +263,7 @@ function MonthlyReport() {
                       <span className="text-xs font-serif font-semibold w-20 text-right flex-shrink-0"
                         style={{ color: isBest ? '#fbbf24' : '#C9A84C' }}>{fmtRupee(d.revenue)}</span>
                       <span className="text-xs w-14 text-right flex-shrink-0"
-                        style={{ color: 'rgba(245,240,232,0.3)' }}>{d.appointments} appointment{d.appointments !== 1 ? 's' : ''}</span>
+                        style={{ color: 'rgba(245,240,232,0.55)' }}>{d.appointments} appointment{d.appointments !== 1 ? 's' : ''}</span>
                     </div>
                   );
                 })}
@@ -287,7 +287,7 @@ export default function Reports() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
             style={tab === key
               ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.25)' }
-              : { color: 'rgba(245,240,232,0.4)', border: '1px solid transparent' }}>
+              : { color: 'rgba(245,240,232,0.68)', border: '1px solid transparent' }}>
             <Icon className="w-4 h-4" />{label}
           </button>
         ))}

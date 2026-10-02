@@ -26,14 +26,14 @@ function StatCard({ icon: Icon, label, value, sub }) {
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
           <span className="text-xs font-medium uppercase tracking-widest"
-            style={{ color: 'rgba(201, 168, 76, 0.6)' }}>{label}</span>
+            style={{ color: 'rgba(201, 168, 76, 0.85)' }}>{label}</span>
           <div className="w-8 h-8 rounded-lg flex items-center justify-center"
             style={{ background: 'rgba(201, 168, 76, 0.12)', border: '1px solid rgba(201, 168, 76, 0.2)' }}>
             <Icon className="w-4 h-4" style={{ color: '#C9A84C' }} />
           </div>
         </div>
         <p className="text-3xl font-serif font-semibold leading-none" style={{ color: '#F5F0E8' }}>{value}</p>
-        {sub && <p className="text-xs mt-2" style={{ color: 'rgba(245, 240, 232, 0.35)' }}>{sub}</p>}
+        {sub && <p className="text-xs mt-2" style={{ color: 'rgba(245, 240, 232, 0.62)' }}>{sub}</p>}
       </div>
 
       {/* bottom gold line */}
@@ -78,7 +78,7 @@ export default function Dashboard() {
       {/* Date + social row */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'rgba(201, 168, 76, 0.5)' }}>Today</p>
+          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: 'rgba(201, 168, 76, 0.78)' }}>Today</p>
           <p className="font-serif text-xl font-semibold" style={{ color: '#F5F0E8' }}>{fmtDate(todayISO())}</p>
         </div>
         {(ig || fb) && (
@@ -126,7 +126,7 @@ export default function Dashboard() {
           style={{ borderBottom: '1px solid rgba(201, 168, 76, 0.1)' }}>
           <h2 className="section-title">Today's Appointments</h2>
           <span className="text-xs font-medium px-2.5 py-1 rounded-full"
-            style={{ color: 'rgba(201,168,76,0.6)', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
+            style={{ color: 'rgba(201,168,76,0.85)', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
             {appointments.length} total
           </span>
         </div>
@@ -136,8 +136,8 @@ export default function Dashboard() {
               style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.12)' }}>
               <CalendarDays className="w-6 h-6" style={{ color: 'rgba(201,168,76,0.3)' }} />
             </div>
-            <p className="text-sm font-medium" style={{ color: 'rgba(245,240,232,0.4)' }}>No appointments today</p>
-            <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.2)' }}>Enjoy the quiet day</p>
+            <p className="text-sm font-medium" style={{ color: 'rgba(245,240,232,0.68)' }}>No appointments today</p>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.42)' }}>Enjoy the quiet day</p>
           </div>
         ) : (
           <div>
@@ -158,7 +158,7 @@ export default function Dashboard() {
                 {/* Customer */}
                 <p className="text-sm font-medium truncate flex-shrink-0" style={{ width: 150, color: '#F5F0E8' }}>{a.customer_name}</p>
                 {/* Service */}
-                <p className="text-xs truncate flex-1 min-w-0" style={{ color: 'rgba(245,240,232,0.4)' }}>{a.services || '—'}</p>
+                <p className="text-xs truncate flex-1 min-w-0" style={{ color: 'rgba(245,240,232,0.68)' }}>{a.services || '—'}</p>
                 {/* Staff */}
                 <p className="text-xs font-medium truncate flex-shrink-0" style={{ width: 120, color: 'rgba(245,240,232,0.55)' }}>{a.staff_name || '—'}</p>
                 {/* Amount */}

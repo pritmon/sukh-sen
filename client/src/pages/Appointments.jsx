@@ -113,7 +113,7 @@ function AppointmentForm({ onSave, onClose }) {
             <p className="text-sm font-semibold" style={{ color: '#E8C96D' }}>
               Welcome back, {recognized.name}!
             </p>
-            <p className="text-xs" style={{ color: 'rgba(201,168,76,0.6)' }}>
+            <p className="text-xs" style={{ color: 'rgba(201,168,76,0.85)' }}>
               {recognized.visitCount || recognized.visit_count || 0} visit{(recognized.visitCount || recognized.visit_count) !== 1 ? 's' : ''} · returning guest
             </p>
           </div>
@@ -140,7 +140,7 @@ function AppointmentForm({ onSave, onClose }) {
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                   <div>
                     <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{c.name}</p>
-                    <p className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>{c.phone || 'No phone'}</p>
+                    <p className="text-xs" style={{ color: 'rgba(245,240,232,0.68)' }}>{c.phone || 'No phone'}</p>
                   </div>
                   <span className="text-xs px-2 py-0.5 rounded-full" style={{ color: 'rgba(201,168,76,0.7)', background: 'rgba(201,168,76,0.1)' }}>
                     {c.visit_count || 0} visits
@@ -189,7 +189,7 @@ function AppointmentForm({ onSave, onClose }) {
           {categories.map(cat => (
             <div key={cat}>
               <p className="text-xs font-medium uppercase tracking-widest mb-1.5"
-                style={{ color: 'rgba(201,168,76,0.5)' }}>{cat}</p>
+                style={{ color: 'rgba(201,168,76,0.78)' }}>{cat}</p>
               {services.filter(s => s.category === cat).map(s => (
                 <label key={s.id} className="flex items-center gap-2 py-1 cursor-pointer">
                   <input type="checkbox" checked={form.serviceIds.includes(s.id)}
@@ -295,7 +295,7 @@ export default function Appointments() {
         <div className="flex items-center gap-1 rounded-lg px-2 py-1.5"
           style={{ background: '#161616', border: '1px solid rgba(201,168,76,0.2)' }}>
           <button onClick={() => shiftDate(-1)} className="p-1 rounded-lg transition-colors"
-            style={{ color: 'rgba(201,168,76,0.5)' }}
+            style={{ color: 'rgba(201,168,76,0.78)' }}
             onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
             onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}>
             <ChevronLeft className="w-4 h-4" />
@@ -304,7 +304,7 @@ export default function Appointments() {
             className="text-sm border-none focus:outline-none bg-transparent font-medium"
             style={{ color: '#F5F0E8', colorScheme: 'dark' }} />
           <button onClick={() => shiftDate(1)} className="p-1 rounded-lg transition-colors"
-            style={{ color: 'rgba(201,168,76,0.5)' }}
+            style={{ color: 'rgba(201,168,76,0.78)' }}
             onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
             onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}>
             <ChevronRight className="w-4 h-4" />
@@ -326,7 +326,7 @@ export default function Appointments() {
       <div className="rounded-xl overflow-hidden" style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
         {/* Header */}
         <div className="hidden sm:flex px-4 py-2.5 text-xs font-medium uppercase tracking-widest gap-3"
-          style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D', color: 'rgba(201,168,76,0.5)' }}>
+          style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D', color: 'rgba(201,168,76,0.78)' }}>
           <span style={{ width: 52, flexShrink: 0 }}>Time</span>
           <span style={{ width: 140, flexShrink: 0 }}>Customer</span>
           <span className="flex-1 min-w-0">Services</span>
@@ -343,7 +343,7 @@ export default function Appointments() {
         ) : error ? (
           <p className="text-center text-sm py-10" style={{ color: '#f87171' }}>{error}</p>
         ) : appts.length === 0 ? (
-          <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.35)' }}>No appointments for {fmtDate(date)}</p>
+          <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.62)' }}>No appointments for {fmtDate(date)}</p>
         ) : (
           <div>
             {appts.map((a, idx) => (
@@ -387,7 +387,7 @@ export default function Appointments() {
                           </>
                         )}
                         <button onClick={() => del(a.id)} title="Delete"
-                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.2)' }}
+                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.42)' }}
                           onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
                           onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
                           <Trash2 className="w-3.5 h-3.5" />
@@ -405,7 +405,7 @@ export default function Appointments() {
                   {/* Customer */}
                   <div className="flex-shrink-0 min-w-0" style={{ width: 140 }}>
                     <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
-                    <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.35)' }}>{a.customer_phone || '—'}</p>
+                    <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.62)' }}>{a.customer_phone || '—'}</p>
                   </div>
                   {/* Services + status */}
                   <div className="flex-1 min-w-0">
@@ -458,7 +458,7 @@ export default function Appointments() {
                       </>
                     )}
                     <button onClick={() => del(a.id)} title="Delete"
-                      className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.2)' }}
+                      className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.42)' }}
                       onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
                       onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
                       <Trash2 className="w-3.5 h-3.5" />

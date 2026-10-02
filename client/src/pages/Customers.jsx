@@ -89,7 +89,7 @@ function EditCustomerModal({ customer, onSave, onClose }) {
                   ? `${TIER_STYLE[t]} border-current`
                   : ''
               }`}
-              style={form.membership_tier !== t ? { background: '#1A1A1A', color: 'rgba(245,240,232,0.5)', border: '1px solid rgba(201,168,76,0.15)' } : {}}>
+              style={form.membership_tier !== t ? { background: '#1A1A1A', color: 'rgba(245,240,232,0.75)', border: '1px solid rgba(201,168,76,0.15)' } : {}}>
               {t === 'none' ? 'No Membership' : t}
             </button>
           ))}
@@ -143,7 +143,7 @@ function DeleteCustomerModal({ customer, onClose, onDeleted }) {
 
       {/* Reason */}
       <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+        <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.85)' }}>
           Reason for deletion *
         </label>
         <div className="space-y-1.5">
@@ -163,7 +163,7 @@ function DeleteCustomerModal({ customer, onClose, onDeleted }) {
 
       {/* Notes */}
       <div className="space-y-1.5">
-        <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+        <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.85)' }}>
           Additional notes (optional)
         </label>
         <textarea className="input" rows={2} placeholder="Any extra context…"
@@ -218,7 +218,7 @@ function LoyaltyModal({ customer, onClose, onDone }) {
               className="flex-1 py-2 rounded-xl border text-sm font-semibold transition-all"
               style={type === val
                 ? { background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A', borderColor: '#C9A84C' }
-                : { background: '#1A1A1A', color: 'rgba(245,240,232,0.5)', borderColor: 'rgba(201,168,76,0.15)' }}>
+                : { background: '#1A1A1A', color: 'rgba(245,240,232,0.75)', borderColor: 'rgba(201,168,76,0.15)' }}>
               {lbl}
             </button>
           ))}
@@ -264,7 +264,7 @@ function CustomerProfile({ id, onBack }) {
   return (
     <div className="space-y-5 max-w-2xl">
       <button onClick={onBack} className="flex items-center gap-1.5 text-sm transition-colors"
-        style={{ color: 'rgba(201,168,76,0.6)' }}
+        style={{ color: 'rgba(201,168,76,0.85)' }}
         onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
         onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.6)'}>
         <ArrowLeft className="w-4 h-4" /> Back
@@ -282,15 +282,15 @@ function CustomerProfile({ id, onBack }) {
               <h2 className="font-serif font-semibold text-lg" style={{ color: '#F5F0E8' }}>{data.name}</h2>
               <MembershipBadge tier={data.membership_tier} />
             </div>
-            <p className="text-sm flex items-center gap-1 mt-0.5" style={{ color: 'rgba(245,240,232,0.45)' }}>
+            <p className="text-sm flex items-center gap-1 mt-0.5" style={{ color: 'rgba(245,240,232,0.72)' }}>
               <Phone className="w-3 h-3" /> {data.phone || 'No phone'}
             </p>
-            {data.birthday && <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>🎂 {fmtDate(data.birthday)}</p>}
-            {data.anniversary && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>💍 {fmtDate(data.anniversary)}</p>}
+            {data.birthday && <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.62)' }}>🎂 {fmtDate(data.birthday)}</p>}
+            {data.anniversary && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>💍 {fmtDate(data.anniversary)}</p>}
           </div>
           <div className="text-right flex-shrink-0">
             <p className="text-2xl font-serif font-semibold" style={{ color: '#C9A84C' }}>{fmtRupee(data.totalSpent)}</p>
-            <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{data.visitCount} visit{data.visitCount !== 1 ? 's' : ''}</p>
+            <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>{data.visitCount} visit{data.visitCount !== 1 ? 's' : ''}</p>
           </div>
         </div>
 
@@ -327,7 +327,7 @@ function CustomerProfile({ id, onBack }) {
           <h3 className="section-title">Visit History</h3>
         </div>
         {data.appointments.length === 0 ? (
-          <p className="text-center text-sm py-8" style={{ color: 'rgba(245,240,232,0.35)' }}>No visits yet</p>
+          <p className="text-center text-sm py-8" style={{ color: 'rgba(245,240,232,0.62)' }}>No visits yet</p>
         ) : (
           <div>
             {data.appointments.map((a, idx) => (
@@ -337,8 +337,8 @@ function CustomerProfile({ id, onBack }) {
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <div>
                   <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{fmtDate(a.date)} · {a.time}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.4)' }}>{a.services || 'No services'}</p>
-                  {a.staff_name && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.3)' }}>by {a.staff_name}</p>}
+                  <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.68)' }}>{a.services || 'No services'}</p>
+                  {a.staff_name && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.55)' }}>by {a.staff_name}</p>}
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-sm font-serif font-semibold" style={{ color: '#C9A84C' }}>{fmtRupee(a.bill_total || a.total_price)}</p>
@@ -408,7 +408,7 @@ export default function Customers() {
   return (
     <div className="space-y-4 max-w-2xl">
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(201,168,76,0.4)' }} />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(201,168,76,0.7)' }} />
         <input className="input pl-10" placeholder="Search by name or phone…"
           value={q} onChange={e => setQ(e.target.value)} />
       </div>
@@ -421,7 +421,7 @@ export default function Customers() {
         ) : error ? (
           <p className="text-center text-sm py-10" style={{ color: '#f87171' }}>{error}</p>
         ) : customers.length === 0 ? (
-          <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.35)' }}>No customers found</p>
+          <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.62)' }}>No customers found</p>
         ) : (
           <div>
             {customers.map((c, idx) => (
@@ -439,7 +439,7 @@ export default function Customers() {
                     <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{c.name}</p>
                     <MembershipBadge tier={c.membership_tier} />
                   </div>
-                  <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>
+                  <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'rgba(245,240,232,0.62)' }}>
                     <Phone className="w-3 h-3" /> {c.phone || 'No phone'}
                   </p>
                 </div>
@@ -449,7 +449,7 @@ export default function Customers() {
                     <Star className="w-3 h-3" /> {c.loyalty_points}
                   </span>
                 )}
-                <p className="hidden sm:block text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>{fmtDate(c.created_at?.split('T')[0])}</p>
+                <p className="hidden sm:block text-xs" style={{ color: 'rgba(245,240,232,0.75)' }}>{fmtDate(c.created_at?.split('T')[0])}</p>
                 <ChevronRight className="w-4 h-4" style={{ color: 'rgba(201,168,76,0.3)' }} />
               </button>
             ))}

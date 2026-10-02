@@ -94,7 +94,7 @@ function ItemCard({ item, onUpdate, onEdit, onDelete }) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold leading-snug" style={{ color: '#F5F0E8' }}>{item.name}</p>
-          <p className="text-xs mt-0.5 capitalize" style={{ color: 'rgba(245,240,232,0.3)' }}>{item.category}</p>
+          <p className="text-xs mt-0.5 capitalize" style={{ color: 'rgba(245,240,232,0.55)' }}>{item.category}</p>
         </div>
         {isLow && (
           <span className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
@@ -107,12 +107,12 @@ function ItemCard({ item, onUpdate, onEdit, onDelete }) {
       {/* Stock number */}
       <div className="flex items-end gap-1">
         <span className="text-3xl font-bold font-serif leading-none" style={{ color: isLow ? '#ef4444' : '#C9A84C' }}>{qty}</span>
-        <span className="text-xs mb-1" style={{ color: 'rgba(245,240,232,0.35)' }}>{item.unit}</span>
+        <span className="text-xs mb-1" style={{ color: 'rgba(245,240,232,0.62)' }}>{item.unit}</span>
       </div>
 
       {/* Stock bar */}
       <StockBar qty={qty} threshold={item.threshold} />
-      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>Alert below {item.threshold} {item.unit}</p>
+      <p className="text-xs" style={{ color: 'rgba(245,240,232,0.75)' }}>Alert below {item.threshold} {item.unit}</p>
 
       {/* Controls */}
       <div className="flex items-center justify-between pt-1" style={{ borderTop: '1px solid rgba(201,168,76,0.08)' }}>
@@ -120,19 +120,19 @@ function ItemCard({ item, onUpdate, onEdit, onDelete }) {
         <div className="flex items-center gap-2">
           <button onClick={() => adjust(-1)} disabled={busy || qty <= 0}
             className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
-            style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.5)', opacity: qty <= 0 ? 0.3 : 1 }}>
+            style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.75)', opacity: qty <= 0 ? 0.3 : 1 }}>
             <Minus className="w-3 h-3" />
           </button>
           <button onClick={() => adjust(1)} disabled={busy}
             className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
-            style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.5)' }}>
+            style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.75)' }}>
             <Plus className="w-3 h-3" />
           </button>
         </div>
         {/* Edit / Delete */}
         <div className="flex gap-1">
           <button onClick={() => onEdit(item)}
-            className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(201,168,76,0.5)' }}
+            className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(201,168,76,0.78)' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
             <Pencil className="w-3.5 h-3.5" />
@@ -195,7 +195,7 @@ export default function Inventory() {
             style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.12)' }}>
             <Package className="w-4 h-4" style={{ color: '#C9A84C' }} />
             <span className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{items.length}</span>
-            <span className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>items</span>
+            <span className="text-xs" style={{ color: 'rgba(245,240,232,0.68)' }}>items</span>
           </div>
           {lowCount > 0 && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
@@ -219,7 +219,7 @@ export default function Inventory() {
               className="px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
               style={filter === cat
                 ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.3)' }
-                : { background: '#111111', color: 'rgba(245,240,232,0.45)', border: '1px solid rgba(201,168,76,0.1)' }}>
+                : { background: '#111111', color: 'rgba(245,240,232,0.72)', border: '1px solid rgba(201,168,76,0.1)' }}>
               {cat}
             </button>
           ))}
@@ -234,7 +234,7 @@ export default function Inventory() {
       ) : visible.length === 0 ? (
         <div className="text-center py-16">
           <Package className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(201,168,76,0.2)' }} />
-          <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>No items{filter !== 'All' ? ` in ${filter}` : ''}</p>
+          <p className="text-sm" style={{ color: 'rgba(245,240,232,0.62)' }}>No items{filter !== 'All' ? ` in ${filter}` : ''}</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem' }}>

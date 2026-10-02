@@ -37,7 +37,7 @@ function CelebrantRow({ c, onWish, accentColor, last }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{c.name}</p>
-        <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{c.phone || 'No phone'}</p>
+        <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.62)' }}>{c.phone || 'No phone'}</p>
       </div>
       <DaysChip days={c.daysUntil} />
       {c.phone && (
@@ -82,7 +82,7 @@ function SectionCard({ icon: Icon, iconBg, iconColor, title, filter, onFilterCha
       ) : children.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 gap-3">
           <Icon className="w-9 h-9" style={{ color: `${iconColor}30` }} />
-          <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>{emptyText}</p>
+          <p className="text-sm" style={{ color: 'rgba(245,240,232,0.62)' }}>{emptyText}</p>
         </div>
       ) : children}
     </div>
@@ -159,12 +159,12 @@ function BirthdayPanel({ salonName }) {
             className="w-28 rounded-xl flex-shrink-0 object-cover"
             style={{ border: '1px solid rgba(236,72,153,0.15)' }} />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium mb-2" style={{ color: 'rgba(245,240,232,0.5)' }}>Message preview:</p>
+            <p className="text-xs font-medium mb-2" style={{ color: 'rgba(245,240,232,0.75)' }}>Message preview:</p>
             <p className="text-xs leading-relaxed whitespace-pre-line"
               style={{ color: 'rgba(245,240,232,0.65)', fontFamily: 'monospace' }}>
               {`🎂 H A P P Y  B I R T H D A Y 🎉\n\nToday, we celebrate the incredible journey of YOU. 🥂🌟\n\nMay the year ahead be filled with:\n 🌸 Divine blessings & good health\n 🌸 Moments that take your breath away\n 🌸 Infinite laughter & peace\n\n~ Warmly, ${salonName} 💕`}
             </p>
-            <p className="text-xs mt-2" style={{ color: 'rgba(245,240,232,0.25)' }}>
+            <p className="text-xs mt-2" style={{ color: 'rgba(245,240,232,0.75)' }}>
               On mobile: Wish opens share sheet — pick WhatsApp to send image + message together. On desktop: image is copied to clipboard, then paste it in WhatsApp.
             </p>
           </div>
@@ -253,20 +253,20 @@ function BroadcastPanel({ salonName }) {
       <div className="p-5 space-y-5">
         {/* Message */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+          <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.85)' }}>
             Broadcast Message
           </label>
           <textarea className="input" rows={3}
             placeholder="e.g. 20% off on all facials this weekend! Book now 💆‍♀️"
             value={message} onChange={e => setMessage(e.target.value)} />
-          <p className="text-xs" style={{ color: 'rgba(245,240,232,0.3)' }}>
+          <p className="text-xs" style={{ color: 'rgba(245,240,232,0.55)' }}>
             Sent individually to each customer via WhatsApp.
           </p>
         </div>
 
         {/* Recipient filter */}
         <div className="space-y-2">
-          <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+          <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.85)' }}>
             Recipients
           </label>
           <div className="flex gap-2">
@@ -275,7 +275,7 @@ function BroadcastPanel({ salonName }) {
                 className="px-3 py-1.5 rounded-xl border text-sm font-medium transition-all"
                 style={filter === val
                   ? { background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A', borderColor: '#C9A84C' }
-                  : { background: '#1A1A1A', color: 'rgba(245,240,232,0.5)', borderColor: 'rgba(201,168,76,0.15)' }}>
+                  : { background: '#1A1A1A', color: 'rgba(245,240,232,0.75)', borderColor: 'rgba(201,168,76,0.15)' }}>
                 {lbl}
               </button>
             ))}
@@ -285,7 +285,7 @@ function BroadcastPanel({ salonName }) {
         {/* Customer list */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+            <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.85)' }}>
               <Users className="w-3.5 h-3.5 inline mr-1" />
               {selected.size} / {filtered.length} selected
             </span>
@@ -298,7 +298,7 @@ function BroadcastPanel({ salonName }) {
             {filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 gap-2">
                 <Users className="w-8 h-8" style={{ color: 'rgba(201,168,76,0.2)' }} />
-                <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>No customers with phone numbers</p>
+                <p className="text-sm" style={{ color: 'rgba(245,240,232,0.62)' }}>No customers with phone numbers</p>
               </div>
             ) : filtered.map((c, i) => (
               <label key={c.id}
@@ -314,7 +314,7 @@ function BroadcastPanel({ salonName }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{c.name}</p>
-                  <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{c.phone}</p>
+                  <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>{c.phone}</p>
                 </div>
                 {c.membership_tier && c.membership_tier !== 'none' && (
                   <span className="text-xs font-medium px-2 py-0.5 rounded-full capitalize flex-shrink-0"
@@ -348,7 +348,7 @@ function BroadcastPanel({ salonName }) {
             <><Send className="w-4 h-4" /> Send to {selected.size || 0} customer{selected.size !== 1 ? 's' : ''}</>
           )}
         </button>
-        <p className="text-xs text-center" style={{ color: 'rgba(245,240,232,0.25)' }}>
+        <p className="text-xs text-center" style={{ color: 'rgba(245,240,232,0.75)' }}>
           Each message opens in WhatsApp — you confirm and send from your phone.
         </p>
       </div>
@@ -376,7 +376,7 @@ export default function Engagement() {
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all"
             style={tab === key
               ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.25)' }
-              : { color: 'rgba(245,240,232,0.4)', border: '1px solid transparent' }}>
+              : { color: 'rgba(245,240,232,0.68)', border: '1px solid transparent' }}>
             <Icon className="w-4 h-4" />{label}
           </button>
         ))}

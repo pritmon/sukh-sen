@@ -35,7 +35,7 @@ export default function Layout({ onLogout }) {
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden p-1.5 rounded-lg transition-colors"
-            style={{ color: 'rgba(201, 168, 76, 0.6)' }}
+            style={{ color: 'rgba(201, 168, 76, 0.85)' }}
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -43,11 +43,11 @@ export default function Layout({ onLogout }) {
           <div className="ml-auto flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#C9A84C', boxShadow: '0 0 6px rgba(201, 168, 76, 0.8)' }} />
-              <span className="text-xs" style={{ color: 'rgba(201, 168, 76, 0.5)' }}>Live</span>
+              <span className="text-xs" style={{ color: 'rgba(201, 168, 76, 0.78)' }}>Live</span>
             </div>
             <button onClick={onLogout}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-xs font-medium"
-              style={{ color: 'rgba(245,240,232,0.4)', border: '1px solid rgba(245,240,232,0.08)' }}
+              style={{ color: 'rgba(245,240,232,0.68)', border: '1px solid rgba(245,240,232,0.08)' }}
               onMouseEnter={e => { e.currentTarget.style.color = '#f87171'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'; }}
               onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.4)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(245,240,232,0.08)'; }}>
               <LogOut className="w-3.5 h-3.5" />

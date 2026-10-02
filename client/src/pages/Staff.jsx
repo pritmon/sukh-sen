@@ -34,7 +34,7 @@ function Section({ title, children }) {
   return (
     <div>
       <p className="text-xs font-medium uppercase tracking-widest mb-3 pb-1"
-        style={{ color: 'rgba(201,168,76,0.6)', borderBottom: '1px solid rgba(201,168,76,0.12)' }}>{title}</p>
+        style={{ color: 'rgba(201,168,76,0.85)', borderBottom: '1px solid rgba(201,168,76,0.12)' }}>{title}</p>
       <div className="space-y-3">{children}</div>
     </div>
   );
@@ -69,7 +69,7 @@ function StaffForm({ initial, onSave, onClose }) {
 
   const toggleStyle = (active) => active
     ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.35)' }
-    : { background: '#1A1A1A', color: 'rgba(245,240,232,0.45)', border: '1px solid rgba(201,168,76,0.12)' };
+    : { background: '#1A1A1A', color: 'rgba(245,240,232,0.72)', border: '1px solid rgba(201,168,76,0.12)' };
 
   async function submit(e) {
     e.preventDefault();
@@ -288,7 +288,7 @@ function StaffForm({ initial, onSave, onClose }) {
               </div>
               <div>
                 <p className="font-semibold text-sm" style={{ color: '#F5F0E8' }}>Required fields missing</p>
-                <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.45)' }}>Please fill in the following before saving:</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.72)' }}>Please fill in the following before saving:</p>
               </div>
             </div>
             <ul className="space-y-2 mb-5">
@@ -324,7 +324,7 @@ function StaffForm({ initial, onSave, onClose }) {
 function StaffProfile({ staff: s, onBack, onEdit }) {
   const infoRow = (label, val) => val ? (
     <div className="flex gap-2">
-      <span className="text-xs font-medium w-28 flex-shrink-0" style={{ color: 'rgba(201,168,76,0.5)' }}>{label}</span>
+      <span className="text-xs font-medium w-28 flex-shrink-0" style={{ color: 'rgba(201,168,76,0.78)' }}>{label}</span>
       <span className="text-sm" style={{ color: '#F5F0E8' }}>{val}</span>
     </div>
   ) : null;
@@ -332,7 +332,7 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
   const cardStyle = { background: '#141414', border: '1px solid rgba(201,168,76,0.15)' };
   const sectionLabel = (text, icon) => (
     <p className="text-xs font-medium uppercase tracking-widest mb-3 flex items-center gap-1.5"
-      style={{ color: 'rgba(201,168,76,0.6)' }}>
+      style={{ color: 'rgba(201,168,76,0.85)' }}>
       {icon}{text}
     </p>
   );
@@ -340,7 +340,7 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
   return (
     <div className="space-y-5 max-w-5xl">
       <button onClick={onBack} className="flex items-center gap-1.5 text-sm transition-colors"
-        style={{ color: 'rgba(201,168,76,0.6)' }}
+        style={{ color: 'rgba(201,168,76,0.85)' }}
         onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
         onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.6)'}>
         <ArrowLeft className="w-4 h-4" /> Back to Staff
@@ -356,7 +356,7 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
           <h2 className="font-serif text-lg font-semibold truncate" style={{ color: '#F5F0E8' }}>{s.name}</h2>
           <p className="text-sm font-medium mt-0.5" style={{ color: '#C9A84C' }}>{s.role}</p>
           {s.years_experience > 0 && (
-            <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.years_experience} yr{s.years_experience !== 1 ? 's' : ''} experience</p>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.62)' }}>{s.years_experience} yr{s.years_experience !== 1 ? 's' : ''} experience</p>
           )}
         </div>
         <button onClick={() => onEdit(s)} className="btn-secondary flex items-center gap-1.5 flex-shrink-0">
@@ -389,7 +389,7 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
               )}
             </>
           ) : (
-            <p className="text-xs" style={{ color: 'rgba(245,240,232,0.3)' }}>Not set</p>
+            <p className="text-xs" style={{ color: 'rgba(245,240,232,0.55)' }}>Not set</p>
           )}
         </div>
 
@@ -400,7 +400,7 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
           {infoRow('Education', s.education)}
           {s.skills && (
             <div>
-              <p className="text-xs font-medium mb-2" style={{ color: 'rgba(201,168,76,0.5)' }}>Skills</p>
+              <p className="text-xs font-medium mb-2" style={{ color: 'rgba(201,168,76,0.78)' }}>Skills</p>
               <div className="flex flex-wrap gap-1.5">
                 {s.skills.split(',').map(sk => (
                   <span key={sk} className="px-2 py-0.5 rounded-full text-xs font-medium"
@@ -413,7 +413,7 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
           )}
           {s.previous_work && (
             <div>
-              <p className="text-xs font-medium mb-1" style={{ color: 'rgba(201,168,76,0.5)' }}>Previous Work</p>
+              <p className="text-xs font-medium mb-1" style={{ color: 'rgba(201,168,76,0.78)' }}>Previous Work</p>
               <p className="text-sm whitespace-pre-line" style={{ color: 'rgba(245,240,232,0.7)' }}>{s.previous_work}</p>
             </div>
           )}
@@ -513,7 +513,7 @@ export default function Staff() {
             style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
         </div>
       ) : staff.length === 0 ? (
-        <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.4)' }}>No staff members added</p>
+        <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.68)' }}>No staff members added</p>
       ) : (
         <div className="min-w-0 w-full" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
           {staff.map(s => (
@@ -531,14 +531,14 @@ export default function Staff() {
                   <p className="font-semibold" style={{ color: '#F5F0E8' }}>{s.name}</p>
                   <p className="text-xs font-medium mt-0.5" style={{ color: '#C9A84C' }}>{s.role}</p>
                   {s.years_experience > 0 && (
-                    <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.years_experience} yr exp</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.62)' }}>{s.years_experience} yr exp</p>
                   )}
-                  {s.phone && <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.phone}</p>}
+                  {s.phone && <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.62)' }}>{s.phone}</p>}
                 </div>
                 <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                   <button onClick={() => setModal(s)}
                     className="p-1.5 rounded-lg transition-colors"
-                    style={{ color: 'rgba(201,168,76,0.5)' }}
+                    style={{ color: 'rgba(201,168,76,0.78)' }}
                     onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
                     <Pencil className="w-3.5 h-3.5" />

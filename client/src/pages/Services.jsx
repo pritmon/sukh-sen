@@ -86,15 +86,15 @@ function ServiceCard({ service, onEdit, onDelete }) {
 
       {/* Duration */}
       <div className="flex items-center gap-1.5">
-        <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(245,240,232,0.3)' }} />
-        <span className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>{service.duration} min</span>
+        <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(245,240,232,0.55)' }} />
+        <span className="text-xs" style={{ color: 'rgba(245,240,232,0.68)' }}>{service.duration} min</span>
       </div>
 
       {/* Footer */}
       <div className="flex items-center justify-end gap-1 pt-1"
         style={{ borderTop: '1px solid rgba(201,168,76,0.08)', marginTop: 'auto' }}>
         <button onClick={() => onEdit(service)}
-          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(201,168,76,0.5)' }}
+          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(201,168,76,0.78)' }}
           onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
           onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
           <Pencil className="w-3.5 h-3.5" />
@@ -150,13 +150,13 @@ export default function Services() {
             style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.12)' }}>
             <Scissors className="w-4 h-4" style={{ color: '#C9A84C' }} />
             <span className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{services.length}</span>
-            <span className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>services</span>
+            <span className="text-xs" style={{ color: 'rgba(245,240,232,0.68)' }}>services</span>
           </div>
           {categories.length > 0 && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
               style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.12)' }}>
               <span className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{categories.length}</span>
-              <span className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>categories</span>
+              <span className="text-xs" style={{ color: 'rgba(245,240,232,0.68)' }}>categories</span>
             </div>
           )}
         </div>
@@ -173,7 +173,7 @@ export default function Services() {
               className="px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
               style={filter === tab
                 ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.3)' }
-                : { background: '#111111', color: 'rgba(245,240,232,0.45)', border: '1px solid rgba(201,168,76,0.1)' }}>
+                : { background: '#111111', color: 'rgba(245,240,232,0.72)', border: '1px solid rgba(201,168,76,0.1)' }}>
               {tab}
             </button>
           ))}
@@ -189,7 +189,7 @@ export default function Services() {
       ) : visible.length === 0 ? (
         <div className="text-center py-16">
           <Scissors className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(201,168,76,0.2)' }} />
-          <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>
+          <p className="text-sm" style={{ color: 'rgba(245,240,232,0.62)' }}>
             No services{filter !== 'All' ? ` in ${filter}` : ''}
           </p>
         </div>
@@ -200,9 +200,9 @@ export default function Services() {
             <div key={cat}>
               <div className="flex items-center gap-3 mb-3">
                 <h3 className="text-xs font-medium uppercase tracking-widest"
-                  style={{ color: 'rgba(201,168,76,0.55)' }}>{cat}</h3>
+                  style={{ color: 'rgba(201,168,76,0.82)' }}>{cat}</h3>
                 <div className="flex-1 h-px" style={{ background: 'rgba(201,168,76,0.08)' }} />
-                <span className="text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>
+                <span className="text-xs" style={{ color: 'rgba(245,240,232,0.75)' }}>
                   {services.filter(s => s.category === cat).length}
                 </span>
               </div>
