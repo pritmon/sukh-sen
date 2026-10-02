@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout        from './components/Layout.jsx';
+import Login         from './pages/Login.jsx';
 import Dashboard     from './pages/Dashboard.jsx';
 import Appointments  from './pages/Appointments.jsx';
 import Customers     from './pages/Customers.jsx';
@@ -12,9 +14,29 @@ import Reports       from './pages/Reports.jsx';
 import Engagement    from './pages/Engagement.jsx';
 
 export default function App() {
+  const [auth, setAuth] = useState(() => !!localStorage.getItem('salon_token'));
+
+  useEffect(() => {
+    if (auth) {
+      fetch('/api/auth/me').then(r => {
+        if (!r.ok) { localStorage.removeItem('salon_token'); setAuth(false); }
+      }).catch(() => {});
+    }
+    const onLogout = () => setAuth(false);
+    window.addEventListener('salon-logout', onLogout);
+    return () => window.removeEventListener('salon-logout', onLogout);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('salon_token');
+    setAuth(false);
+  };
+
+  if (!auth) return <Login onLogin={() => setAuth(true)} />;
+
   return (
     <Routes>
-      <Route element={<Layout />}>
+      <Route element={<Layout onLogout={handleLogout} />}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard"    element={<Dashboard />} />
         <Route path="/appointments" element={<Appointments />} />

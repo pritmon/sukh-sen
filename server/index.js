@@ -3,6 +3,9 @@ const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 const fs      = require('fs');
+const jwt     = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'sukhandsen-fallback-secret-2025';
 
 // Init DB (runs migrations + seed)
 const db = require('./db');
@@ -193,16 +196,30 @@ app.get('/devlog/pm2025', (req, res) => {
   }
 });
 
+// ─── JWT auth middleware (protects all /api/* except login & health) ─────────
+const requireAuth = (req, res, next) => {
+  if (req.path === '/api/health') return next();
+  const auth = req.headers.authorization;
+  if (!auth?.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    jwt.verify(auth.slice(7), JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ error: 'Token expired or invalid' });
+  }
+};
+
 // ─── API Routes ─────────────────────────────────────────────────────────────
-app.use('/api/dashboard',    require('./routes/dashboard'));
-app.use('/api/appointments', require('./routes/appointments'));
-app.use('/api/customers',    require('./routes/customers'));
-app.use('/api/services',     require('./routes/services'));
-app.use('/api/bills',        require('./routes/billing'));
-app.use('/api/staff',        require('./routes/staff'));
-app.use('/api/inventory',    require('./routes/inventory'));
-app.use('/api/settings',     require('./routes/settings'));
-app.use('/api/reports',      require('./routes/reports'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/dashboard',    requireAuth, require('./routes/dashboard'));
+app.use('/api/appointments', requireAuth, require('./routes/appointments'));
+app.use('/api/customers',    requireAuth, require('./routes/customers'));
+app.use('/api/services',     requireAuth, require('./routes/services'));
+app.use('/api/bills',        requireAuth, require('./routes/billing'));
+app.use('/api/staff',        requireAuth, require('./routes/staff'));
+app.use('/api/inventory',    requireAuth, require('./routes/inventory'));
+app.use('/api/settings',     requireAuth, require('./routes/settings'));
+app.use('/api/reports',      requireAuth, require('./routes/reports'));
 
 // ─── Serve React build in production ────────────────────────────────────────
 if (process.env.NODE_ENV === 'production') {

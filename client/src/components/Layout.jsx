@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, LogOut } from 'lucide-react';
 import Sidebar from './Sidebar.jsx';
 
 const titles = {
@@ -16,7 +16,7 @@ const titles = {
   '/settings':     'Settings',
 };
 
-export default function Layout() {
+export default function Layout({ onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const title = titles[location.pathname] || 'Sukh&Sen';
@@ -40,9 +40,18 @@ export default function Layout() {
             <Menu className="w-5 h-5" />
           </button>
           <h1 className="font-serif text-base font-semibold tracking-wide" style={{ color: '#F5F0E8' }}>{title}</h1>
-          <div className="ml-auto flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#C9A84C', boxShadow: '0 0 6px rgba(201, 168, 76, 0.8)' }} />
-            <span className="text-xs" style={{ color: 'rgba(201, 168, 76, 0.5)' }}>Live</span>
+          <div className="ml-auto flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#C9A84C', boxShadow: '0 0 6px rgba(201, 168, 76, 0.8)' }} />
+              <span className="text-xs" style={{ color: 'rgba(201, 168, 76, 0.5)' }}>Live</span>
+            </div>
+            <button onClick={onLogout} title="Sign out"
+              className="p-1.5 rounded-lg transition-colors"
+              style={{ color: 'rgba(245,240,232,0.25)' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#f87171'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.25)'; e.currentTarget.style.background = 'transparent'; }}>
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </header>
 
