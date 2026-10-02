@@ -272,7 +272,7 @@ export default function Staff() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-5xl">
       <div className="flex justify-end">
         <button onClick={() => setModal('new')} className="btn-primary flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add Staff
