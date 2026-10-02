@@ -184,17 +184,18 @@ function AppointmentForm({ onSave, onClose }) {
 
       <div>
         <label className="label">Services</label>
-        <div className="border border-gray-200 rounded-xl p-3 space-y-3 max-h-48 overflow-y-auto bg-gray-50/50">
+        <div className="rounded-xl p-3 space-y-3 max-h-48 overflow-y-auto"
+          style={{ border: '1px solid rgba(201,168,76,0.15)', background: '#0D0D0D' }}>
           {categories.map(cat => (
             <div key={cat}>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">{cat}</p>
+              <p className="text-xs font-medium uppercase tracking-widest mb-1.5"
+                style={{ color: 'rgba(201,168,76,0.5)' }}>{cat}</p>
               {services.filter(s => s.category === cat).map(s => (
                 <label key={s.id} className="flex items-center gap-2 py-1 cursor-pointer">
                   <input type="checkbox" checked={form.serviceIds.includes(s.id)}
-                    onChange={() => toggle(s.id)}
-                    className="rounded border-gray-300 text-brand-500" />
-                  <span className="text-sm text-gray-700 flex-1">{s.name}</span>
-                  <span className="text-sm text-gray-500">{fmtRupee(s.price)}</span>
+                    onChange={() => toggle(s.id)} style={{ accentColor: '#C9A84C' }} />
+                  <span className="text-sm flex-1" style={{ color: form.serviceIds.includes(s.id) ? '#F5F0E8' : 'rgba(245,240,232,0.5)' }}>{s.name}</span>
+                  <span className="text-sm font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(s.price)}</span>
                 </label>
               ))}
             </div>
@@ -212,8 +213,8 @@ function AppointmentForm({ onSave, onClose }) {
       <label className="flex items-center gap-2 cursor-pointer">
         <input type="checkbox" checked={form.isWalkin}
           onChange={e => setForm(f => ({ ...f, isWalkin: e.target.checked }))}
-          className="rounded border-gray-300 text-brand-500" />
-        <span className="text-sm text-gray-700">Walk-in</span>
+          style={{ accentColor: '#C9A84C' }} />
+        <span className="text-sm" style={{ color: 'rgba(245,240,232,0.7)' }}>Walk-in</span>
       </label>
 
       <div className="flex justify-end gap-2 pt-2">
@@ -287,24 +288,31 @@ export default function Appointments() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-5xl">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl px-2 py-1.5 shadow-sm">
-          <button onClick={() => shiftDate(-1)} className="p-1 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+        <div className="flex items-center gap-1 rounded-lg px-2 py-1.5"
+          style={{ background: '#161616', border: '1px solid rgba(201,168,76,0.2)' }}>
+          <button onClick={() => shiftDate(-1)} className="p-1 rounded-lg transition-colors"
+            style={{ color: 'rgba(201,168,76,0.5)' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
+            onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}>
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <input
-            type="date" value={date} onChange={e => setDate(e.target.value)}
-            className="text-sm border-none focus:outline-none bg-transparent font-medium text-gray-700"
-          />
-          <button onClick={() => shiftDate(1)} className="p-1 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+          <input type="date" value={date} onChange={e => setDate(e.target.value)}
+            className="text-sm border-none focus:outline-none bg-transparent font-medium"
+            style={{ color: '#F5F0E8', colorScheme: 'dark' }} />
+          <button onClick={() => shiftDate(1)} className="p-1 rounded-lg transition-colors"
+            style={{ color: 'rgba(201,168,76,0.5)' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
+            onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
         <button onClick={() => setDate(todayISO())} className="btn-secondary text-xs px-3 py-2">Today</button>
         <div className="ml-auto flex gap-2">
-          <button onClick={handleWalkin} className="flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97]">
+          <button onClick={handleWalkin} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all active:scale-[0.97]"
+            style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.25)' }}>
             <Zap className="w-4 h-4" /> Walk-in
           </button>
           <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-1.5">
@@ -314,33 +322,44 @@ export default function Appointments() {
       </div>
 
       {/* List */}
-      <div className="card overflow-hidden">
-        <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide grid grid-cols-12 gap-2">
-          <span className="col-span-1">Time</span>
-          <span className="col-span-3">Customer</span>
-          <span className="col-span-4">Services</span>
-          <span className="col-span-1">Staff</span>
-          <span className="col-span-1 text-right">Amount</span>
-          <span className="col-span-2 text-right">Actions</span>
+      <div className="rounded-xl overflow-hidden" style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
+        {/* Header */}
+        <div className="hidden sm:flex px-4 py-2.5 text-xs font-medium uppercase tracking-widest gap-3"
+          style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D', color: 'rgba(201,168,76,0.5)' }}>
+          <span style={{ width: 52, flexShrink: 0 }}>Time</span>
+          <span style={{ width: 140, flexShrink: 0 }}>Customer</span>
+          <span className="flex-1 min-w-0">Services</span>
+          <span style={{ width: 72, flexShrink: 0 }}>Staff</span>
+          <span style={{ width: 64, flexShrink: 0, textAlign: 'right' }}>Amount</span>
+          <span style={{ width: 96, flexShrink: 0 }}></span>
         </div>
 
         {loading ? (
-          <p className="text-center text-gray-400 text-sm py-10">Loading…</p>
+          <div className="flex items-center justify-center py-10">
+            <div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
+          </div>
         ) : error ? (
-          <p className="text-center text-red-500 text-sm py-10">{error}</p>
+          <p className="text-center text-sm py-10" style={{ color: '#f87171' }}>{error}</p>
         ) : appts.length === 0 ? (
-          <p className="text-center text-gray-400 text-sm py-10">No appointments for {fmtDate(date)}</p>
+          <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.35)' }}>No appointments for {fmtDate(date)}</p>
         ) : (
-          <div className="divide-y divide-gray-50">
-            {appts.map(a => (
-              <div key={a.id} className="px-5 py-3 grid grid-cols-12 gap-2 items-center hover:bg-gray-50">
-                <span className="col-span-1 text-sm font-mono text-gray-500">{a.time}</span>
-                <div className="col-span-3 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{a.customer_name}</p>
-                  <p className="text-xs text-gray-400">{a.customer_phone}</p>
+          <div>
+            {appts.map((a, idx) => (
+              <div key={a.id} className="px-4 py-3 flex items-center gap-3 transition-colors"
+                style={{ borderBottom: idx < appts.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                {/* Time */}
+                <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0"
+                  style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{a.time}</span>
+                {/* Customer */}
+                <div className="flex-shrink-0 min-w-0" style={{ width: 140 }}>
+                  <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
+                  <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.35)' }}>{a.customer_phone || '—'}</p>
                 </div>
-                <div className="col-span-4 min-w-0">
-                  <p className="text-sm text-gray-700 truncate">
+                {/* Services + status */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.6)' }}>
                     {a.services?.map(s => s.name).join(', ') || '—'}
                   </p>
                   <div className="flex items-center gap-1 mt-0.5">
@@ -348,51 +367,46 @@ export default function Appointments() {
                     {a.is_walkin ? <span className="badge-pending">Walk-in</span> : null}
                   </div>
                 </div>
-                <span className="col-span-1 text-xs text-gray-500">{a.staff_name || '—'}</span>
-                <span className="col-span-1 text-sm text-right text-gray-700">{fmtRupee(a.total_price)}</span>
-                <div className="col-span-2 flex justify-end gap-1">
+                {/* Staff */}
+                <span className="text-xs flex-shrink-0 truncate" style={{ width: 72, color: 'rgba(245,240,232,0.4)' }}>
+                  {a.staff_name || '—'}
+                </span>
+                {/* Amount */}
+                <span className="text-sm flex-shrink-0 font-serif font-semibold text-right" style={{ width: 64, color: '#C9A84C' }}>
+                  {fmtRupee(a.total_price)}
+                </span>
+                {/* Actions */}
+                <div className="flex-shrink-0 flex justify-end gap-0.5" style={{ width: 96 }}>
                   {a.customer_phone && (
-                    <button
-                      title="Send WhatsApp confirmation"
-                      onClick={() => openWhatsApp(
-                        a.customer_phone,
-                        whatsappConfirmMsg(
-                          settings.salon_name || 'Sukh Sen Salon',
-                          a.customer_name,
-                          a.date,
-                          a.time,
-                          a.services?.map(s => s.name).join(', ')
-                        )
-                      )}
-                      className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                    >
-                      <MessageCircle className="w-4 h-4" />
+                    <button title="WhatsApp"
+                      onClick={() => openWhatsApp(a.customer_phone, whatsappConfirmMsg(settings.salon_name || 'Sukh Sen Salon', a.customer_name, a.date, a.time, a.services?.map(s => s.name).join(', ')))}
+                      className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(74,222,128,0.6)' }}
+                      onMouseEnter={e => { e.currentTarget.style.color = '#4ade80'; e.currentTarget.style.background = 'rgba(74,222,128,0.08)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = 'rgba(74,222,128,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
+                      <MessageCircle className="w-3.5 h-3.5" />
                     </button>
                   )}
                   {a.status === 'pending' && (
                     <>
-                      <button
-                        onClick={() => setStatus(a.id, 'done')}
-                        title="Mark done"
-                        className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                      >
-                        <Check className="w-4 h-4" />
+                      <button onClick={() => setStatus(a.id, 'done')} title="Mark done"
+                        className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(74,222,128,0.6)' }}
+                        onMouseEnter={e => { e.currentTarget.style.color = '#4ade80'; e.currentTarget.style.background = 'rgba(74,222,128,0.08)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(74,222,128,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
+                        <Check className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        onClick={() => setStatus(a.id, 'cancelled')}
-                        title="Cancel"
-                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"
-                      >
-                        <X className="w-4 h-4" />
+                      <button onClick={() => setStatus(a.id, 'cancelled')} title="Cancel"
+                        className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.6)' }}
+                        onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </>
                   )}
-                  <button
-                    onClick={() => del(a.id)}
-                    title="Delete"
-                    className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg"
-                  >
-                    <Trash2 className="w-4 h-4" />
+                  <button onClick={() => del(a.id)} title="Delete"
+                    className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.2)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>

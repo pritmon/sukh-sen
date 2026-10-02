@@ -325,18 +325,20 @@ function seed() {
     return `2000-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
   const demoCustomers = [
-    { name: 'Rima Biswas',     phone: '9831111001', gender: 'female', birthday: mmdd(0),  anniversary: null,     membership_tier: 'gold',   loyalty_points: 320 },
-    { name: 'Kakoli Mondal',   phone: '9732222002', gender: 'female', birthday: mmdd(1),  anniversary: mmdd(8),  membership_tier: 'silver', loyalty_points: 150 },
-    { name: 'Sunita Bera',     phone: '9051333003', gender: 'female', birthday: mmdd(3),  anniversary: null,     membership_tier: 'none',   loyalty_points: 60  },
-    { name: 'Puja Das',        phone: '8420444004', gender: 'female', birthday: mmdd(5),  anniversary: mmdd(12), membership_tier: 'silver', loyalty_points: 210 },
-    { name: 'Ananya Roy',      phone: '7001555005', gender: 'female', birthday: mmdd(7),  anniversary: null,     membership_tier: 'none',   loyalty_points: 40  },
-    { name: 'Debasree Halder', phone: '9831666006', gender: 'female', birthday: mmdd(11), anniversary: mmdd(3),  membership_tier: 'gold',   loyalty_points: 480 },
-    { name: 'Suparna Naskar',  phone: '9732777007', gender: 'female', birthday: mmdd(20), anniversary: mmdd(0),  membership_tier: 'silver', loyalty_points: 190 },
-    { name: 'Mita Sen',        phone: '9051888008', gender: 'female', birthday: mmdd(25), anniversary: mmdd(2),  membership_tier: 'none',   loyalty_points: 75  },
-    { name: 'Priti Ghosh',     phone: '8420999009', gender: 'female', birthday: mmdd(18), anniversary: mmdd(6),  membership_tier: 'gold',   loyalty_points: 560 },
-    { name: 'Subhash Halder',  phone: '9831000011', gender: 'male',   birthday: mmdd(4),  anniversary: null,     membership_tier: 'none',   loyalty_points: 30  },
-    { name: 'Tapan Mondal',    phone: '9732000022', gender: 'male',   birthday: mmdd(9),  anniversary: mmdd(9),  membership_tier: 'silver', loyalty_points: 120 },
-    { name: 'Bikash Roy',      phone: '9051000033', gender: 'male',   birthday: mmdd(13), anniversary: null,     membership_tier: 'none',   loyalty_points: 50  },
+    // birthdays within next 7 days (always visible in default "Next 7 days" view)
+    { name: 'Rima Biswas',     phone: '9831111001', gender: 'female', birthday: mmdd(0), anniversary: mmdd(5),  membership_tier: 'gold',   loyalty_points: 320 },
+    { name: 'Kakoli Mondal',   phone: '9732222002', gender: 'female', birthday: mmdd(1), anniversary: null,     membership_tier: 'silver', loyalty_points: 150 },
+    { name: 'Sunita Bera',     phone: '9051333003', gender: 'female', birthday: mmdd(2), anniversary: mmdd(6),  membership_tier: 'none',   loyalty_points: 60  },
+    { name: 'Puja Das',        phone: '8420444004', gender: 'female', birthday: mmdd(3), anniversary: null,     membership_tier: 'silver', loyalty_points: 210 },
+    { name: 'Ananya Roy',      phone: '7001555005', gender: 'female', birthday: mmdd(4), anniversary: mmdd(1),  membership_tier: 'none',   loyalty_points: 40  },
+    { name: 'Debasree Halder', phone: '9831666006', gender: 'female', birthday: mmdd(5), anniversary: mmdd(3),  membership_tier: 'gold',   loyalty_points: 480 },
+    { name: 'Suparna Naskar',  phone: '9732777007', gender: 'female', birthday: mmdd(6), anniversary: mmdd(0),  membership_tier: 'silver', loyalty_points: 190 },
+    // birthdays beyond 7 days
+    { name: 'Mita Sen',        phone: '9051888008', gender: 'female', birthday: mmdd(14), anniversary: mmdd(2), membership_tier: 'none',   loyalty_points: 75  },
+    { name: 'Priti Ghosh',     phone: '8420999009', gender: 'female', birthday: mmdd(20), anniversary: mmdd(4), membership_tier: 'gold',   loyalty_points: 560 },
+    { name: 'Subhash Halder',  phone: '9831000011', gender: 'male',   birthday: mmdd(10), anniversary: null,   membership_tier: 'none',   loyalty_points: 30  },
+    { name: 'Tapan Mondal',    phone: '9732000022', gender: 'male',   birthday: mmdd(12), anniversary: mmdd(6), membership_tier: 'silver', loyalty_points: 120 },
+    { name: 'Bikash Roy',      phone: '9051000033', gender: 'male',   birthday: mmdd(18), anniversary: null,   membership_tier: 'none',   loyalty_points: 50  },
   ];
   const insCustDemo = db.prepare(
     'INSERT OR IGNORE INTO customers (name, phone, gender, birthday, anniversary, membership_tier, loyalty_points) VALUES (?,?,?,?,?,?,?)'
