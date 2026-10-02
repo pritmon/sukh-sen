@@ -41,16 +41,16 @@ export default function Sidebar({ open, onClose }) {
         <div className="px-6 py-6" style={{ borderBottom: '1px solid rgba(201, 168, 76, 0.12)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{
                   background: 'linear-gradient(135deg, #C9A84C 0%, #E8C96D 100%)',
-                  boxShadow: '0 0 16px rgba(201, 168, 76, 0.3)',
+                  boxShadow: '0 0 20px rgba(201, 168, 76, 0.4)',
                 }}>
-                <Scissors style={{ width: '18px', height: '18px', color: '#0A0A0A' }} />
+                <Scissors style={{ width: '22px', height: '22px', color: '#0A0A0A' }} />
               </div>
               <div>
-                <p className="font-serif font-semibold text-cream text-sm leading-tight tracking-wide">Sukh&Sen</p>
-                <p className="text-xs mt-0.5" style={{ color: 'rgba(201, 168, 76, 0.85)' }}>Unisex Salon · Kakdwip</p>
+                <p className="font-serif font-bold leading-tight tracking-wide" style={{ fontSize: '17px', color: '#F5F0E8' }}>Sukh&amp;Sen</p>
+                <p className="text-xs font-medium mt-0.5" style={{ color: '#C9A84C' }}>Unisex Salon · Kakdwip</p>
               </div>
             </div>
             <button onClick={onClose} className="lg:hidden p-1 rounded-lg transition-colors"
