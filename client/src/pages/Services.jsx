@@ -202,8 +202,9 @@ export default function Services() {
                 <h3 className="text-sm font-bold uppercase tracking-widest"
                   style={{ color: '#C9A84C' }}>{cat}</h3>
                 <div className="flex-1 h-px" style={{ background: 'rgba(201,168,76,0.15)' }} />
-                <span className="text-xs font-semibold" style={{ color: '#C9A84C' }}>
-                  {services.filter(s => s.category === cat).length}
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                  style={{ color: '#E8C96D', background: 'rgba(201,168,76,0.15)', border: '1px solid rgba(201,168,76,0.3)' }}>
+                  {services.filter(s => s.category === cat).length} services
                 </span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
