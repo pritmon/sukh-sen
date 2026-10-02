@@ -76,7 +76,7 @@ function StaffPerformance() {
         <>
           {/* Day summary strip */}
           {totalAppts > 0 && (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <SummaryCard icon={TrendingUp}    label="Day Revenue"   value={fmtRupee(totalRev)} gold />
               <SummaryCard icon={CalendarDays}  label="Appointments"  value={totalAppts} sub={`${totalBill} billed`} />
 
