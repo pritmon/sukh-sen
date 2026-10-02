@@ -79,6 +79,7 @@ function StaffPerformance() {
             <div className="grid grid-cols-3 gap-3">
               <SummaryCard icon={TrendingUp}    label="Day Revenue"   value={fmtRupee(totalRev)} gold />
               <SummaryCard icon={CalendarDays}  label="Appointments"  value={totalAppts} sub={`${totalBill} billed`} />
+
               <SummaryCard icon={CheckCircle2}  label="Conversion"    value={`${convRate}%`} sub="appts billed" />
             </div>
           )}
@@ -132,7 +133,7 @@ function StaffPerformance() {
                     {/* Stats row */}
                     <div className="flex items-center gap-3 mb-2.5 ml-12 flex-wrap">
                       <span className="flex items-center gap-1 text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>
-                        <CalendarDays className="w-3 h-3" /> {s.appointments} appt{s.appointments !== 1 ? 's' : ''}
+                        <CalendarDays className="w-3 h-3" /> {s.appointments} appointment{s.appointments !== 1 ? 's' : ''}
                       </span>
                       <span className="flex items-center gap-1 text-xs"
                         style={{ color: s.billed_count > 0 ? 'rgba(134,239,172,0.7)' : 'rgba(245,240,232,0.4)' }}>
@@ -228,7 +229,7 @@ function MonthlyReport() {
           <div className="grid grid-cols-2 gap-3">
             <SummaryCard icon={TrendingUp}   label="Total Revenue"  value={fmtRupee(data.totalRevenue)} gold />
             <SummaryCard icon={CalendarDays} label="Appointments"   value={data.totalAppts} sub={`${activeDays} working day${activeDays !== 1 ? 's' : ''}`} />
-            <SummaryCard icon={BarChart2}    label="Avg / Day"      value={fmtRupee(avgRev)} sub={`${avgAppts} appts/day avg`} />
+            <SummaryCard icon={BarChart2}    label="Avg / Day"      value={fmtRupee(avgRev)} sub={`${avgAppts} appointments/day avg`} />
             <SummaryCard icon={Star}         label="Best Day"       value={bestDay && bestDay.revenue > 0 ? fmtRupee(bestDay.revenue) : '—'} sub={bestDay && bestDay.revenue > 0 ? fmtDate(bestDay.date) : 'No data yet'} />
           </div>
 
@@ -262,7 +263,7 @@ function MonthlyReport() {
                       <span className="text-xs font-serif font-semibold w-20 text-right flex-shrink-0"
                         style={{ color: isBest ? '#fbbf24' : '#C9A84C' }}>{fmtRupee(d.revenue)}</span>
                       <span className="text-xs w-14 text-right flex-shrink-0"
-                        style={{ color: 'rgba(245,240,232,0.3)' }}>{d.appointments} appts</span>
+                        style={{ color: 'rgba(245,240,232,0.3)' }}>{d.appointments} appointment{d.appointments !== 1 ? 's' : ''}</span>
                     </div>
                   );
                 })}
