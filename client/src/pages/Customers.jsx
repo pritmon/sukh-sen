@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { fmtDate, fmtRupee, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
+import { fmtDate, fmtRupee, fmtTime, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
 import { Search, Phone, ChevronRight, ArrowLeft, Star, Gift, Heart, MessageCircle, Pencil, Award, Trash2, AlertTriangle } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
@@ -336,7 +336,7 @@ function CustomerProfile({ id, onBack }) {
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <div>
-                  <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{fmtDate(a.date)} · {a.time}</p>
+                  <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{fmtDate(a.date)} · {fmtTime(a.time)}</p>
                   <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.68)' }}>{a.services || 'No services'}</p>
                   {a.staff_name && <p className="text-xs" style={{ color: 'rgba(245,240,232,0.55)' }}>by {a.staff_name}</p>}
                 </div>

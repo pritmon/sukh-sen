@@ -1,3 +1,12 @@
+// Format HH:MM (24h) → "2:30 PM"
+export function fmtTime(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12  = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+}
+
 // Format YYYY-MM-DD → DD/MM/YYYY
 export function fmtDate(d) {
   if (!d) return '';
@@ -41,7 +50,7 @@ export function openWhatsApp(phone, message) {
 }
 
 export function whatsappConfirmMsg(salonName, customerName, date, time, services) {
-  return `Hello ${customerName},\n\nYour appointment at *${salonName}* is confirmed!\n\n📅 Date: ${fmtDate(date)}\n⏰ Time: ${time}\n✂️ Services: ${services || 'TBD'}\n\nSee you soon! 🙏`;
+  return `Hello ${customerName},\n\nYour appointment at *${salonName}* is confirmed!\n\n📅 Date: ${fmtDate(date)}\n⏰ Time: ${fmtTime(time)}\n✂️ Services: ${services || 'TBD'}\n\nSee you soon! 🙏`;
 }
 
 export function whatsappBillMsg(salonName, customerName, items, total, method) {

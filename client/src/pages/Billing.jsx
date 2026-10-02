@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { fmtDate, fmtRupee, todayISO, openWhatsApp, whatsappBillMsg } from '../utils.js';
+import { fmtDate, fmtRupee, fmtTime, todayISO, openWhatsApp, whatsappBillMsg } from '../utils.js';
 import { Plus, Check, Banknote, Smartphone, Eye, MessageCircle, Receipt, TrendingUp, CalendarDays } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
@@ -47,7 +47,7 @@ function BillForm({ appointment, onSave, onClose }) {
     <form onSubmit={submit} className="space-y-4">
       <div className="rounded-xl p-3.5 text-sm" style={{ background: '#0D0D0D', border: '1px solid rgba(201,168,76,0.12)' }}>
         <p className="font-semibold font-serif" style={{ color: '#F5F0E8' }}>{appointment.customer_name}</p>
-        <p className="mt-0.5" style={{ color: 'rgba(245,240,232,0.68)' }}>{fmtDate(appointment.date)} at {appointment.time}</p>
+        <p className="mt-0.5" style={{ color: 'rgba(245,240,232,0.68)' }}>{fmtDate(appointment.date)} at {fmtTime(appointment.time)}</p>
       </div>
 
       <div>
@@ -165,7 +165,7 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
         <div className="flex items-start justify-between">
           <div>
             <p className="font-semibold font-serif text-base" style={{ color: '#F5F0E8' }}>{bill.customer_name}</p>
-            <p className="mt-0.5" style={{ color: 'rgba(245,240,232,0.68)' }}>{fmtDate(bill.date)} at {bill.time}</p>
+            <p className="mt-0.5" style={{ color: 'rgba(245,240,232,0.68)' }}>{fmtDate(bill.date)} at {fmtTime(bill.time)}</p>
             {bill.staff_name && <p style={{ color: 'rgba(245,240,232,0.55)' }}>by {bill.staff_name}</p>}
           </div>
           {bill.customer_phone && (
@@ -361,7 +361,7 @@ export default function Billing() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
                   <p className="text-xs mt-0.5 truncate" style={{ color: 'rgba(245,240,232,0.62)' }}>
-                    {fmtDate(a.date)} · {a.time}
+                    {fmtDate(a.date)} · {fmtTime(a.time)}
                     {a.services?.length ? ' · ' + a.services.map(s => s.name).join(', ') : ''}
                   </p>
                 </div>

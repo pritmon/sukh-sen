@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { fmtDate, fmtRupee, todayISO, statusClass, statusLabel } from '../utils.js';
+import { fmtDate, fmtRupee, fmtTime, todayISO, statusClass, statusLabel } from '../utils.js';
 import { CalendarDays, TrendingUp, UserPlus, Receipt, Instagram } from 'lucide-react';
 
 function FacebookIcon({ className }) {
@@ -153,7 +153,7 @@ export default function Dashboard() {
                 {/* Time */}
                 <span className="text-xs font-mono flex-shrink-0 text-center py-1.5 rounded-lg"
                   style={{ width: 56, color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.15)' }}>
-                  {a.time}
+                  {fmtTime(a.time)}
                 </span>
                 {/* Customer */}
                 <p className="text-sm font-medium truncate flex-shrink-0" style={{ width: 150, color: '#F5F0E8' }}>{a.customer_name}</p>

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { api } from '../api.js';
-import { fmtDate, fmtRupee, todayISO, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
+import { fmtDate, fmtRupee, fmtTime, todayISO, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
 import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight, MessageCircle, UserCheck } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
@@ -355,7 +355,7 @@ export default function Appointments() {
                 {/* Mobile card layout */}
                 <div className="flex items-start gap-2.5 sm:hidden">
                   <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0 mt-0.5"
-                    style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{a.time}</span>
+                    style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{fmtTime(a.time)}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium truncate flex-1" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
@@ -401,7 +401,7 @@ export default function Appointments() {
                 <div className="hidden sm:flex items-center gap-3">
                   {/* Time */}
                   <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0"
-                    style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{a.time}</span>
+                    style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{fmtTime(a.time)}</span>
                   {/* Customer */}
                   <div className="flex-shrink-0 min-w-0" style={{ width: 140 }}>
                     <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
