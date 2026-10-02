@@ -356,8 +356,14 @@ function seed() {
   const insCustDemo = db.prepare(
     'INSERT OR IGNORE INTO customers (name, phone, gender, birthday, anniversary, membership_tier, loyalty_points) VALUES (?,?,?,?,?,?,?)'
   );
+  const updCustDates = db.prepare(
+    'UPDATE customers SET birthday=?, anniversary=? WHERE phone=?'
+  );
   for (const c of demoCustomers) {
-    if (!deletedPhones.has(c.phone)) insCustDemo.run(c.name, c.phone, c.gender, c.birthday, c.anniversary, c.membership_tier, c.loyalty_points);
+    if (deletedPhones.has(c.phone)) continue;
+    insCustDemo.run(c.name, c.phone, c.gender, c.birthday, c.anniversary, c.membership_tier, c.loyalty_points);
+    // Refresh birthday/anniversary on every startup so they stay in the upcoming window
+    updCustDates.run(c.birthday, c.anniversary, c.phone);
   }
 
   const apptCount = db.prepare('SELECT COUNT(*) as n FROM appointments').get().n;
