@@ -73,8 +73,8 @@ export default function Sidebar({ open, onClose }) {
                 to={to}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                    isActive ? 'active-nav' : 'inactive-nav'
+                  `flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm transition-all duration-150 ${
+                    isActive ? 'active-nav font-semibold' : 'inactive-nav font-medium'
                   }`
                 }
                 style={({ isActive }) => isActive ? {
@@ -82,13 +82,13 @@ export default function Sidebar({ open, onClose }) {
                   color: '#E8C96D',
                   border: '1px solid rgba(201, 168, 76, 0.2)',
                 } : {
-                  color: 'rgba(245, 240, 232, 0.72)',
+                  color: '#F5F0E8',
                   border: '1px solid transparent',
                 }}
               >
                 {({ isActive }) => (
                   <>
-                    <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive ? '#E8C96D' : 'rgba(245, 240, 232, 0.4)' }} />
+                    <Icon className="w-4 h-4 flex-shrink-0" style={{ color: isActive ? '#E8C96D' : 'rgba(201, 168, 76, 0.65)' }} />
                     {label}
                     {isActive && (
                       <span className="ml-auto w-1.5 h-1.5 rounded-full"
