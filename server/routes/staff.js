@@ -30,9 +30,25 @@ router.get('/:id', (req, res) => {
 // POST /api/staff
 router.post('/', (req, res) => {
   try {
-    const { name, phone, role } = req.body;
+    const {
+      name, phone, role,
+      dob, address,
+      emergency_name, emergency_phone, emergency_relation,
+      years_experience, skills, education, previous_work, family_details,
+    } = req.body;
     if (!name) return res.status(400).json({ error: 'name required' });
-    const r = db.prepare('INSERT INTO staff (name, phone, role) VALUES (?,?,?)').run(name, phone || null, role || 'Stylist');
+    const r = db.prepare(`
+      INSERT INTO staff (name, phone, role, dob, address,
+        emergency_name, emergency_phone, emergency_relation,
+        years_experience, skills, education, previous_work, family_details)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+    `).run(
+      name, phone || null, role || 'Stylist',
+      dob || null, address || null,
+      emergency_name || null, emergency_phone || null, emergency_relation || null,
+      years_experience || null, skills || null, education || null,
+      previous_work || null, family_details || null,
+    );
     res.status(201).json(db.prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(r.lastInsertRowid));
   } catch (err) {
     res.status(500).json({ error: err.message });

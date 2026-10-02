@@ -67,7 +67,7 @@ function AppointmentForm({ onSave, onClose }) {
 
   function handlePhoneChange(phone) {
     setForm(f => ({ ...f, customerPhone: phone }));
-    if (!recognized) return; // already selected by name, don't override
+    if (recognized) return; // already selected by name, don't override phone lookup
     setRecognized(null);
     clearTimeout(phoneTimer);
     if (phone.replace(/\D/g, '').length >= 10) {

@@ -12,6 +12,7 @@ function ServiceForm({ initial, categories, onSave, onClose }) {
 
   async function submit(e) {
     e.preventDefault();
+    if (!form.name || form.category === '__new__' || !form.category) return;
     setSaving(true);
     try {
       await onSave({ ...form, price: Number(form.price), duration: Number(form.duration) });

@@ -10,7 +10,7 @@ function StaffPerformance() {
 
   useEffect(() => {
     setLoading(true);
-    api.staffPerformance(date).then(setData).finally(() => setLoading(false));
+    api.staffPerformance(date).then(setData).catch(() => {}).finally(() => setLoading(false));
   }, [date]);
 
   function shiftDate(n) {
@@ -134,7 +134,7 @@ function MonthlyReport() {
 
   useEffect(() => {
     setLoading(true);
-    api.monthlyReport(month).then(setData).finally(() => setLoading(false));
+    api.monthlyReport(month).then(setData).catch(() => {}).finally(() => setLoading(false));
   }, [month]);
 
   if (loading) return (

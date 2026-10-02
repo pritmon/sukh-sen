@@ -87,14 +87,16 @@ function EditCustomerModal({ customer, onSave, onClose }) {
               className={`px-3 py-1.5 rounded-xl border text-sm font-semibold capitalize transition-all ${
                 form.membership_tier === t
                   ? `${TIER_STYLE[t]} border-current`
-                  : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'
-              }`}>
+                  : ''
+              }`}
+              style={form.membership_tier !== t ? { background: '#1A1A1A', color: 'rgba(245,240,232,0.5)', border: '1px solid rgba(201,168,76,0.15)' } : {}}>
               {t === 'none' ? 'No Membership' : t}
             </button>
           ))}
         </div>
       </div>
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
+        style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-primary" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
       </div>
@@ -203,18 +205,20 @@ function LoyaltyModal({ customer, onClose, onDone }) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="bg-brand-50 rounded-xl px-4 py-3 border border-brand-100 flex items-center justify-between">
-        <p className="text-sm font-medium text-gray-700">Current Points</p>
-        <p className="text-2xl font-bold text-brand-600">{customer.loyalty_points ?? 0} pts</p>
+      <div className="rounded-xl px-4 py-3 flex items-center justify-between"
+        style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)' }}>
+        <p className="text-sm font-medium" style={{ color: 'rgba(245,240,232,0.6)' }}>Current Points</p>
+        <p className="text-2xl font-bold font-serif" style={{ color: '#C9A84C' }}>{customer.loyalty_points ?? 0} pts</p>
       </div>
       <div>
         <label className="label">Transaction Type</label>
         <div className="flex gap-2">
           {[['earn', 'Add Points'], ['redeem', 'Redeem'], ['bonus', 'Bonus']].map(([val, lbl]) => (
             <button key={val} type="button" onClick={() => setType(val)}
-              className={`flex-1 py-2 rounded-xl border text-sm font-semibold transition-all ${
-                type === val ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-              }`}>
+              className="flex-1 py-2 rounded-xl border text-sm font-semibold transition-all"
+              style={type === val
+                ? { background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A', borderColor: '#C9A84C' }
+                : { background: '#1A1A1A', color: 'rgba(245,240,232,0.5)', borderColor: 'rgba(201,168,76,0.15)' }}>
               {lbl}
             </button>
           ))}
@@ -228,7 +232,8 @@ function LoyaltyModal({ customer, onClose, onDone }) {
         <label className="label">Note (optional)</label>
         <input className="input" value={note} onChange={e => setNote(e.target.value)} placeholder="e.g. Birthday bonus" />
       </div>
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
+        style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-primary" disabled={saving}>{saving ? 'Saving…' : 'Update Points'}</button>
       </div>
@@ -380,12 +385,15 @@ function CustomerProfile({ id, onBack }) {
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
   const [loading,   setLoading]   = useState(true);
+  const [error,     setError]     = useState(null);
   const [q,         setQ]         = useState('');
   const [selected,  setSelected]  = useState(null);
 
   async function load(query = '') {
     setLoading(true);
+    setError(null);
     try { setCustomers(await api.customers(query)); }
+    catch (e) { setError(e.message); }
     finally { setLoading(false); }
   }
 
@@ -410,6 +418,8 @@ export default function Customers() {
           <div className="flex items-center justify-center h-24">
             <div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
           </div>
+        ) : error ? (
+          <p className="text-center text-sm py-10" style={{ color: '#f87171' }}>{error}</p>
         ) : customers.length === 0 ? (
           <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.35)' }}>No customers found</p>
         ) : (

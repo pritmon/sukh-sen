@@ -285,7 +285,7 @@ export default function Engagement() {
   const [settings, setSettings] = useState({});
   const [tab,      setTab]      = useState('birthdays');
 
-  useEffect(() => { api.settings().then(setSettings); }, []);
+  useEffect(() => { api.settings().then(setSettings).catch(() => {}); }, []);
   const salonName = settings.salon_name || 'Sukh&Sen Salon';
 
   return (
