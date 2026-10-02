@@ -162,6 +162,10 @@ export default function Dashboard() {
                   <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
                   <p className="text-xs truncate mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{a.services || '—'}</p>
                 </div>
+                <div className="flex-shrink-0 w-32 hidden md:block">
+                  <p className="text-xs font-medium truncate" style={{ color: 'rgba(245,240,232,0.55)' }}>{a.staff_name || '—'}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.25)' }}>Staff</p>
+                </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <span className="text-sm font-semibold font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(a.total_price)}</span>
                   <span className={statusClass(a.status)}>{statusLabel(a.status)}</span>
