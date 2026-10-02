@@ -19,7 +19,7 @@ export default function Login({ onLogin }) {
       });
       const data = await r.json();
       if (!r.ok) { setError(data.error || 'Login failed'); return; }
-      localStorage.setItem('salon_token', data.token);
+      sessionStorage.setItem('salon_token', data.token);
       onLogin();
     } catch {
       setError('Cannot connect to server. Try again.');

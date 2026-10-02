@@ -14,12 +14,12 @@ import Reports       from './pages/Reports.jsx';
 import Engagement    from './pages/Engagement.jsx';
 
 export default function App() {
-  const [auth, setAuth] = useState(() => !!localStorage.getItem('salon_token'));
+  const [auth, setAuth] = useState(() => !!sessionStorage.getItem('salon_token'));
 
   useEffect(() => {
     if (auth) {
       fetch('/api/auth/me').then(r => {
-        if (!r.ok) { localStorage.removeItem('salon_token'); setAuth(false); }
+        if (!r.ok) { sessionStorage.removeItem('salon_token'); setAuth(false); }
       }).catch(() => {});
     }
     const onLogout = () => setAuth(false);
@@ -28,7 +28,7 @@ export default function App() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('salon_token');
+    sessionStorage.removeItem('salon_token');
     setAuth(false);
   };
 
