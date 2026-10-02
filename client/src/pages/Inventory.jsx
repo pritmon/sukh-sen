@@ -216,10 +216,10 @@ export default function Inventory() {
         <div className="flex flex-wrap gap-2">
           {usedCats.map(cat => (
             <button key={cat} onClick={() => setFilter(cat)}
-              className="px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
+              className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
               style={filter === cat
-                ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.3)' }
-                : { background: '#111111', color: 'rgba(245,240,232,0.72)', border: '1px solid rgba(201,168,76,0.1)' }}>
+                ? { background: 'rgba(201,168,76,0.18)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.4)' }
+                : { background: '#111111', color: '#F5F0E8', border: '1px solid rgba(201,168,76,0.2)' }}>
               {cat}
             </button>
           ))}
