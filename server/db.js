@@ -301,7 +301,7 @@ function seed() {
 
   const staffCount = db.prepare('SELECT COUNT(*) as n FROM staff').get().n;
   if (staffCount === 0) {
-    db.prepare("INSERT INTO staff (name, role) VALUES (?, ?)").run('Owner', 'Owner');
+    db.prepare("INSERT INTO staff (name, phone, role) VALUES (?, ?, ?)").run('Dev Das', '8116708080', 'Owner');
   }
 
   // Bengali demo staff — insert by name, skip if already present
