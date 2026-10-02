@@ -170,7 +170,7 @@ export default function Services() {
         <div className="flex flex-wrap gap-2">
           {allTabs.map(tab => (
             <button key={tab} onClick={() => setFilter(tab)}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+              className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
               style={filter === tab
                 ? { background: 'rgba(201,168,76,0.18)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.4)' }
                 : { background: '#111111', color: '#F5F0E8', border: '1px solid rgba(201,168,76,0.2)' }}>
