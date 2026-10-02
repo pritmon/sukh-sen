@@ -449,7 +449,7 @@ export default function Customers() {
                     <Star className="w-3 h-3" /> {c.loyalty_points}
                   </span>
                 )}
-                <p className="text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>{fmtDate(c.created_at?.split('T')[0])}</p>
+                <p className="hidden sm:block text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>{fmtDate(c.created_at?.split('T')[0])}</p>
                 <ChevronRight className="w-4 h-4" style={{ color: 'rgba(201,168,76,0.3)' }} />
               </button>
             ))}

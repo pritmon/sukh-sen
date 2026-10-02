@@ -347,75 +347,125 @@ export default function Appointments() {
         ) : (
           <div>
             {appts.map((a, idx) => (
-              <div key={a.id} className="px-4 py-3 flex items-center gap-3 transition-colors"
+              <div key={a.id} className="px-4 py-3 transition-colors"
                 style={{ borderBottom: idx < appts.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                {/* Time */}
-                <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0"
-                  style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{a.time}</span>
-                {/* Customer */}
-                <div className="flex-shrink-0 min-w-0" style={{ width: 140 }}>
-                  <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
-                  <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.35)' }}>{a.customer_phone || '—'}</p>
-                </div>
-                {/* Services + status */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.6)' }}>
-                    {a.services?.map(s => s.name).join(', ') || '—'}
-                  </p>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <span className={statusClass(a.status)}>{statusLabel(a.status)}</span>
-                    {a.is_walkin ? <span className="badge-pending">Walk-in</span> : null}
+
+                {/* Mobile card layout */}
+                <div className="flex items-start gap-2.5 sm:hidden">
+                  <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0 mt-0.5"
+                    style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{a.time}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium truncate flex-1" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
+                      <span className="text-sm font-serif font-semibold flex-shrink-0" style={{ color: '#C9A84C' }}>{fmtRupee(a.total_price)}</span>
+                    </div>
+                    <p className="text-xs truncate mt-0.5" style={{ color: 'rgba(245,240,232,0.55)' }}>
+                      {a.services?.map(s => s.name).join(', ') || '—'}
+                    </p>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <div className="flex items-center gap-1">
+                        <span className={statusClass(a.status)}>{statusLabel(a.status)}</span>
+                        {a.is_walkin ? <span className="badge-pending">Walk-in</span> : null}
+                      </div>
+                      <div className="flex items-center gap-0.5">
+                        {a.status === 'pending' && (
+                          <>
+                            <button onClick={() => setStatus(a.id, 'done')} title="Mark done"
+                              className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(74,222,128,0.6)' }}
+                              onMouseEnter={e => { e.currentTarget.style.color = '#4ade80'; e.currentTarget.style.background = 'rgba(74,222,128,0.08)'; }}
+                              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(74,222,128,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                            <button onClick={() => setStatus(a.id, 'cancelled')} title="Cancel"
+                              className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.6)' }}
+                              onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </>
+                        )}
+                        <button onClick={() => del(a.id)} title="Delete"
+                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.2)' }}
+                          onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                {/* Staff */}
-                <span className="text-xs flex-shrink-0 truncate" style={{ width: 110, color: 'rgba(245,240,232,0.55)' }}>
-                  {a.staff_name || '—'}
-                </span>
-                {/* Amount */}
-                <span className="text-sm flex-shrink-0 font-serif font-semibold text-right" style={{ width: 60, color: '#C9A84C' }}>
-                  {fmtRupee(a.total_price)}
-                </span>
-                {/* WhatsApp — own column so it never overlaps */}
-                <div className="flex-shrink-0" style={{ width: 100 }}>
-                  {a.customer_phone && (
-                    <button
-                      onClick={() => openWhatsApp(a.customer_phone, whatsappConfirmMsg(settings.salon_name || 'Sukh Sen Salon', a.customer_name, a.date, a.time, a.services?.map(s => s.name).join(', ')))}
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors w-full justify-center"
-                      style={{ color: '#22c55e', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(34,197,94,0.16)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(34,197,94,0.08)'}>
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      WhatsApp
+
+                {/* Desktop row layout */}
+                <div className="hidden sm:flex items-center gap-3">
+                  {/* Time */}
+                  <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0"
+                    style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{a.time}</span>
+                  {/* Customer */}
+                  <div className="flex-shrink-0 min-w-0" style={{ width: 140 }}>
+                    <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
+                    <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.35)' }}>{a.customer_phone || '—'}</p>
+                  </div>
+                  {/* Services + status */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.6)' }}>
+                      {a.services?.map(s => s.name).join(', ') || '—'}
+                    </p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className={statusClass(a.status)}>{statusLabel(a.status)}</span>
+                      {a.is_walkin ? <span className="badge-pending">Walk-in</span> : null}
+                    </div>
+                  </div>
+                  {/* Staff */}
+                  <span className="text-xs flex-shrink-0 truncate" style={{ width: 110, color: 'rgba(245,240,232,0.55)' }}>
+                    {a.staff_name || '—'}
+                  </span>
+                  {/* Amount */}
+                  <span className="text-sm flex-shrink-0 font-serif font-semibold text-right" style={{ width: 60, color: '#C9A84C' }}>
+                    {fmtRupee(a.total_price)}
+                  </span>
+                  {/* WhatsApp */}
+                  <div className="flex-shrink-0" style={{ width: 100 }}>
+                    {a.customer_phone && (
+                      <button
+                        onClick={() => openWhatsApp(a.customer_phone, whatsappConfirmMsg(settings.salon_name || 'Sukh Sen Salon', a.customer_name, a.date, a.time, a.services?.map(s => s.name).join(', ')))}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors w-full justify-center"
+                        style={{ color: '#22c55e', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(34,197,94,0.16)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(34,197,94,0.08)'}>
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        WhatsApp
+                      </button>
+                    )}
+                  </div>
+                  {/* Status actions */}
+                  <div className="flex-shrink-0 flex items-center justify-end gap-0.5" style={{ width: 72 }}>
+                    {a.status === 'pending' && (
+                      <>
+                        <button onClick={() => setStatus(a.id, 'done')} title="Mark done"
+                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(74,222,128,0.6)' }}
+                          onMouseEnter={e => { e.currentTarget.style.color = '#4ade80'; e.currentTarget.style.background = 'rgba(74,222,128,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(74,222,128,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
+                          <Check className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => setStatus(a.id, 'cancelled')} title="Cancel"
+                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.6)' }}
+                          onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </>
+                    )}
+                    <button onClick={() => del(a.id)} title="Delete"
+                      className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.2)' }}
+                      onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
-                  )}
+                  </div>
                 </div>
-                {/* Status actions — own column */}
-                <div className="flex-shrink-0 flex items-center justify-end gap-0.5" style={{ width: 72 }}>
-                  {a.status === 'pending' && (
-                    <>
-                      <button onClick={() => setStatus(a.id, 'done')} title="Mark done"
-                        className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(74,222,128,0.6)' }}
-                        onMouseEnter={e => { e.currentTarget.style.color = '#4ade80'; e.currentTarget.style.background = 'rgba(74,222,128,0.08)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(74,222,128,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
-                        <Check className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => setStatus(a.id, 'cancelled')} title="Cancel"
-                        className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.6)' }}
-                        onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.6)'; e.currentTarget.style.background = 'transparent'; }}>
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </>
-                  )}
-                  <button onClick={() => del(a.id)} title="Delete"
-                    className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.2)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+
               </div>
             ))}
           </div>
