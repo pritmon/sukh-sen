@@ -16,6 +16,7 @@ const EMPTY_FAMILY = {
   marital_status: '', spouse: '',
   mother: '', father: '', brother: '', sister: '',
   grandfather: '', grandmother: '',
+  son: '', daughter: '',
 };
 
 function parseFamily(raw) {
@@ -192,6 +193,14 @@ function StaffForm({ initial, onSave, onClose }) {
           <Field label="Grandmother">
             <input className="input" value={family.grandmother || ''}
               onChange={e => setFam('grandmother', e.target.value)} placeholder="Grandmother's name" />
+          </Field>
+          <Field label="Son">
+            <input className="input" value={family.son || ''}
+              onChange={e => setFam('son', e.target.value)} placeholder="Son's name(s)" />
+          </Field>
+          <Field label="Daughter">
+            <input className="input" value={family.daughter || ''}
+              onChange={e => setFam('daughter', e.target.value)} placeholder="Daughter's name(s)" />
           </Field>
         </div>
       </Section>
@@ -391,6 +400,8 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
             fam.sister && ['Sister', fam.sister],
             fam.grandfather && ['Grandfather', fam.grandfather],
             fam.grandmother && ['Grandmother', fam.grandmother],
+            fam.son && ['Son', fam.son],
+            fam.daughter && ['Daughter', fam.daughter],
             fam.notes && ['Notes', fam.notes],
           ].filter(Boolean);
           return rows.length > 0 ? (
