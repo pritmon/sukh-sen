@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { fmtRupee } from '../utils.js';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Scissors, Clock } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
 const EMPTY = { name: '', price: '', duration: 30, category: "Women's Styling" };
@@ -52,7 +52,8 @@ function ServiceForm({ initial, categories, onSave, onClose }) {
             onChange={e => setForm(f => ({ ...f, category: e.target.value === '__new__' ? '' : e.target.value }))} />
         )}
       </div>
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
+        style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-primary" disabled={saving}>
           {saving ? 'Saving…' : 'Save Service'}
@@ -62,10 +63,57 @@ function ServiceForm({ initial, categories, onSave, onClose }) {
   );
 }
 
+function ServiceCard({ service, onEdit, onDelete }) {
+  return (
+    <div className="p-4 rounded-xl flex flex-col gap-3 transition-all"
+      style={{
+        background: '#111111',
+        border: '1px solid rgba(201,168,76,0.15)',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(201,168,76,0.3)'; e.currentTarget.style.background = '#141414'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(201,168,76,0.15)'; e.currentTarget.style.background = '#111111'; }}>
+
+      {/* Name */}
+      <p className="text-sm font-semibold leading-snug" style={{ color: '#F5F0E8' }}>{service.name}</p>
+
+      {/* Price — big */}
+      <div>
+        <p className="text-2xl font-bold font-serif leading-none" style={{ color: '#C9A84C' }}>
+          {fmtRupee(service.price)}
+        </p>
+      </div>
+
+      {/* Duration */}
+      <div className="flex items-center gap-1.5">
+        <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(245,240,232,0.3)' }} />
+        <span className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>{service.duration} min</span>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-end gap-1 pt-1"
+        style={{ borderTop: '1px solid rgba(201,168,76,0.08)', marginTop: 'auto' }}>
+        <button onClick={() => onEdit(service)}
+          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(201,168,76,0.5)' }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
+        <button onClick={() => onDelete(service.id)}
+          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.45)' }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.45)'; e.currentTarget.style.background = 'transparent'; }}>
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [modal,    setModal]    = useState(null);
+  const [filter,   setFilter]   = useState('All');
 
   async function load() {
     setLoading(true);
@@ -89,67 +137,87 @@ export default function Services() {
   }
 
   const categories = [...new Set(services.map(s => s.category))].sort();
-  const grouped = categories.reduce((acc, cat) => {
-    acc[cat] = services.filter(s => s.category === cat);
-    return acc;
-  }, {});
+  const allTabs    = ['All', ...categories];
+  const visible    = filter === 'All' ? services : services.filter(s => s.category === filter);
 
   return (
-    <div className="space-y-4 max-w-3xl">
-      <div className="flex justify-end">
-        <button onClick={() => setModal('new')} className="btn-primary flex items-center gap-1.5">
+    <div className="space-y-5 max-w-5xl">
+      {/* Top bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
+            style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.12)' }}>
+            <Scissors className="w-4 h-4" style={{ color: '#C9A84C' }} />
+            <span className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{services.length}</span>
+            <span className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>services</span>
+          </div>
+          {categories.length > 0 && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
+              style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.12)' }}>
+              <span className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{categories.length}</span>
+              <span className="text-xs" style={{ color: 'rgba(245,240,232,0.4)' }}>categories</span>
+            </div>
+          )}
+        </div>
+        <button onClick={() => setModal('new')} className="btn-primary flex items-center gap-1.5 flex-shrink-0">
           <Plus className="w-4 h-4" /> Add Service
         </button>
       </div>
 
+      {/* Category filter tabs */}
+      {allTabs.length > 2 && (
+        <div className="flex flex-wrap gap-2">
+          {allTabs.map(tab => (
+            <button key={tab} onClick={() => setFilter(tab)}
+              className="px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
+              style={filter === tab
+                ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.3)' }
+                : { background: '#111111', color: 'rgba(245,240,232,0.45)', border: '1px solid rgba(201,168,76,0.1)' }}>
+              {tab}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Grid */}
       {loading ? (
-        <div className="flex items-center justify-center h-32">
+        <div className="flex items-center justify-center py-16">
           <div className="w-5 h-5 rounded-full animate-spin"
             style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
         </div>
-      ) : services.length === 0 ? (
-        <div className="text-center py-14" style={{ color: 'rgba(245,240,232,0.4)' }}>
-          <p className="text-sm">No services added yet</p>
+      ) : visible.length === 0 ? (
+        <div className="text-center py-16">
+          <Scissors className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgba(201,168,76,0.2)' }} />
+          <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>
+            No services{filter !== 'All' ? ` in ${filter}` : ''}
+          </p>
         </div>
-      ) : (
-        <div className="space-y-4">
+      ) : filter === 'All' ? (
+        /* Grouped view when showing all */
+        <div className="space-y-6">
           {categories.map(cat => (
-            <div key={cat} className="rounded-xl overflow-hidden"
-              style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
-              <div className="px-5 py-3" style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D' }}>
-                <h3 className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(201,168,76,0.6)' }}>{cat}</h3>
+            <div key={cat}>
+              <div className="flex items-center gap-3 mb-3">
+                <h3 className="text-xs font-medium uppercase tracking-widest"
+                  style={{ color: 'rgba(201,168,76,0.55)' }}>{cat}</h3>
+                <div className="flex-1 h-px" style={{ background: 'rgba(201,168,76,0.08)' }} />
+                <span className="text-xs" style={{ color: 'rgba(245,240,232,0.25)' }}>
+                  {services.filter(s => s.category === cat).length}
+                </span>
               </div>
-              <div>
-                {grouped[cat].map((s, idx) => (
-                  <div key={s.id} className="px-4 py-3 flex items-center transition-colors"
-                    style={{ borderBottom: idx < grouped[cat].length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <div className="flex-1 min-w-0 mr-3">
-                      <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{s.name}</p>
-                      <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{s.duration} min</p>
-                    </div>
-                    <span className="text-sm font-serif font-semibold w-16 text-right flex-shrink-0" style={{ color: '#C9A84C' }}>{fmtRupee(s.price)}</span>
-                    <div className="flex gap-1 ml-2 flex-shrink-0">
-                      <button onClick={() => setModal(s)}
-                        className="p-1.5 rounded-lg transition-colors"
-                        style={{ color: 'rgba(201,168,76,0.5)' }}
-                        onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => handleDelete(s.id)}
-                        className="p-1.5 rounded-lg transition-colors"
-                        style={{ color: 'rgba(239,68,68,0.5)' }}
-                        onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                {services.filter(s => s.category === cat).map(s => (
+                  <ServiceCard key={s.id} service={s} onEdit={setModal} onDelete={handleDelete} />
                 ))}
               </div>
             </div>
+          ))}
+        </div>
+      ) : (
+        /* Flat grid when a category is selected */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          {visible.map(s => (
+            <ServiceCard key={s.id} service={s} onEdit={setModal} onDelete={handleDelete} />
           ))}
         </div>
       )}
