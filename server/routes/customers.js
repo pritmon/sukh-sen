@@ -40,7 +40,7 @@ router.get('/lookup', (req, res) => {
 router.get('/birthdays', (req, res) => {
   try {
     const days = Number(req.query.days) || 7;
-    const all = db.prepare('SELECT * FROM customers WHERE birthday IS NOT NULL AND birthday != ""').all();
+    const all = db.prepare("SELECT * FROM customers WHERE birthday IS NOT NULL AND birthday != ''").all();
     const today = new Date();
     const results = [];
     for (const c of all) {
@@ -61,7 +61,7 @@ router.get('/birthdays', (req, res) => {
 router.get('/anniversaries', (req, res) => {
   try {
     const days = Number(req.query.days) || 7;
-    const all = db.prepare('SELECT * FROM customers WHERE anniversary IS NOT NULL AND anniversary != ""').all();
+    const all = db.prepare("SELECT * FROM customers WHERE anniversary IS NOT NULL AND anniversary != ''").all();
     const today = new Date();
     const results = [];
     for (const c of all) {
