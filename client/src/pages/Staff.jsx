@@ -52,8 +52,9 @@ function Field({ label, children }) {
 function StaffForm({ initial, onSave, onClose }) {
   const [form,   setForm]   = useState(initial || EMPTY);
   const [family, setFamily] = useState(() => parseFamily(initial?.family_details));
-  const [saving, setSaving] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [saving,    setSaving]    = useState(false);
+  const [errors,    setErrors]    = useState({});
+  const [showAlert, setShowAlert] = useState(false);
   const photoRef = useRef(null);
   const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErrors(e => ({ ...e, [k]: false })); };
   const setFam = (k, v) => setFamily(f => ({ ...f, [k]: v }));
@@ -73,11 +74,11 @@ function StaffForm({ initial, onSave, onClose }) {
   async function submit(e) {
     e.preventDefault();
     const errs = {};
-    if (!form.name?.trim())         errs.name    = 'Name is required';
-    if (!form.phone?.trim())        errs.phone   = 'Phone number is required';
-    if (!form.photo)                errs.photo   = 'Passport photo is required';
-    if (!form.aadhar_number?.trim()) errs.aadhar_number = 'Aadhar number is required';
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    if (!form.name?.trim())          errs.name          = 'Name';
+    if (!form.phone?.trim())         errs.phone         = 'Phone Number';
+    if (!form.photo)                 errs.photo         = 'Passport Photo';
+    if (!form.aadhar_number?.trim()) errs.aadhar_number = 'Aadhar Number';
+    if (Object.keys(errs).length) { setErrors(errs); setShowAlert(true); return; }
     setSaving(true);
     try {
       await onSave({ ...form, family_details: serializeFamily(family) });
@@ -271,6 +272,43 @@ function StaffForm({ initial, onSave, onClose }) {
           </Field>
         </div>
       </Section>
+
+      {/* Validation alert popup */}
+      {showAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.7)' }}
+          onClick={() => setShowAlert(false)}>
+          <div className="rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+            style={{ background: '#1A1A1A', border: '1px solid rgba(239,68,68,0.4)' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-start gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                <AlertCircle className="w-5 h-5" style={{ color: '#f87171' }} />
+              </div>
+              <div>
+                <p className="font-semibold text-sm" style={{ color: '#F5F0E8' }}>Required fields missing</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.45)' }}>Please fill in the following before saving:</p>
+              </div>
+            </div>
+            <ul className="space-y-2 mb-5">
+              {Object.values(errors).map(label => (
+                <li key={label} className="flex items-center gap-2 text-sm rounded-lg px-3 py-2"
+                  style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.15)', color: '#f87171' }}>
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#f87171' }} />
+                  {label}
+                </li>
+              ))}
+            </ul>
+            <button onClick={() => setShowAlert(false)} className="w-full py-2.5 rounded-xl text-sm font-medium transition-all"
+              style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.25)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(239,68,68,0.15)'}>
+              Got it, I'll fix these
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
         style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
