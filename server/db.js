@@ -304,6 +304,45 @@ function seed() {
     db.prepare("INSERT INTO staff (name, role) VALUES (?, ?)").run('Owner', 'Owner');
   }
 
+  // Bengali demo staff — insert by name, skip if already present
+  const demoStaff = [
+    { name: 'Priya Mandal',   role: 'Senior Stylist',            phone: '9831001122', dob: '1995-06-14', years_experience: 6,  skills: 'Hair cutting, colouring, hair spa' },
+    { name: 'Suchitra Das',   role: 'Stylist',                   phone: '9732001133', dob: '1999-03-22', years_experience: 3,  skills: 'Blow dry, straightening, threading' },
+    { name: 'Rekha Ghosh',    role: 'Threading & Waxing Expert', phone: '9051002244', dob: '1992-11-05', years_experience: 9,  skills: 'Threading, waxing, facials' },
+    { name: 'Sourav Naskar',  role: "Men's Hair Specialist",      phone: '8420003355', dob: '1997-08-30', years_experience: 5,  skills: "Men's cuts, beard styling, head massage" },
+    { name: 'Mita Roy',       role: 'Beautician',                phone: '7001004466', dob: '1993-01-18', years_experience: 8,  skills: 'Bridal makeup, facials, manicure/pedicure' },
+  ];
+  const existingNames = new Set(db.prepare('SELECT name FROM staff').all().map(r => r.name));
+  const insStaff = db.prepare('INSERT OR IGNORE INTO staff (name, role, phone, dob, years_experience, skills) VALUES (?,?,?,?,?,?)');
+  for (const s of demoStaff) {
+    if (!existingNames.has(s.name)) insStaff.run(s.name, s.role, s.phone, s.dob, s.years_experience, s.skills);
+  }
+
+  // Demo customers with birthdays/anniversaries — keyed by phone, safe to re-run
+  function mmdd(daysOffset) {
+    const d = new Date();
+    d.setDate(d.getDate() + daysOffset);
+    return `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  const demoCustomers = [
+    { name: 'Rima Biswas',     phone: '9831111001', gender: 'female', birthday: mmdd(0),  anniversary: null,     membership_tier: 'gold',   loyalty_points: 320 },
+    { name: 'Kakoli Mondal',   phone: '9732222002', gender: 'female', birthday: mmdd(1),  anniversary: mmdd(8),  membership_tier: 'silver', loyalty_points: 150 },
+    { name: 'Sunita Bera',     phone: '9051333003', gender: 'female', birthday: mmdd(3),  anniversary: null,     membership_tier: 'none',   loyalty_points: 60  },
+    { name: 'Puja Das',        phone: '8420444004', gender: 'female', birthday: mmdd(5),  anniversary: mmdd(12), membership_tier: 'silver', loyalty_points: 210 },
+    { name: 'Ananya Roy',      phone: '7001555005', gender: 'female', birthday: mmdd(7),  anniversary: null,     membership_tier: 'none',   loyalty_points: 40  },
+    { name: 'Debasree Halder', phone: '9831666006', gender: 'female', birthday: mmdd(11), anniversary: mmdd(3),  membership_tier: 'gold',   loyalty_points: 480 },
+    { name: 'Suparna Naskar',  phone: '9732777007', gender: 'female', birthday: mmdd(20), anniversary: mmdd(0),  membership_tier: 'silver', loyalty_points: 190 },
+    { name: 'Mita Sen',        phone: '9051888008', gender: 'female', birthday: mmdd(25), anniversary: mmdd(2),  membership_tier: 'none',   loyalty_points: 75  },
+    { name: 'Priti Ghosh',     phone: '8420999009', gender: 'female', birthday: mmdd(18), anniversary: mmdd(6),  membership_tier: 'gold',   loyalty_points: 560 },
+    { name: 'Subhash Halder',  phone: '9831000011', gender: 'male',   birthday: mmdd(4),  anniversary: null,     membership_tier: 'none',   loyalty_points: 30  },
+    { name: 'Tapan Mondal',    phone: '9732000022', gender: 'male',   birthday: mmdd(9),  anniversary: mmdd(9),  membership_tier: 'silver', loyalty_points: 120 },
+    { name: 'Bikash Roy',      phone: '9051000033', gender: 'male',   birthday: mmdd(13), anniversary: null,     membership_tier: 'none',   loyalty_points: 50  },
+  ];
+  const insCustDemo = db.prepare(
+    'INSERT OR IGNORE INTO customers (name, phone, gender, birthday, anniversary, membership_tier, loyalty_points) VALUES (?,?,?,?,?,?,?)'
+  );
+  for (const c of demoCustomers) insCustDemo.run(c.name, c.phone, c.gender, c.birthday, c.anniversary, c.membership_tier, c.loyalty_points);
+
   const apptCount = db.prepare('SELECT COUNT(*) as n FROM appointments').get().n;
   if (apptCount === 0) {
     const today = new Date().toISOString().split('T')[0];
