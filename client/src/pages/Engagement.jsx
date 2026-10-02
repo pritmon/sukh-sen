@@ -1,39 +1,48 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { openWhatsApp, whatsappBirthdayMsg, whatsappAnniversaryMsg, whatsappBroadcastMsg } from '../utils.js';
-import { MessageCircle, Gift, Heart, Megaphone, Send } from 'lucide-react';
+import { MessageCircle, Gift, Heart, Megaphone, Send, Users } from 'lucide-react';
 
-const cardStyle = { background: '#111111', border: '1px solid rgba(201,168,76,0.15)' };
-
-function DaysUntilBadge({ days }) {
-  if (days === 0) return <span className="badge-done">Today! 🎉</span>;
-  if (days === 1) return <span className="badge-pending">Tomorrow</span>;
+function DaysChip({ days }) {
+  if (days === 0) return (
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold"
+      style={{ background: 'rgba(34,197,94,0.12)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.25)' }}>
+      🎉 Today!
+    </span>
+  );
+  if (days === 1) return (
+    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold"
+      style={{ background: 'rgba(251,146,60,0.12)', color: '#fb923c', border: '1px solid rgba(251,146,60,0.25)' }}>
+      Tomorrow
+    </span>
+  );
   return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium"
       style={{ background: 'rgba(96,165,250,0.1)', color: '#60a5fa', border: '1px solid rgba(96,165,250,0.2)' }}>
-      In {days} days
+      {days}d
     </span>
   );
 }
 
-function CelebrantRow({ c, onWish }) {
+function CelebrantRow({ c, onWish, accentColor, last }) {
+  const initial = c.name?.[0]?.toUpperCase();
   return (
-    <div className="px-5 py-3.5 flex items-center gap-3 transition-colors"
-      style={{ borderBottom: '1px solid rgba(201,168,76,0.06)' }}
-      onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
+    <div className="px-5 py-3.5 flex items-center gap-3.5 transition-colors"
+      style={{ borderBottom: last ? 'none' : '1px solid rgba(201,168,76,0.06)' }}
+      onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.03)'}
       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-      <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
-        style={{ background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A' }}>
-        {c.name[0]}
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0"
+        style={{ background: `${accentColor}18`, color: accentColor, border: `1px solid ${accentColor}30` }}>
+        {initial}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{c.name}</p>
-        <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{c.phone || 'No phone'}</p>
+        <p className="text-sm font-semibold" style={{ color: '#F5F0E8' }}>{c.name}</p>
+        <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.35)' }}>{c.phone || 'No phone'}</p>
       </div>
-      <DaysUntilBadge days={c.daysUntil} />
+      <DaysChip days={c.daysUntil} />
       {c.phone && (
         <button onClick={() => onWish(c)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all active:scale-[0.97]"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all active:scale-[0.97] flex-shrink-0"
           style={{ background: 'rgba(34,197,94,0.08)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.2)' }}
           onMouseEnter={e => e.currentTarget.style.background = 'rgba(34,197,94,0.14)'}
           onMouseLeave={e => e.currentTarget.style.background = 'rgba(34,197,94,0.08)'}>
@@ -44,85 +53,77 @@ function CelebrantRow({ c, onWish }) {
   );
 }
 
-function BirthdayPanel({ salonName }) {
-  const [days,    setDays]    = useState(7);
-  const [data,    setData]    = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    api.birthdays(days).then(setData).finally(() => setLoading(false));
-  }, [days]);
-
+function SectionCard({ icon: Icon, iconBg, iconColor, title, filter, onFilterChange, filterOptions, loading, children, emptyText }) {
   return (
-    <div className="rounded-xl overflow-hidden" style={cardStyle}>
-      <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D' }}>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(236,72,153,0.12)' }}>
-            <Gift className="w-4 h-4" style={{ color: '#ec4899' }} />
+    <div className="rounded-xl overflow-hidden"
+      style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
+      <div className="px-5 py-3.5 flex items-center justify-between"
+        style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: 'rgba(201,168,76,0.03)' }}>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: iconBg }}>
+            <Icon className="w-4 h-4" style={{ color: iconColor }} />
           </div>
-          <h3 className="text-sm font-medium" style={{ color: '#F5F0E8' }}>Upcoming Birthdays</h3>
+          <h3 className="font-serif font-semibold text-sm" style={{ color: '#F5F0E8' }}>{title}</h3>
         </div>
-        <select className="input max-w-[130px] text-xs py-1.5" style={{ colorScheme: 'dark' }}
-          value={days} onChange={e => setDays(Number(e.target.value))}>
-          <option value={3}>Next 3 days</option>
-          <option value={7}>Next 7 days</option>
-          <option value={14}>Next 14 days</option>
-          <option value={30}>Next 30 days</option>
-        </select>
+        {filterOptions && (
+          <select className="text-xs rounded-lg px-2.5 py-1.5 focus:outline-none"
+            style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.7)', colorScheme: 'dark' }}
+            value={filter} onChange={e => onFilterChange(Number(e.target.value))}>
+            {filterOptions.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          </select>
+        )}
       </div>
       {loading ? (
-        <div className="flex justify-center py-8">
-          <div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
+        <div className="flex justify-center py-10">
+          <div className="w-5 h-5 rounded-full animate-spin"
+            style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
         </div>
-      ) : data.length === 0 ? (
-        <p className="text-center text-sm py-8" style={{ color: 'rgba(245,240,232,0.35)' }}>No birthdays in the next {days} days</p>
-      ) : (
-        <div>{data.map(c => <CelebrantRow key={c.id} c={c} onWish={c => openWhatsApp(c.phone, whatsappBirthdayMsg(salonName, c.name))} />)}</div>
-      )}
+      ) : children.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 gap-3">
+          <Icon className="w-9 h-9" style={{ color: `${iconColor}30` }} />
+          <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>{emptyText}</p>
+        </div>
+      ) : children}
     </div>
   );
 }
 
-function AnniversaryPanel({ salonName }) {
-  const [days,    setDays]    = useState(7);
-  const [data,    setData]    = useState([]);
+const FILTER_OPTS = [[3,'Next 3 days'],[7,'Next 7 days'],[14,'Next 14 days'],[30,'Next 30 days']];
+
+function BirthdayPanel({ salonName }) {
+  const [days, setDays] = useState(7);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    api.anniversaries(days).then(setData).finally(() => setLoading(false));
-  }, [days]);
-
+  useEffect(() => { setLoading(true); api.birthdays(days).then(setData).finally(() => setLoading(false)); }, [days]);
   return (
-    <div className="rounded-xl overflow-hidden" style={cardStyle}>
-      <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D' }}>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(244,63,94,0.1)' }}>
-            <Heart className="w-4 h-4" style={{ color: '#f43f5e' }} />
-          </div>
-          <h3 className="text-sm font-medium" style={{ color: '#F5F0E8' }}>Upcoming Anniversaries</h3>
-        </div>
-        <select className="input max-w-[130px] text-xs py-1.5" style={{ colorScheme: 'dark' }}
-          value={days} onChange={e => setDays(Number(e.target.value))}>
-          <option value={3}>Next 3 days</option>
-          <option value={7}>Next 7 days</option>
-          <option value={14}>Next 14 days</option>
-          <option value={30}>Next 30 days</option>
-        </select>
-      </div>
-      {loading ? (
-        <div className="flex justify-center py-8">
-          <div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid rgba(201,168,76,0.2)', borderTopColor: '#C9A84C' }} />
-        </div>
-      ) : data.length === 0 ? (
-        <p className="text-center text-sm py-8" style={{ color: 'rgba(245,240,232,0.35)' }}>No anniversaries in the next {days} days</p>
-      ) : (
-        <div>{data.map(c => <CelebrantRow key={c.id} c={c} onWish={c => openWhatsApp(c.phone, whatsappAnniversaryMsg(salonName, c.name))} />)}</div>
-      )}
-    </div>
+    <SectionCard icon={Gift} iconBg="rgba(236,72,153,0.12)" iconColor="#ec4899"
+      title="Upcoming Birthdays" filter={days} onFilterChange={setDays}
+      filterOptions={FILTER_OPTS} loading={loading}
+      emptyText={`No birthdays in the next ${days} days`}>
+      {data.map((c, i) => (
+        <CelebrantRow key={c.id} c={c} accentColor="#ec4899" last={i === data.length - 1}
+          onWish={c => openWhatsApp(c.phone, whatsappBirthdayMsg(salonName, c.name))} />
+      ))}
+    </SectionCard>
+  );
+}
+
+function AnniversaryPanel({ salonName }) {
+  const [days, setDays] = useState(7);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { setLoading(true); api.anniversaries(days).then(setData).finally(() => setLoading(false)); }, [days]);
+  return (
+    <SectionCard icon={Heart} iconBg="rgba(244,63,94,0.1)" iconColor="#f43f5e"
+      title="Upcoming Anniversaries" filter={days} onFilterChange={setDays}
+      filterOptions={FILTER_OPTS} loading={loading}
+      emptyText={`No anniversaries in the next ${days} days`}>
+      {data.map((c, i) => (
+        <CelebrantRow key={c.id} c={c} accentColor="#f43f5e" last={i === data.length - 1}
+          onWish={c => openWhatsApp(c.phone, whatsappAnniversaryMsg(salonName, c.name))} />
+      ))}
+    </SectionCard>
   );
 }
 
@@ -158,25 +159,41 @@ function BroadcastPanel({ salonName }) {
   }
 
   return (
-    <div className="rounded-xl overflow-hidden" style={cardStyle}>
-      <div className="px-5 py-4 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D' }}>
+    <div className="rounded-xl overflow-hidden"
+      style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
+      {/* Header */}
+      <div className="px-5 py-3.5 flex items-center gap-2.5"
+        style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: 'rgba(201,168,76,0.03)' }}>
         <div className="w-8 h-8 rounded-xl flex items-center justify-center"
           style={{ background: 'rgba(201,168,76,0.12)' }}>
           <Megaphone className="w-4 h-4" style={{ color: '#C9A84C' }} />
         </div>
-        <h3 className="text-sm font-medium" style={{ color: '#F5F0E8' }}>WhatsApp Broadcast</h3>
+        <h3 className="font-serif font-semibold text-sm" style={{ color: '#F5F0E8' }}>WhatsApp Broadcast</h3>
+        {selected.size > 0 && (
+          <span className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full"
+            style={{ background: '#C9A84C', color: '#0A0A0A' }}>{selected.size} selected</span>
+        )}
       </div>
-      <div className="p-5 space-y-4">
-        <div>
-          <label className="label">Broadcast Message</label>
+
+      <div className="p-5 space-y-5">
+        {/* Message */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+            Broadcast Message
+          </label>
           <textarea className="input" rows={3}
             placeholder="e.g. 20% off on all facials this weekend! Book now 💆‍♀️"
             value={message} onChange={e => setMessage(e.target.value)} />
-          <p className="text-xs mt-1" style={{ color: 'rgba(245,240,232,0.3)' }}>This message will be sent to each selected customer via WhatsApp.</p>
+          <p className="text-xs" style={{ color: 'rgba(245,240,232,0.3)' }}>
+            Sent individually to each customer via WhatsApp.
+          </p>
         </div>
 
-        <div>
-          <label className="label">Recipient Filter</label>
+        {/* Recipient filter */}
+        <div className="space-y-2">
+          <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+            Recipients
+          </label>
           <div className="flex gap-2">
             {[['all', 'All (with phone)'], ['membership', 'Members only']].map(([val, lbl]) => (
               <button key={val} onClick={() => setFilter(val)}
@@ -190,11 +207,13 @@ function BroadcastPanel({ salonName }) {
           </div>
         </div>
 
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="label mb-0" style={{ color: 'rgba(245,240,232,0.5)' }}>
-              Select Customers ({selected.size}/{filtered.length})
-            </label>
+        {/* Customer list */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+              <Users className="w-3.5 h-3.5 inline mr-1" />
+              {selected.size} / {filtered.length} selected
+            </span>
             <button onClick={toggleAll} className="text-xs font-medium" style={{ color: '#C9A84C' }}>
               {selected.size === filtered.length ? 'Deselect all' : 'Select all'}
             </button>
@@ -202,42 +221,61 @@ function BroadcastPanel({ salonName }) {
           <div className="rounded-xl max-h-52 overflow-y-auto"
             style={{ border: '1px solid rgba(201,168,76,0.12)', background: '#0D0D0D' }}>
             {filtered.length === 0 ? (
-              <p className="text-center text-sm py-6" style={{ color: 'rgba(245,240,232,0.35)' }}>No customers with phone numbers</p>
-            ) : (
-              filtered.map(c => (
-                <label key={c.id} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors"
-                  style={{ borderBottom: '1px solid rgba(201,168,76,0.05)' }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                  <input type="checkbox" checked={selected.has(c.id)} style={{ accentColor: '#C9A84C' }}
-                    onChange={() => { const s = new Set(selected); s.has(c.id) ? s.delete(c.id) : s.add(c.id); setSelected(s); }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{c.name}</p>
-                    <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{c.phone}</p>
-                  </div>
-                  {c.membership_tier && c.membership_tier !== 'none' && (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full capitalize"
-                      style={{ background: 'rgba(201,168,76,0.12)', color: '#C9A84C' }}>{c.membership_tier}</span>
-                  )}
-                </label>
-              ))
-            )}
+              <div className="flex flex-col items-center justify-center py-8 gap-2">
+                <Users className="w-8 h-8" style={{ color: 'rgba(201,168,76,0.2)' }} />
+                <p className="text-sm" style={{ color: 'rgba(245,240,232,0.35)' }}>No customers with phone numbers</p>
+              </div>
+            ) : filtered.map((c, i) => (
+              <label key={c.id}
+                className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors"
+                style={{ borderBottom: i < filtered.length - 1 ? '1px solid rgba(201,168,76,0.05)' : 'none' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <input type="checkbox" checked={selected.has(c.id)} style={{ accentColor: '#C9A84C' }}
+                  onChange={() => { const s = new Set(selected); s.has(c.id) ? s.delete(c.id) : s.add(c.id); setSelected(s); }} />
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
+                  style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C' }}>
+                  {c.name?.[0]?.toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{c.name}</p>
+                  <p className="text-xs" style={{ color: 'rgba(245,240,232,0.35)' }}>{c.phone}</p>
+                </div>
+                {c.membership_tier && c.membership_tier !== 'none' && (
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full capitalize flex-shrink-0"
+                    style={{ background: 'rgba(201,168,76,0.12)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' }}>
+                    {c.membership_tier}
+                  </span>
+                )}
+              </label>
+            ))}
           </div>
         </div>
 
-        {sentCount > 0 && (
-          <p className="text-sm font-medium" style={{ color: '#22c55e' }}>✓ Sent to {sentCount} customer{sentCount > 1 ? 's' : ''}</p>
+        {sentCount > 0 && !sending && (
+          <div className="flex items-center gap-2 rounded-xl px-4 py-3"
+            style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', color: '#22c55e' }}>
+            <MessageCircle className="w-4 h-4 flex-shrink-0" />
+            <span className="text-sm font-medium">Sent to {sentCount} customer{sentCount > 1 ? 's' : ''}</span>
+          </div>
         )}
 
-        <button onClick={sendBroadcast} disabled={sending || selected.size === 0 || !message.trim()}
+        <button onClick={sendBroadcast}
+          disabled={sending || selected.size === 0 || !message.trim()}
           className="btn-primary flex items-center gap-2 w-full justify-center">
           {sending ? (
-            <><div className="w-4 h-4 rounded-full animate-spin" style={{ border: '2px solid rgba(0,0,0,0.2)', borderTopColor: '#0A0A0A' }} /> Sending ({sentCount}/{selected.size})…</>
+            <>
+              <div className="w-4 h-4 rounded-full animate-spin"
+                style={{ border: '2px solid rgba(0,0,0,0.2)', borderTopColor: '#0A0A0A' }} />
+              Sending {sentCount}/{selected.size}…
+            </>
           ) : (
-            <><Send className="w-4 h-4" /> Send to {selected.size} customer{selected.size !== 1 ? 's' : ''}</>
+            <><Send className="w-4 h-4" /> Send to {selected.size || 0} customer{selected.size !== 1 ? 's' : ''}</>
           )}
         </button>
-        <p className="text-xs text-center" style={{ color: 'rgba(245,240,232,0.3)' }}>Each message opens in WhatsApp. You confirm and send from your phone.</p>
+        <p className="text-xs text-center" style={{ color: 'rgba(245,240,232,0.25)' }}>
+          Each message opens in WhatsApp — you confirm and send from your phone.
+        </p>
       </div>
     </div>
   );
@@ -245,15 +283,20 @@ function BroadcastPanel({ salonName }) {
 
 export default function Engagement() {
   const [settings, setSettings] = useState({});
-  const [tab, setTab] = useState('birthdays');
+  const [tab,      setTab]      = useState('birthdays');
 
   useEffect(() => { api.settings().then(setSettings); }, []);
   const salonName = settings.salon_name || 'Sukh&Sen Salon';
 
   return (
     <div className="space-y-5 max-w-2xl">
-      <div className="flex gap-1 rounded-xl p-1 w-fit" style={{ background: '#161616', border: '1px solid rgba(201,168,76,0.12)' }}>
-        {[['birthdays','Birthdays', Gift], ['anniversaries','Anniversaries', Heart], ['broadcast','Broadcast', Megaphone]].map(([key, label, Icon]) => (
+      <div className="flex gap-1 rounded-xl p-1 w-fit"
+        style={{ background: '#161616', border: '1px solid rgba(201,168,76,0.12)' }}>
+        {[
+          ['birthdays',     'Birthdays',    Gift],
+          ['anniversaries', 'Anniversaries', Heart],
+          ['broadcast',     'Broadcast',    Megaphone],
+        ].map(([key, label, Icon]) => (
           <button key={key} onClick={() => setTab(key)}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all"
             style={tab === key
@@ -264,9 +307,9 @@ export default function Engagement() {
         ))}
       </div>
 
-      {tab === 'birthdays'     && <BirthdayPanel salonName={salonName} />}
-      {tab === 'anniversaries' && <AnniversaryPanel salonName={salonName} />}
-      {tab === 'broadcast'     && <BroadcastPanel salonName={salonName} />}
+      {tab === 'birthdays'     && <BirthdayPanel     salonName={salonName} />}
+      {tab === 'anniversaries' && <AnniversaryPanel  salonName={salonName} />}
+      {tab === 'broadcast'     && <BroadcastPanel    salonName={salonName} />}
     </div>
   );
 }
