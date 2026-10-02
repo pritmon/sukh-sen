@@ -96,16 +96,63 @@ function BirthdayPanel({ salonName }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => { setLoading(true); api.birthdays(days).then(setData).finally(() => setLoading(false)); }, [days]);
+
+  function handleWish(c) {
+    // Download the birthday card image first
+    const a = document.createElement('a');
+    a.href = '/birthday-card.webp';
+    a.download = 'birthday-card.webp';
+    a.click();
+    // Then open WhatsApp with the message
+    setTimeout(() => openWhatsApp(c.phone, whatsappBirthdayMsg(salonName, c.name)), 400);
+  }
+
   return (
-    <SectionCard icon={Gift} iconBg="rgba(236,72,153,0.12)" iconColor="#ec4899"
-      title="Upcoming Birthdays" filter={days} onFilterChange={setDays}
-      filterOptions={FILTER_OPTS} loading={loading}
-      emptyText={`No birthdays in the next ${days} days`}>
-      {data.map((c, i) => (
-        <CelebrantRow key={c.id} c={c} accentColor="#ec4899" last={i === data.length - 1}
-          onWish={c => openWhatsApp(c.phone, whatsappBirthdayMsg(salonName, c.name))} />
-      ))}
-    </SectionCard>
+    <div className="space-y-4">
+      {/* Birthday card preview */}
+      <div className="rounded-xl overflow-hidden"
+        style={{ background: '#111111', border: '1px solid rgba(236,72,153,0.2)' }}>
+        <div className="px-5 py-3 flex items-center justify-between"
+          style={{ borderBottom: '1px solid rgba(236,72,153,0.12)', background: 'rgba(236,72,153,0.04)' }}>
+          <div className="flex items-center gap-2">
+            <Gift className="w-4 h-4" style={{ color: '#ec4899' }} />
+            <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(236,72,153,0.7)' }}>Birthday Card</span>
+          </div>
+          <a href="/birthday-card.webp" download="birthday-card.webp"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
+            style={{ background: 'rgba(236,72,153,0.08)', color: '#ec4899', border: '1px solid rgba(236,72,153,0.2)' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(236,72,153,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(236,72,153,0.08)'}>
+            ⬇ Download Image
+          </a>
+        </div>
+        <div className="p-4 flex gap-4 items-start">
+          <img src="/birthday-card.webp" alt="Birthday card"
+            className="w-28 rounded-xl flex-shrink-0 object-cover"
+            style={{ border: '1px solid rgba(236,72,153,0.15)' }} />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium mb-2" style={{ color: 'rgba(245,240,232,0.5)' }}>Message preview:</p>
+            <p className="text-xs leading-relaxed whitespace-pre-line"
+              style={{ color: 'rgba(245,240,232,0.65)', fontFamily: 'monospace' }}>
+              {`⚜️ ✨ H A P P Y  B I R T H D A Y ✨ ⚜️\n\nToday, we celebrate the incredible journey of YOU. 🥂🌟\n\nMay the year ahead be filled with:\n ✨ Divine blessings & good health\n ✨ Moments that take your breath away\n ✨ Infinite laughter & peace\n\n~ Warmly, ${salonName} 🤍`}
+            </p>
+            <p className="text-xs mt-2" style={{ color: 'rgba(245,240,232,0.25)' }}>
+              Clicking Wish downloads this image + opens WhatsApp with the message.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <SectionCard icon={Gift} iconBg="rgba(236,72,153,0.12)" iconColor="#ec4899"
+        title="Upcoming Birthdays" filter={days} onFilterChange={setDays}
+        filterOptions={FILTER_OPTS} loading={loading}
+        emptyText={`No birthdays in the next ${days} days`}>
+        {data.map((c, i) => (
+          <CelebrantRow key={c.id} c={c} accentColor="#ec4899" last={i === data.length - 1}
+            onWish={handleWish} />
+        ))}
+      </SectionCard>
+    </div>
   );
 }
 
