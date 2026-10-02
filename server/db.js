@@ -343,7 +343,6 @@ function seed() {
     { name: 'Mita Sen',        phone: '9051888008', gender: 'female', birthday: mmdd(14), anniversary: mmdd(2), membership_tier: 'none',   loyalty_points: 75  },
     { name: 'Priti Ghosh',     phone: '8420999009', gender: 'female', birthday: mmdd(20), anniversary: mmdd(4), membership_tier: 'gold',   loyalty_points: 560 },
     { name: 'Subhash Halder',  phone: '9831000011', gender: 'male',   birthday: mmdd(10), anniversary: null,   membership_tier: 'none',   loyalty_points: 30  },
-    { name: 'Tapan Mondal',    phone: '9732000022', gender: 'male',   birthday: mmdd(12), anniversary: mmdd(6), membership_tier: 'silver', loyalty_points: 120 },
     { name: 'Bikash Roy',      phone: '9051000033', gender: 'male',   birthday: mmdd(18), anniversary: null,   membership_tier: 'none',   loyalty_points: 50  },
   ];
   const insCustDemo = db.prepare(
@@ -378,7 +377,6 @@ function seed() {
     const cAnanya   = custId('7001555005'); // Ananya Roy
     const cDebasree = custId('9831666006'); // Debasree Halder
     const cSubhash  = custId('9831000011'); // Subhash Halder
-    const cTapan    = custId('9732000022'); // Tapan Mondal
     const cBikash   = custId('9051000033'); // Bikash Roy
     const cMitaS    = custId('9051888008'); // Mita Sen
     const cPriti    = custId('8420999009'); // Priti Ghosh
@@ -408,7 +406,6 @@ function seed() {
 
     // ── Today ───────────────────────────────────────────────────────────────────
     addAppt(cRima,    sOwner,    today, '09:30', 'done',    svcWomCut);
-    addAppt(cTapan,   sSourav,   today, '10:00', 'done',    svcMenCut);
     addAppt(cKakoli,  sPriya,    today, '10:30', 'done',    svcColour);
     addAppt(cSunita,  sRekha,    today, '11:00', 'done',    svcThreading);
     addAppt(cSubhash, sSourav,   today, '11:30', 'pending', svcBeard);
@@ -421,7 +418,6 @@ function seed() {
     // ── Yesterday ──────────────────────────────────────────────────────────────
     addAppt(cMitaS,   sRekha,    yday1, '09:00', 'done', svcWax);
     addAppt(cRima,    sPriya,    yday1, '10:00', 'done', svcBlowDry);
-    addAppt(cTapan,   sSourav,   yday1, '11:00', 'done', svcMenCut);
     addAppt(cPuja,    sMita,     yday1, '12:30', 'done', svcFacial);
     addAppt(cSubhash, sOwner,    yday1, '14:00', 'done', svcHeadMassage);
     addAppt(cKakoli,  sSuchitra, yday1, '15:00', 'done', svcThreading);
@@ -436,7 +432,6 @@ function seed() {
     // ── 3 days ago ─────────────────────────────────────────────────────────────
     addAppt(cMitaS,   sSuchitra, yday3, '10:00', 'done', svcBlowDry);
     addAppt(cRima,    sMita,     yday3, '11:30', 'done', svcFacial);
-    addAppt(cTapan,   sSourav,   yday3, '13:00', 'done', svcBeard);
     addAppt(cKakoli,  sRekha,    yday3, '14:00', 'done', svcWax);
 
     const insInv = db.prepare('INSERT INTO inventory (name, quantity, threshold, unit, category) VALUES (?,?,?,?,?)');
