@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { openWhatsApp, whatsappBirthdayMsg, whatsappAnniversaryMsg, whatsappBroadcastMsg } from '../utils.js';
-import { MessageCircle, Gift, Heart, Megaphone, Send, Users } from 'lucide-react';
+import { MessageCircle, Gift, Heart, Megaphone, Send, Users, Check } from 'lucide-react';
 
 function DaysChip({ days }) {
   if (days === 0) return (
@@ -92,23 +92,51 @@ function SectionCard({ icon: Icon, iconBg, iconColor, title, filter, onFilterCha
 const FILTER_OPTS = [[3,'Next 3 days'],[7,'Next 7 days'],[14,'Next 14 days'],[30,'Next 30 days']];
 
 function BirthdayPanel({ salonName }) {
-  const [days, setDays] = useState(7);
-  const [data, setData] = useState([]);
+  const [days,   setDays]   = useState(7);
+  const [data,   setData]   = useState([]);
   const [loading, setLoading] = useState(true);
+  const [toast,  setToast]  = useState('');
   useEffect(() => { setLoading(true); api.birthdays(days).then(setData).finally(() => setLoading(false)); }, [days]);
 
-  function handleWish(c) {
-    // Download the birthday card image first
-    const a = document.createElement('a');
-    a.href = '/birthday-card.webp';
-    a.download = 'birthday-card.webp';
-    a.click();
-    // Then open WhatsApp with the message
-    setTimeout(() => openWhatsApp(c.phone, whatsappBirthdayMsg(salonName, c.name)), 400);
+  function showToast(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3500);
+  }
+
+  async function handleWish(c) {
+    const message = whatsappBirthdayMsg(salonName, c.name);
+
+    try {
+      const res  = await fetch('/birthday-card.webp');
+      const blob = await res.blob();
+      const file = new File([blob], 'birthday-card.webp', { type: 'image/webp' });
+
+      // Mobile: Web Share API — opens native share sheet (pick WhatsApp directly)
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text: message });
+        return;
+      }
+
+      // Desktop fallback: copy image to clipboard, then open WhatsApp
+      if (window.ClipboardItem) {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/webp': blob })]);
+        showToast('Image copied! Paste it in WhatsApp after it opens.');
+      }
+    } catch (_) {}
+
+    openWhatsApp(c.phone, message);
   }
 
   return (
     <div className="space-y-4">
+      {/* Toast */}
+      {toast && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl"
+          style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#22c55e' }}>
+          <Check className="w-4 h-4 flex-shrink-0" />
+          <span className="text-sm font-medium">{toast}</span>
+        </div>
+      )}
       {/* Birthday card preview */}
       <div className="rounded-xl overflow-hidden"
         style={{ background: '#111111', border: '1px solid rgba(236,72,153,0.2)' }}>
@@ -134,10 +162,10 @@ function BirthdayPanel({ salonName }) {
             <p className="text-xs font-medium mb-2" style={{ color: 'rgba(245,240,232,0.5)' }}>Message preview:</p>
             <p className="text-xs leading-relaxed whitespace-pre-line"
               style={{ color: 'rgba(245,240,232,0.65)', fontFamily: 'monospace' }}>
-              {`⚜️ ✨ H A P P Y  B I R T H D A Y ✨ ⚜️\n\nToday, we celebrate the incredible journey of YOU. 🥂🌟\n\nMay the year ahead be filled with:\n ✨ Divine blessings & good health\n ✨ Moments that take your breath away\n ✨ Infinite laughter & peace\n\n~ Warmly, ${salonName} 🤍`}
+              {`🎂 H A P P Y  B I R T H D A Y 🎉\n\nToday, we celebrate the incredible journey of YOU. 🥂🌟\n\nMay the year ahead be filled with:\n 🌸 Divine blessings & good health\n 🌸 Moments that take your breath away\n 🌸 Infinite laughter & peace\n\n~ Warmly, ${salonName} 💕`}
             </p>
             <p className="text-xs mt-2" style={{ color: 'rgba(245,240,232,0.25)' }}>
-              Clicking Wish downloads this image + opens WhatsApp with the message.
+              On mobile: Wish opens share sheet — pick WhatsApp to send image + message together. On desktop: image is copied to clipboard, then paste it in WhatsApp.
             </p>
           </div>
         </div>

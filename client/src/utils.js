@@ -50,7 +50,7 @@ export function whatsappBillMsg(salonName, customerName, items, total, method) {
 }
 
 export function whatsappBirthdayMsg(salonName, customerName) {
-  return `⚜️ *✨ H A P P Y  B I R T H D A Y ✨* ⚜️\n\nToday, we celebrate the incredible journey of *${customerName}*. 🥂🌟\n\nMay the year ahead stretch out before you like a beautiful path, filled with:\n ✨ Divine blessings & good health\n ✨ Moments that take your breath away\n ✨ Infinite laughter & unshakeable peace\n\nSending you our warmest energy and highest vibes for a truly magnificent celebration today! 🌟🎂\n\n~ *Warmly, ${salonName}* 🤍`;
+  return `🎂 *H A P P Y  B I R T H D A Y* 🎉\n\nToday, we celebrate the incredible journey of *${customerName}*. 🥂🌟\n\nMay the year ahead stretch out before you like a beautiful path, filled with:\n 🌸 Divine blessings & good health\n 🌸 Moments that take your breath away\n 🌸 Infinite laughter & unshakeable peace\n\nSending you our warmest energy and highest vibes for a truly magnificent celebration today! 🌟🎊\n\n~ *Warmly, ${salonName}* 💕`;
 }
 
 export function whatsappAnniversaryMsg(salonName, customerName) {
