@@ -33,6 +33,7 @@ export const api = {
   customer:         (id)   => req(`/customers/${id}`),
   customerLookup:   (phone)=> req(`/customers/lookup?phone=${encodeURIComponent(phone)}`),
   updateCustomer:   (id,d) => put(`/customers/${id}`, d),
+  deleteCustomer:   (id,d) => req(`/customers/${id}`, { method: 'DELETE', body: JSON.stringify(d) }),
   addLoyaltyPoints: (id,d) => post(`/customers/${id}/loyalty`, d),
   birthdays:        (days) => req(`/customers/birthdays?days=${days||7}`),
   anniversaries:    (days) => req(`/customers/anniversaries?days=${days||7}`),

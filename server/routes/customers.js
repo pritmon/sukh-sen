@@ -132,6 +132,29 @@ router.put('/:id', (req, res) => {
   }
 });
 
+// DELETE /api/customers/:id  — remove customer + all their data
+router.delete('/:id', (req, res) => {
+  try {
+    const { reason, notes } = req.body || {};
+    const customer = db.prepare('SELECT id, name FROM customers WHERE id=?').get(req.params.id);
+    if (!customer) return res.status(404).json({ error: 'Not found' });
+
+    // cascade delete in dependency order
+    const apptIds = db.prepare('SELECT id FROM appointments WHERE customer_id=?').all(req.params.id).map(r => r.id);
+    for (const aid of apptIds) {
+      db.prepare('DELETE FROM appointment_services WHERE appointment_id=?').run(aid);
+      db.prepare('DELETE FROM bills WHERE appointment_id=?').run(aid);
+    }
+    db.prepare('DELETE FROM appointments WHERE customer_id=?').run(req.params.id);
+    db.prepare('DELETE FROM loyalty_transactions WHERE customer_id=?').run(req.params.id);
+    db.prepare('DELETE FROM customers WHERE id=?').run(req.params.id);
+
+    res.json({ deleted: true, name: customer.name, reason: reason || null, notes: notes || null });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/customers/:id/loyalty  — add/deduct points
 router.post('/:id/loyalty', (req, res) => {
   try {

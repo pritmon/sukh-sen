@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { fmtDate, fmtRupee, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
-import { Search, Phone, ChevronRight, ArrowLeft, Star, Gift, Heart, MessageCircle, Pencil, Award } from 'lucide-react';
+import { Search, Phone, ChevronRight, ArrowLeft, Star, Gift, Heart, MessageCircle, Pencil, Award, Trash2, AlertTriangle } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
 const TIERS = ['none', 'bronze', 'silver', 'gold', 'platinum'];
@@ -102,6 +102,89 @@ function EditCustomerModal({ customer, onSave, onClose }) {
   );
 }
 
+const DELETE_REASONS = [
+  'Duplicate entry',
+  'Customer request',
+  'Inactive / no longer visiting',
+  'Incorrect record',
+  'Other',
+];
+
+function DeleteCustomerModal({ customer, onClose, onDeleted }) {
+  const [reason,  setReason]  = useState('');
+  const [notes,   setNotes]   = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!reason) return;
+    setDeleting(true);
+    try {
+      await api.deleteCustomer(customer.id, { reason, notes });
+      onDeleted();
+    } finally { setDeleting(false); }
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      {/* Warning banner */}
+      <div className="flex items-start gap-3 rounded-xl px-4 py-3"
+        style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+        <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#ef4444' }} />
+        <div>
+          <p className="text-sm font-semibold" style={{ color: '#ef4444' }}>This cannot be undone</p>
+          <p className="text-xs mt-0.5" style={{ color: 'rgba(239,68,68,0.7)' }}>
+            Deleting <strong>{customer.name}</strong> will also remove all their appointments, bills and loyalty history.
+          </p>
+        </div>
+      </div>
+
+      {/* Reason */}
+      <div className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+          Reason for deletion *
+        </label>
+        <div className="space-y-1.5">
+          {DELETE_REASONS.map(r => (
+            <label key={r} className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-colors"
+              style={{
+                background: reason === r ? 'rgba(239,68,68,0.08)' : '#0D0D0D',
+                border: `1px solid ${reason === r ? 'rgba(239,68,68,0.3)' : 'rgba(201,168,76,0.1)'}`,
+              }}>
+              <input type="radio" name="reason" value={r} checked={reason === r}
+                onChange={() => setReason(r)} style={{ accentColor: '#ef4444' }} />
+              <span className="text-sm" style={{ color: reason === r ? '#fca5a5' : 'rgba(245,240,232,0.6)' }}>{r}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Notes */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.6)' }}>
+          Additional notes (optional)
+        </label>
+        <textarea className="input" rows={2} placeholder="Any extra context…"
+          value={notes} onChange={e => setNotes(e.target.value)} />
+      </div>
+
+      <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
+        style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
+        <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
+        <button type="submit" disabled={!reason || deleting}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-[0.97]"
+          style={{
+            background: !reason || deleting ? 'rgba(239,68,68,0.3)' : '#ef4444',
+            color: '#fff',
+            opacity: !reason || deleting ? 0.6 : 1,
+          }}>
+          <Trash2 className="w-4 h-4" /> {deleting ? 'Deleting…' : 'Delete Customer'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
 function LoyaltyModal({ customer, onClose, onDone }) {
   const [pts,  setPts]  = useState('');
   const [type, setType] = useState('earn');
@@ -158,6 +241,7 @@ function CustomerProfile({ id, onBack }) {
   const [loading, setLoading] = useState(true);
   const [editOpen,    setEditOpen]    = useState(false);
   const [loyaltyOpen, setLoyaltyOpen] = useState(false);
+  const [deleteOpen,  setDeleteOpen]  = useState(false);
 
   async function load() {
     setLoading(true);
@@ -218,7 +302,14 @@ function CustomerProfile({ id, onBack }) {
           </div>
         </div>
 
-        <div className="flex justify-end mt-3">
+        <div className="flex items-center justify-between mt-3">
+          <button onClick={() => setDeleteOpen(true)}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl transition-colors"
+            style={{ color: 'rgba(239,68,68,0.5)', border: '1px solid rgba(239,68,68,0.15)', background: 'transparent' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
+            <Trash2 className="w-3.5 h-3.5" /> Delete Customer
+          </button>
           <button onClick={() => setEditOpen(true)} className="btn-secondary flex items-center gap-1.5 text-xs">
             <Pencil className="w-3.5 h-3.5" /> Edit Profile
           </button>
@@ -273,6 +364,13 @@ function CustomerProfile({ id, onBack }) {
         <Modal title="Loyalty Points" onClose={() => setLoyaltyOpen(false)}>
           <LoyaltyModal customer={data} onClose={() => setLoyaltyOpen(false)}
             onDone={() => { setLoyaltyOpen(false); load(); }} />
+        </Modal>
+      )}
+
+      {deleteOpen && (
+        <Modal title="Delete Customer" onClose={() => setDeleteOpen(false)}>
+          <DeleteCustomerModal customer={data} onClose={() => setDeleteOpen(false)}
+            onDeleted={onBack} />
         </Modal>
       )}
     </div>
