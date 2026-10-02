@@ -322,7 +322,7 @@ function seed() {
   function mmdd(daysOffset) {
     const d = new Date();
     d.setDate(d.getDate() + daysOffset);
-    return `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return `2000-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
   const demoCustomers = [
     { name: 'Rima Biswas',     phone: '9831111001', gender: 'female', birthday: mmdd(0),  anniversary: null,     membership_tier: 'gold',   loyalty_points: 320 },
