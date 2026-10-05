@@ -315,21 +315,22 @@ export default function Appointments() {
     <div className="space-y-4 max-w-5xl">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-1 rounded-lg px-2 py-1.5"
-          style={{ background: '#161616', border: '1px solid rgba(201,168,76,0.2)' }}>
-          <button onClick={() => shiftDate(-1)} className="p-1 rounded-lg transition-colors"
-            style={{ color: 'rgba(201,168,76,0.78)' }}
-            onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
-            onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}>
+        <div className="flex items-center gap-1">
+          <button onClick={() => shiftDate(-1)}
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: 'rgba(201,168,76,0.6)', background: '#161616', border: '1px solid rgba(201,168,76,0.15)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.borderColor = 'rgba(201,168,76,0.35)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.6)'; e.currentTarget.style.borderColor = 'rgba(201,168,76,0.15)'; }}>
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)}
-            className="text-sm border-none focus:outline-none bg-transparent font-medium"
-            style={{ color: '#F5F0E8', colorScheme: 'dark' }} />
-          <button onClick={() => shiftDate(1)} className="p-1 rounded-lg transition-colors"
-            style={{ color: 'rgba(201,168,76,0.78)' }}
-            onMouseEnter={e => e.currentTarget.style.color = '#C9A84C'}
-            onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}>
+          <div style={{ width: 180 }}>
+            <DatePicker value={date} onChange={setDate} />
+          </div>
+          <button onClick={() => shiftDate(1)}
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: 'rgba(201,168,76,0.6)', background: '#161616', border: '1px solid rgba(201,168,76,0.15)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#C9A84C'; e.currentTarget.style.borderColor = 'rgba(201,168,76,0.35)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.6)'; e.currentTarget.style.borderColor = 'rgba(201,168,76,0.15)'; }}>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { api } from '../api.js';
 import { Plus, Pencil, Trash2, Phone, AlertCircle, BookOpen, ArrowLeft, Users, CreditCard, Camera, X } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
+import DatePicker from '../components/DatePicker.jsx';
 
 const ROLES = ['Owner', 'Top Stylist', 'Senior Stylist', 'Stylist', 'Assistant', 'Receptionist', 'Trainee'];
 
@@ -109,8 +110,7 @@ function StaffForm({ initial, onSave, onClose }) {
             {errors.phone && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.phone}</p>}
           </Field>
           <Field label="Date of Birth">
-            <input className="input" type="date" value={form.dob || ''}
-              onChange={e => set('dob', e.target.value)} />
+            <DatePicker value={form.dob || ''} onChange={v => set('dob', v)} placeholder="Date of birth" />
           </Field>
         </div>
         <Field label="Address">

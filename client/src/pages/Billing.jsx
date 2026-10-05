@@ -3,6 +3,7 @@ import { api } from '../api.js';
 import { fmtDate, fmtRupee, fmtTime, todayISO, openWhatsApp, whatsappBillMsg } from '../utils.js';
 import { Plus, Check, Banknote, Smartphone, Eye, MessageCircle, Receipt, TrendingUp, CalendarDays } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
+import DatePicker from '../components/DatePicker.jsx';
 
 function BillForm({ appointment, onSave, onClose }) {
   const [items,    setItems]    = useState(
@@ -284,9 +285,9 @@ export default function Billing() {
             <TrendingUp className="w-4 h-4" style={{ color: '#C9A84C' }} />
             <h2 className="font-serif font-bold text-sm" style={{ color: '#E8C96D' }}>Daily Revenue</h2>
           </div>
-          <input type="date" value={summaryDate} onChange={e => setSummaryDate(e.target.value)}
-            className="text-sm rounded-lg px-3 py-1.5 focus:outline-none"
-            style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.2)', color: '#F5F0E8', colorScheme: 'dark' }} />
+          <div style={{ width: 170 }}>
+            <DatePicker value={summaryDate} onChange={setSummaryDate} />
+          </div>
         </div>
 
         {summary && (

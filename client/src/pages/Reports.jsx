@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { fmtDate, fmtRupee, todayISO } from '../utils.js';
 import { Users, ChevronLeft, ChevronRight, BarChart2, TrendingUp, CalendarDays, CheckCircle2, AlertCircle, Star } from 'lucide-react';
+import DatePicker from '../components/DatePicker.jsx';
 
 function SummaryCard({ icon: Icon, label, value, sub, gold }) {
   return (
@@ -54,8 +55,9 @@ function StaffPerformance() {
           onMouseLeave={e => e.currentTarget.style.background = '#161616'}>
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <input type="date" value={date} onChange={e => setDate(e.target.value)}
-          className="input flex-1 max-w-[160px]" style={{ colorScheme: 'dark' }} />
+        <div style={{ width: 170 }}>
+          <DatePicker value={date} onChange={setDate} />
+        </div>
         <button onClick={() => shiftDate(1)}
           className="p-2 rounded-xl transition-colors"
           style={{ border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.75)', background: '#161616' }}

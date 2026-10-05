@@ -3,6 +3,7 @@ import { api } from '../api.js';
 import { fmtDate, fmtRupee, fmtTime, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
 import { Search, Phone, ChevronRight, ArrowLeft, Star, Gift, Heart, MessageCircle, Pencil, Award, Trash2, AlertTriangle } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
+import DatePicker from '../components/DatePicker.jsx';
 
 const TIERS = ['none', 'bronze', 'silver', 'gold', 'platinum'];
 const TIER_STYLE = {
@@ -72,11 +73,11 @@ function EditCustomerModal({ customer, onSave, onClose }) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="label flex items-center gap-1"><Gift className="w-3 h-3" /> Birthday</label>
-          <input className="input" type="date" value={form.birthday} onChange={e => set('birthday', e.target.value)} />
+          <DatePicker value={form.birthday} onChange={v => set('birthday', v)} placeholder="Select date" />
         </div>
         <div>
           <label className="label flex items-center gap-1"><Heart className="w-3 h-3" /> Anniversary</label>
-          <input className="input" type="date" value={form.anniversary} onChange={e => set('anniversary', e.target.value)} />
+          <DatePicker value={form.anniversary} onChange={v => set('anniversary', v)} placeholder="Select date" />
         </div>
       </div>
       <div>
