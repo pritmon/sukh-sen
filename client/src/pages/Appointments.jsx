@@ -3,6 +3,7 @@ import { api } from '../api.js';
 import { fmtDate, fmtRupee, fmtTime, todayISO, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
 import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight, MessageCircle, UserCheck } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
+import DatePicker from '../components/DatePicker.jsx';
 
 function AppointmentForm({ onSave, onClose, walkin }) {
   const [services,     setServices]     = useState([]);
@@ -161,13 +162,15 @@ function AppointmentForm({ onSave, onClose, walkin }) {
         </div>
       </div>
 
-      {/* Date / Time — for walk-in show but pre-filled; for new show fully */}
+      {/* Date / Time */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="label">{walkin ? 'Date (today)' : 'Date *'}</label>
-          <input className="input" type="date" value={form.date}
-            onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-            required readOnly={!!walkin} style={walkin ? { opacity: 0.6 } : {}} />
+          <DatePicker
+            value={form.date}
+            onChange={d => setForm(f => ({ ...f, date: d }))}
+            readOnly={!!walkin}
+          />
         </div>
         <div>
           <label className="label">{walkin ? 'Time (now)' : 'Time *'}</label>
