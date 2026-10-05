@@ -345,16 +345,16 @@ ${a}
 
 Have a great day! 😊`}function hu(e,t){return`🎂 *H A P P Y  B I R T H D A Y* 🎉
 
-Today, we celebrate the incredible journey of *${t}*. 🥂🌟
+Today, we celebrate the incredible journey of *${t}*. ✨
 
 May the year ahead stretch out before you like a beautiful path, filled with:
- 🌸 Divine blessings & good health
- 🌸 Moments that take your breath away
- 🌸 Infinite laughter & unshakeable peace
+ ❤️ Divine blessings & good health
+ ❤️ Moments that take your breath away
+ ❤️ Infinite laughter & unshakeable peace
 
-Sending you our warmest energy and highest vibes for a truly magnificent celebration today! 🌟🎊
+Sending you our warmest energy and highest vibes for a truly magnificent celebration today! 🎉🎂
 
-~ *Warmly, ${e}* 💕`}function h1(e,t){return`💍 Happy Anniversary ${t}! 🥂
+~ *Warmly, ${e}* ❤️`}function h1(e,t){return`💍 Happy Anniversary ${t}! 🥂
 
 Wishing you both a beautiful celebration! 🌹
 
