@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
 
-export default function Modal({ title, onClose, children, wide }) {
+export default function Modal({ title, subtitle, onClose, children, wide }) {
   useEffect(() => {
     function onKey(e) { if (e.key === 'Escape') onClose(); }
     document.addEventListener('keydown', onKey);
@@ -18,7 +18,10 @@ export default function Modal({ title, onClose, children, wide }) {
       >
         <div className="flex items-center justify-between px-6 py-4 flex-shrink-0"
           style={{ borderBottom: '1px solid rgba(201,168,76,0.1)' }}>
-          <h2 className="font-serif font-semibold text-base" style={{ color: '#F5F0E8' }}>{title}</h2>
+          <div>
+            <h2 className="font-serif font-semibold text-base" style={{ color: '#F5F0E8' }}>{title}</h2>
+            {subtitle && <p className="text-xs mt-0.5" style={{ color: 'rgba(201,168,76,0.6)' }}>{subtitle}</p>}
+          </div>
           <button onClick={onClose}
             className="p-1.5 rounded-lg transition-colors"
             style={{ color: 'rgba(245,240,232,0.68)' }}

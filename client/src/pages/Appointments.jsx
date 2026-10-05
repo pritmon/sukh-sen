@@ -535,13 +535,13 @@ export default function Appointments() {
       </div>
 
       {showNew && (
-        <Modal title="New Appointment" onClose={() => setShowNew(false)} wide>
+        <Modal title="Book Appointment" subtitle="Schedule a future visit for a customer" onClose={() => setShowNew(false)} wide>
           <AppointmentForm onSave={handleNew} onClose={() => setShowNew(false)} />
         </Modal>
       )}
 
       {showWalkin && (
-        <Modal title="⚡ Walk-in" onClose={() => setShowWalkin(false)} wide>
+        <Modal title="⚡ Walk-in" subtitle="Customer is here now · date & time auto-filled" onClose={() => setShowWalkin(false)} wide>
           <AppointmentForm onSave={handleWalkin} onClose={() => setShowWalkin(false)} walkin />
         </Modal>
       )}
