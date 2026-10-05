@@ -75,10 +75,25 @@ function StaffForm({ initial, onSave, onClose }) {
   async function submit(e) {
     e.preventDefault();
     const errs = {};
-    if (!form.name?.trim())          errs.name          = 'Name';
-    if (!form.phone?.trim())         errs.phone         = 'Phone Number';
-    if (!form.photo)                 errs.photo         = 'Passport Photo';
-    if (!form.aadhar_number?.trim()) errs.aadhar_number = 'Aadhar Number';
+    if (!form.name?.trim())
+      errs.name = 'Name is required';
+    const digits = (form.phone || '').replace(/\D/g, '');
+    if (!digits)
+      errs.phone = 'Phone number is required';
+    else if (digits.length !== 10)
+      errs.phone = 'Must be a 10-digit mobile number';
+    if (!form.photo)
+      errs.photo = 'Passport Photo is required';
+    const aadhar = (form.aadhar_number || '').replace(/\s/g, '');
+    if (!aadhar)
+      errs.aadhar_number = 'Aadhar number is required';
+    else if (!/^\d{12}$/.test(aadhar))
+      errs.aadhar_number = 'Must be exactly 12 digits';
+    const edigits = (form.emergency_phone || '').replace(/\D/g, '');
+    if (edigits && edigits.length !== 10)
+      errs.emergency_phone = 'Must be a 10-digit mobile number';
+    if (form.pan_number && !/^[A-Z]{5}\d{4}[A-Z]$/.test(form.pan_number))
+      errs.pan_number = 'Invalid PAN format (e.g. ABCDE1234F)';
     if (Object.keys(errs).length) { setErrors(errs); setShowAlert(true); return; }
     setSaving(true);
     try {
@@ -105,7 +120,8 @@ function StaffForm({ initial, onSave, onClose }) {
         <div className="grid grid-cols-2 gap-3">
           <Field label="Phone *">
             <input className="input" value={form.phone || ''} type="tel"
-              onChange={e => set('phone', e.target.value)} placeholder="Mobile number"
+              onChange={e => set('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
+              placeholder="10-digit mobile number" maxLength={10}
               style={errors.phone ? { borderColor: '#ef4444' } : {}} />
             {errors.phone && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.phone}</p>}
           </Field>
@@ -132,7 +148,10 @@ function StaffForm({ initial, onSave, onClose }) {
         </div>
         <Field label="Emergency Phone">
           <input className="input" value={form.emergency_phone || ''} type="tel"
-            onChange={e => set('emergency_phone', e.target.value)} placeholder="Emergency contact number" />
+            onChange={e => set('emergency_phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
+            placeholder="10-digit mobile number" maxLength={10}
+            style={errors.emergency_phone ? { borderColor: '#ef4444' } : {}} />
+          {errors.emergency_phone && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.emergency_phone}</p>}
         </Field>
       </Section>
 
@@ -251,11 +270,17 @@ function StaffForm({ initial, onSave, onClose }) {
           <Field label="PAN Number">
             <input className="input" value={form.pan_number || ''}
               onChange={e => set('pan_number', e.target.value.toUpperCase())}
-              placeholder="ABCDE1234F" maxLength={10} />
+              placeholder="ABCDE1234F" maxLength={10}
+              style={errors.pan_number ? { borderColor: '#ef4444' } : {}} />
+            {errors.pan_number && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.pan_number}</p>}
           </Field>
           <Field label="Aadhar Number *">
             <input className="input" value={form.aadhar_number || ''}
-              onChange={e => set('aadhar_number', e.target.value)}
+              onChange={e => {
+                const digits = e.target.value.replace(/\D/g, '').slice(0, 12);
+                const formatted = digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+                set('aadhar_number', formatted);
+              }}
               placeholder="XXXX XXXX XXXX" maxLength={14}
               style={errors.aadhar_number ? { borderColor: '#ef4444' } : {}} />
             {errors.aadhar_number && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.aadhar_number}</p>}

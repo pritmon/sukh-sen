@@ -36,8 +36,15 @@ function EditCustomerModal({ customer, onSave, onClose }) {
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  const [formErrors, setFormErrors] = useState({});
+
   async function submit(e) {
     e.preventDefault();
+    const errs = {};
+    if (!form.name?.trim()) errs.name = 'Name is required';
+    const digits = (form.phone || '').replace(/\D/g, '');
+    if (digits && digits.length !== 10) errs.phone = 'Must be a 10-digit number';
+    if (Object.keys(errs).length) { setFormErrors(errs); return; }
     setSaving(true);
     try { await onSave(form); }
     finally { setSaving(false); }
@@ -52,7 +59,11 @@ function EditCustomerModal({ customer, onSave, onClose }) {
         </div>
         <div>
           <label className="label">Phone</label>
-          <input className="input" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)} />
+          <input className="input" type="tel" value={form.phone}
+            onChange={e => { set('phone', e.target.value.replace(/\D/g, '').slice(0, 10)); setFormErrors(er => ({ ...er, phone: '' })); }}
+            placeholder="10-digit number" maxLength={10}
+            style={formErrors.phone ? { borderColor: '#ef4444' } : {}} />
+          {formErrors.phone && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{formErrors.phone}</p>}
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
