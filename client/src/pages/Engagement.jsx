@@ -370,7 +370,7 @@ export default function Engagement() {
 
   return (
     <div className="space-y-5 max-w-2xl">
-      <div className="flex gap-1 rounded-xl p-1 w-fit"
+      <div className="flex gap-1 rounded-xl p-1 w-full sm:w-fit"
         style={{ background: '#161616', border: '1px solid rgba(201,168,76,0.12)' }}>
         {[
           ['birthdays',     'Birthdays',    Gift],
@@ -378,7 +378,7 @@ export default function Engagement() {
           ['broadcast',     'Broadcast',    Megaphone],
         ].map(([key, label, Icon]) => (
           <button key={key} onClick={() => setTab(key)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all"
             style={tab === key
               ? { background: 'rgba(201,168,76,0.15)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.25)' }
               : { color: 'rgba(245,240,232,0.68)', border: '1px solid transparent' }}>
