@@ -73,8 +73,10 @@ function StockBar({ qty, threshold }) {
 }
 
 function ItemCard({ item, onUpdate, onEdit, onDelete }) {
-  const [qty,  setQty]  = useState(item.quantity);
-  const [busy, setBusy] = useState(false);
+  const [qty,        setQty]        = useState(item.quantity);
+  const [busy,       setBusy]       = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  function requestDelete() { setConfirming(true); setTimeout(() => setConfirming(false), 3000); }
   const isLow = qty <= item.threshold;
 
   async function adjust(delta) {
@@ -137,12 +139,18 @@ function ItemCard({ item, onUpdate, onEdit, onDelete }) {
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
             <Pencil className="w-3.5 h-3.5" />
           </button>
-          <button onClick={() => onDelete(item.id)}
-            className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.45)' }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.45)'; e.currentTarget.style.background = 'transparent'; }}>
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          {confirming
+            ? <button onClick={() => onDelete(item.id)}
+                className="px-2 py-1 rounded-lg text-xs font-semibold"
+                style={{ color: '#ef4444', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)' }}>
+                Sure?
+              </button>
+            : <button onClick={requestDelete}
+                className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.45)' }}
+                onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.45)'; e.currentTarget.style.background = 'transparent'; }}>
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>}
         </div>
       </div>
     </div>
@@ -176,7 +184,6 @@ export default function Inventory() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Delete this item?')) return;
     await api.deleteInventory(id);
     load();
   }

@@ -229,12 +229,14 @@ function AppointmentForm({ onSave, onClose }) {
 }
 
 export default function Appointments() {
-  const [appts,    setAppts]    = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [date,     setDate]     = useState(todayISO());
-  const [showNew,  setShowNew]  = useState(false);
-  const [error,    setError]    = useState(null);
-  const [settings, setSettings] = useState({});
+  const [appts,         setAppts]         = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [date,          setDate]          = useState(todayISO());
+  const [showNew,       setShowNew]       = useState(false);
+  const [error,         setError]         = useState(null);
+  const [settings,      setSettings]      = useState({});
+  const [pendingDelete, setPendingDelete] = useState(null);
+  function requestDelete(id) { setPendingDelete(id); setTimeout(() => setPendingDelete(null), 3000); }
 
   useEffect(() => {
     api.settings().then(setSettings).catch(() => {});
@@ -283,7 +285,6 @@ export default function Appointments() {
   }
 
   async function del(id) {
-    if (!confirm('Delete this appointment?')) return;
     await api.deleteAppointment(id);
     load(date);
   }
@@ -386,12 +387,18 @@ export default function Appointments() {
                             </button>
                           </>
                         )}
-                        <button onClick={() => del(a.id)} title="Delete"
-                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.42)' }}
-                          onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
-                          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        {pendingDelete === a.id
+                          ? <button onClick={() => del(a.id)}
+                              className="px-2 py-1 rounded-lg text-xs font-semibold"
+                              style={{ color: '#ef4444', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)' }}>
+                              Sure?
+                            </button>
+                          : <button onClick={() => requestDelete(a.id)} title="Delete"
+                              className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.42)' }}
+                              onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>}
                       </div>
                     </div>
                   </div>
@@ -457,12 +464,18 @@ export default function Appointments() {
                         </button>
                       </>
                     )}
-                    <button onClick={() => del(a.id)} title="Delete"
-                      className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.42)' }}
-                      onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
-                      onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    {pendingDelete === a.id
+                      ? <button onClick={() => del(a.id)}
+                          className="px-2 py-1 rounded-lg text-xs font-semibold"
+                          style={{ color: '#ef4444', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)' }}>
+                          Sure?
+                        </button>
+                      : <button onClick={() => requestDelete(a.id)} title="Delete"
+                          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(245,240,232,0.42)' }}
+                          onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(245,240,232,0.2)'; e.currentTarget.style.background = 'transparent'; }}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>}
                   </div>
                 </div>
 

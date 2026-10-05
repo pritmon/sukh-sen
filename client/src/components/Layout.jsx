@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Menu, LogOut } from 'lucide-react';
 import Sidebar from './Sidebar.jsx';
@@ -20,6 +20,8 @@ export default function Layout({ onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const title = titles[location.pathname] || 'Sukh&Sen';
+
+  useEffect(() => { document.title = `${title} · Sukh&Sen`; }, [title]);
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#0A0A0A' }}>

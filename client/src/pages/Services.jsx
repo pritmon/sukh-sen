@@ -65,6 +65,11 @@ function ServiceForm({ initial, categories, onSave, onClose }) {
 }
 
 function ServiceCard({ service, onEdit, onDelete }) {
+  const [confirming, setConfirming] = useState(false);
+  function requestDelete() {
+    setConfirming(true);
+    setTimeout(() => setConfirming(false), 3000);
+  }
   return (
     <div className="p-4 rounded-xl flex flex-col gap-3 transition-all"
       style={{
@@ -99,12 +104,18 @@ function ServiceCard({ service, onEdit, onDelete }) {
           onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
           <Pencil className="w-3.5 h-3.5" />
         </button>
-        <button onClick={() => onDelete(service.id)}
-          className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.45)' }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.45)'; e.currentTarget.style.background = 'transparent'; }}>
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
+        {confirming
+          ? <button onClick={() => onDelete(service.id)}
+              className="px-2 py-1 rounded-lg text-xs font-semibold transition-colors"
+              style={{ color: '#ef4444', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)' }}>
+              Sure?
+            </button>
+          : <button onClick={requestDelete}
+              className="p-1.5 rounded-lg transition-colors" style={{ color: 'rgba(239,68,68,0.45)' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.45)'; e.currentTarget.style.background = 'transparent'; }}>
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>}
       </div>
     </div>
   );
@@ -132,7 +143,6 @@ export default function Services() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Delete this service?')) return;
     await api.deleteService(id);
     load();
   }

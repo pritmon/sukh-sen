@@ -469,10 +469,12 @@ function StaffProfile({ staff: s, onBack, onEdit }) {
 }
 
 export default function Staff() {
-  const [staff,    setStaff]    = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [modal,    setModal]    = useState(null);  // null | 'new' | staffObj
-  const [selected, setSelected] = useState(null);  // staff profile view
+  const [staff,         setStaff]         = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [modal,         setModal]         = useState(null);
+  const [selected,      setSelected]      = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  function requestDelete(id) { setPendingDelete(id); setTimeout(() => setPendingDelete(null), 3000); }
 
   async function load() {
     setLoading(true);
@@ -490,7 +492,6 @@ export default function Staff() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Remove this staff member?')) return;
     await api.deleteStaff(id);
     load();
   }
@@ -543,13 +544,19 @@ export default function Staff() {
                     onMouseLeave={e => { e.currentTarget.style.color = 'rgba(201,168,76,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={() => handleDelete(s.id)}
-                    className="p-1.5 rounded-lg transition-colors"
-                    style={{ color: 'rgba(239,68,68,0.5)' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  {pendingDelete === s.id
+                    ? <button onClick={() => handleDelete(s.id)}
+                        className="px-2 py-1 rounded-lg text-xs font-semibold"
+                        style={{ color: '#ef4444', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)' }}>
+                        Sure?
+                      </button>
+                    : <button onClick={() => requestDelete(s.id)}
+                        className="p-1.5 rounded-lg transition-colors"
+                        style={{ color: 'rgba(239,68,68,0.5)' }}
+                        onMouseEnter={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = 'rgba(239,68,68,0.5)'; e.currentTarget.style.background = 'transparent'; }}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>}
                 </div>
               </div>
               {s.skills && (
