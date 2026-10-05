@@ -4,25 +4,31 @@ import { fmtDate, fmtRupee, fmtTime, todayISO, statusClass, statusLabel, openWha
 import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight, MessageCircle, UserCheck } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 
-function AppointmentForm({ onSave, onClose }) {
-  const [services,      setServices]      = useState([]);
-  const [staff,         setStaff]         = useState([]);
-  const [saving,        setSaving]        = useState(false);
-  const [recognized,    setRecognized]    = useState(null);
-  const [nameSuggests,  setNameSuggests]  = useState([]);
-  const [showSuggests,  setShowSuggests]  = useState(false);
-  const [nameTimer,     setNameTimer]     = useState(null);
-  const [phoneTimer,    setPhoneTimer]    = useState(null);
+function AppointmentForm({ onSave, onClose, walkin }) {
+  const [services,     setServices]     = useState([]);
+  const [staff,        setStaff]        = useState([]);
+  const [saving,       setSaving]       = useState(false);
+  const [recognized,   setRecognized]   = useState(null);
+  const [nameSuggests, setNameSuggests] = useState([]);
+  const [showSuggests, setShowSuggests] = useState(false);
+  const [nameTimer,    setNameTimer]    = useState(null);
+  const [phoneTimer,   setPhoneTimer]   = useState(null);
   const nameRef = useRef(null);
+
+  const nowTime = () => {
+    const d = new Date();
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  };
+
   const [form, setForm] = useState({
     customerName:  '',
     customerPhone: '',
     serviceIds:    [],
     staffId:       '',
     date:          todayISO(),
-    time:          '10:00',
+    time:          walkin ? nowTime() : '10:00',
     notes:         '',
-    isWalkin:      false,
+    isWalkin:      !!walkin,
   });
 
   useEffect(() => {
@@ -33,7 +39,6 @@ function AppointmentForm({ onSave, onClose }) {
     });
   }, []);
 
-  // Close suggestions when clicking outside
   useEffect(() => {
     function handler(e) {
       if (nameRef.current && !nameRef.current.contains(e.target)) setShowSuggests(false);
@@ -67,7 +72,7 @@ function AppointmentForm({ onSave, onClose }) {
 
   function handlePhoneChange(phone) {
     setForm(f => ({ ...f, customerPhone: phone }));
-    if (recognized) return; // already selected by name, don't override phone lookup
+    if (recognized) return;
     setRecognized(null);
     clearTimeout(phoneTimer);
     if (phone.replace(/\D/g, '').length >= 10) {
@@ -94,19 +99,18 @@ function AppointmentForm({ onSave, onClose }) {
     e.preventDefault();
     if (!form.customerName.trim()) return;
     setSaving(true);
-    try {
-      await onSave(form);
-    } finally {
-      setSaving(false);
-    }
+    try { await onSave(form); } finally { setSaving(false); }
   }
 
   const categories = [...new Set(services.map(s => s.category))];
+  const selectedServices = services.filter(s => form.serviceIds.includes(s.id));
+  const total = selectedServices.reduce((sum, s) => sum + (s.price || 0), 0);
 
   return (
     <form onSubmit={submit} className="space-y-4">
+      {/* Returning customer banner */}
       {recognized && (
-        <div className="flex items-center gap-2 rounded-xl px-3.5 py-2.5"
+        <div className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5"
           style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)' }}>
           <UserCheck className="w-4 h-4 flex-shrink-0" style={{ color: '#C9A84C' }} />
           <div className="flex-1 min-w-0">
@@ -120,8 +124,8 @@ function AppointmentForm({ onSave, onClose }) {
         </div>
       )}
 
+      {/* Customer */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Name with autocomplete */}
         <div className="relative" ref={nameRef}>
           <label className="label">Customer Name *</label>
           <input className="input" value={form.customerName}
@@ -132,8 +136,7 @@ function AppointmentForm({ onSave, onClose }) {
             <div className="absolute z-50 w-full mt-1 rounded-lg overflow-hidden shadow-xl"
               style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.25)' }}>
               {nameSuggests.map(c => (
-                <button key={c.id} type="button"
-                  onMouseDown={() => selectCustomer(c)}
+                <button key={c.id} type="button" onMouseDown={() => selectCustomer(c)}
                   className="w-full px-4 py-2.5 text-left flex items-center justify-between transition-colors"
                   style={{ borderBottom: '1px solid rgba(201,168,76,0.08)' }}
                   onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.08)'}
@@ -150,78 +153,102 @@ function AppointmentForm({ onSave, onClose }) {
             </div>
           )}
         </div>
-
-        {/* Phone */}
         <div>
           <label className="label">Phone</label>
           <input className="input" value={form.customerPhone}
             onChange={e => handlePhoneChange(e.target.value)}
-            placeholder="Auto-filled or enter number" type="tel" />
+            placeholder="10-digit number" type="tel" />
         </div>
       </div>
 
+      {/* Date / Time — for walk-in show but pre-filled; for new show fully */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Date *</label>
+          <label className="label">{walkin ? 'Date (today)' : 'Date *'}</label>
           <input className="input" type="date" value={form.date}
-            onChange={e => setForm(f => ({ ...f, date: e.target.value }))} required />
+            onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+            required readOnly={!!walkin} style={walkin ? { opacity: 0.6 } : {}} />
         </div>
         <div>
-          <label className="label">Time *</label>
+          <label className="label">{walkin ? 'Time (now)' : 'Time *'}</label>
           <input className="input" type="time" value={form.time}
             onChange={e => setForm(f => ({ ...f, time: e.target.value }))} required />
         </div>
       </div>
 
+      {/* Staff */}
       <div>
         <label className="label">Staff</label>
         <select className="input" value={form.staffId}
           onChange={e => setForm(f => ({ ...f, staffId: e.target.value }))}>
           <option value="">Unassigned</option>
-          {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+          {staff.map(s => <option key={s.id} value={s.id}>{s.name} — {s.role}</option>)}
         </select>
       </div>
 
+      {/* Services */}
       <div>
-        <label className="label">Services</label>
-        <div className="rounded-xl p-3 space-y-3 max-h-48 overflow-y-auto"
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="label mb-0">Services</label>
+          {selectedServices.length > 0 && (
+            <span className="text-xs font-semibold" style={{ color: '#E8C96D' }}>
+              {selectedServices.length} selected · {fmtRupee(total)}
+            </span>
+          )}
+        </div>
+        <div className="rounded-xl p-3 space-y-3 max-h-52 overflow-y-auto"
           style={{ border: '1px solid rgba(201,168,76,0.15)', background: '#0D0D0D' }}>
           {categories.map(cat => (
             <div key={cat}>
-              <p className="text-xs font-medium uppercase tracking-widest mb-1.5"
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1.5"
                 style={{ color: 'rgba(201,168,76,0.78)' }}>{cat}</p>
-              {services.filter(s => s.category === cat).map(s => (
-                <label key={s.id} className="flex items-center gap-2 py-1 cursor-pointer">
-                  <input type="checkbox" checked={form.serviceIds.includes(s.id)}
-                    onChange={() => toggle(s.id)} style={{ accentColor: '#C9A84C' }} />
-                  <span className="text-sm flex-1" style={{ color: form.serviceIds.includes(s.id) ? '#F5F0E8' : 'rgba(245,240,232,0.5)' }}>{s.name}</span>
-                  <span className="text-sm font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(s.price)}</span>
-                </label>
-              ))}
+              {services.filter(s => s.category === cat).map(s => {
+                const checked = form.serviceIds.includes(s.id);
+                return (
+                  <label key={s.id}
+                    className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg cursor-pointer transition-colors"
+                    style={checked ? { background: 'rgba(201,168,76,0.06)' } : {}}>
+                    <input type="checkbox" checked={checked}
+                      onChange={() => toggle(s.id)} style={{ accentColor: '#C9A84C' }} />
+                    <span className="text-sm flex-1"
+                      style={{ color: checked ? '#F5F0E8' : 'rgba(245,240,232,0.5)' }}>{s.name}</span>
+                    <span className="text-sm font-serif font-semibold"
+                      style={{ color: checked ? '#E8C96D' : 'rgba(201,168,76,0.55)' }}>{fmtRupee(s.price)}</span>
+                  </label>
+                );
+              })}
             </div>
           ))}
         </div>
       </div>
 
+      {/* Total summary */}
+      {selectedServices.length > 0 && (
+        <div className="flex items-center justify-between rounded-xl px-4 py-3"
+          style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.18)' }}>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(201,168,76,0.7)' }}>Services selected</p>
+            <p className="text-xs mt-0.5 truncate" style={{ color: 'rgba(245,240,232,0.65)', maxWidth: 280 }}>
+              {selectedServices.map(s => s.name).join(' · ')}
+            </p>
+          </div>
+          <p className="text-xl font-serif font-bold flex-shrink-0 ml-3" style={{ color: '#E8C96D' }}>{fmtRupee(total)}</p>
+        </div>
+      )}
+
+      {/* Notes */}
       <div>
         <label className="label">Notes</label>
         <textarea className="input" rows={2} value={form.notes}
           onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-          placeholder="Optional notes" />
+          placeholder="Special requests, allergies, preferences…" />
       </div>
-
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" checked={form.isWalkin}
-          onChange={e => setForm(f => ({ ...f, isWalkin: e.target.checked }))}
-          style={{ accentColor: '#C9A84C' }} />
-        <span className="text-sm" style={{ color: 'rgba(245,240,232,0.7)' }}>Walk-in</span>
-      </label>
 
       <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
         style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)', marginTop: 8 }}>
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
         <button type="submit" className="btn-primary" disabled={saving}>
-          {saving ? 'Saving…' : 'Book Appointment'}
+          {saving ? 'Saving…' : walkin ? '⚡ Log Walk-in' : 'Book Appointment'}
         </button>
       </div>
     </form>
@@ -233,32 +260,30 @@ export default function Appointments() {
   const [loading,       setLoading]       = useState(true);
   const [date,          setDate]          = useState(todayISO());
   const [showNew,       setShowNew]       = useState(false);
+  const [showWalkin,    setShowWalkin]    = useState(false);
   const [error,         setError]         = useState(null);
   const [settings,      setSettings]      = useState({});
   const [pendingDelete, setPendingDelete] = useState(null);
   function requestDelete(id) { setPendingDelete(id); setTimeout(() => setPendingDelete(null), 3000); }
 
-  useEffect(() => {
-    api.settings().then(setSettings).catch(() => {});
-  }, []);
+  useEffect(() => { api.settings().then(setSettings).catch(() => {}); }, []);
 
   async function load(d) {
     setLoading(true);
-    try {
-      setAppts(await api.appointments(d));
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
+    try { setAppts(await api.appointments(d)); }
+    catch (e) { setError(e.message); }
+    finally { setLoading(false); }
   }
 
   useEffect(() => { load(date); }, [date]);
 
   function shiftDate(n) {
-    const d = new Date(date);
+    const d = new Date(date + 'T00:00:00');
     d.setDate(d.getDate() + n);
-    setDate(d.toISOString().split('T')[0]);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    setDate(`${y}-${m}-${day}`);
   }
 
   async function handleNew(form) {
@@ -267,15 +292,9 @@ export default function Appointments() {
     load(date);
   }
 
-  async function handleWalkin() {
-    const name  = prompt('Customer name:');
-    if (!name) return;
-    const phone = prompt('Phone number (optional):') || '';
-    await api.createAppointment({
-      customerName: name, customerPhone: phone,
-      serviceIds: [], staffId: '', date, time: new Date().toTimeString().slice(0,5),
-      notes: '', isWalkin: true,
-    });
+  async function handleWalkin(form) {
+    await api.createAppointment(form);
+    setShowWalkin(false);
     load(date);
   }
 
@@ -313,7 +332,8 @@ export default function Appointments() {
         </div>
         <button onClick={() => setDate(todayISO())} className="btn-secondary text-xs px-3 py-2">Today</button>
         <div className="ml-auto flex gap-2">
-          <button onClick={handleWalkin} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all active:scale-[0.97]"
+          <button onClick={() => setShowWalkin(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all active:scale-[0.97]"
             style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.25)' }}>
             <Zap className="w-4 h-4" /> Walk-in
           </button>
@@ -325,7 +345,6 @@ export default function Appointments() {
 
       {/* List */}
       <div className="rounded-xl overflow-hidden" style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
-        {/* Header */}
         <div className="hidden sm:flex px-4 py-2.5 text-xs font-medium uppercase tracking-widest gap-3"
           style={{ borderBottom: '1px solid rgba(201,168,76,0.1)', background: '#0D0D0D', color: 'rgba(201,168,76,0.78)' }}>
           <span style={{ width: 52, flexShrink: 0 }}>Time</span>
@@ -344,7 +363,10 @@ export default function Appointments() {
         ) : error ? (
           <p className="text-center text-sm py-10" style={{ color: '#f87171' }}>{error}</p>
         ) : appts.length === 0 ? (
-          <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.62)' }}>No appointments for {fmtDate(date)}</p>
+          <div className="flex flex-col items-center justify-center py-14 gap-2">
+            <p className="text-sm font-medium" style={{ color: 'rgba(245,240,232,0.68)' }}>No appointments for {fmtDate(date)}</p>
+            <p className="text-xs" style={{ color: 'rgba(245,240,232,0.42)' }}>Use + New to book or Walk-in for drop-ins</p>
+          </div>
         ) : (
           <div>
             {appts.map((a, idx) => (
@@ -353,7 +375,7 @@ export default function Appointments() {
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
 
-                {/* Mobile card layout */}
+                {/* Mobile card */}
                 <div className="flex items-start gap-2.5 sm:hidden">
                   <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0 mt-0.5"
                     style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{fmtTime(a.time)}</span>
@@ -365,6 +387,7 @@ export default function Appointments() {
                     <p className="text-xs truncate mt-0.5" style={{ color: 'rgba(245,240,232,0.55)' }}>
                       {a.services?.map(s => s.name).join(', ') || '—'}
                     </p>
+                    {a.staff_name && <p className="text-xs mt-0.5" style={{ color: 'rgba(245,240,232,0.45)' }}>{a.staff_name}</p>}
                     <div className="flex items-center justify-between mt-1.5">
                       <div className="flex items-center gap-1">
                         <span className={statusClass(a.status)}>{statusLabel(a.status)}</span>
@@ -404,17 +427,14 @@ export default function Appointments() {
                   </div>
                 </div>
 
-                {/* Desktop row layout */}
+                {/* Desktop row */}
                 <div className="hidden sm:flex items-center gap-3">
-                  {/* Time */}
                   <span className="text-xs font-mono py-1 px-1.5 rounded text-center flex-shrink-0"
                     style={{ width: 52, color: '#C9A84C', background: 'rgba(201,168,76,0.08)' }}>{fmtTime(a.time)}</span>
-                  {/* Customer */}
                   <div className="flex-shrink-0 min-w-0" style={{ width: 140 }}>
                     <p className="text-sm font-medium truncate" style={{ color: '#F5F0E8' }}>{a.customer_name}</p>
                     <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.62)' }}>{a.customer_phone || '—'}</p>
                   </div>
-                  {/* Services + status */}
                   <div className="flex-1 min-w-0">
                     <p className="text-xs truncate" style={{ color: 'rgba(245,240,232,0.6)' }}>
                       {a.services?.map(s => s.name).join(', ') || '—'}
@@ -424,15 +444,12 @@ export default function Appointments() {
                       {a.is_walkin ? <span className="badge-pending">Walk-in</span> : null}
                     </div>
                   </div>
-                  {/* Staff */}
                   <span className="text-xs flex-shrink-0 truncate" style={{ width: 110, color: 'rgba(245,240,232,0.55)' }}>
                     {a.staff_name || '—'}
                   </span>
-                  {/* Amount */}
                   <span className="text-sm flex-shrink-0 font-serif font-semibold text-right" style={{ width: 60, color: '#C9A84C' }}>
                     {fmtRupee(a.total_price)}
                   </span>
-                  {/* WhatsApp */}
                   <div className="flex-shrink-0" style={{ width: 100 }}>
                     {a.customer_phone && (
                       <button
@@ -441,12 +458,10 @@ export default function Appointments() {
                         style={{ color: '#22c55e', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}
                         onMouseEnter={e => e.currentTarget.style.background = 'rgba(34,197,94,0.16)'}
                         onMouseLeave={e => e.currentTarget.style.background = 'rgba(34,197,94,0.08)'}>
-                        <MessageCircle className="w-3.5 h-3.5" />
-                        WhatsApp
+                        <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
                       </button>
                     )}
                   </div>
-                  {/* Status actions */}
                   <div className="flex-shrink-0 flex items-center justify-end gap-0.5" style={{ width: 72 }}>
                     {a.status === 'pending' && (
                       <>
@@ -488,6 +503,12 @@ export default function Appointments() {
       {showNew && (
         <Modal title="New Appointment" onClose={() => setShowNew(false)} wide>
           <AppointmentForm onSave={handleNew} onClose={() => setShowNew(false)} />
+        </Modal>
+      )}
+
+      {showWalkin && (
+        <Modal title="⚡ Walk-in" onClose={() => setShowWalkin(false)} wide>
+          <AppointmentForm onSave={handleWalkin} onClose={() => setShowWalkin(false)} walkin />
         </Modal>
       )}
     </div>
