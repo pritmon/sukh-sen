@@ -255,7 +255,7 @@ export default function Inventory() {
       )}
 
       {modal && (
-        <Modal title={modal === 'new' ? 'Add Inventory Item' : 'Edit Item'} onClose={() => setModal(null)}>
+        <Modal title={modal === 'new' ? 'Add Inventory Item' : 'Edit Item'} subtitle={modal === 'new' ? 'Track a new product or supply in your stock' : 'Update stock quantity, price or details'} onClose={() => setModal(null)}>
           <InventoryForm initial={modal !== 'new' ? modal : null} onSave={handleSave} onClose={() => setModal(null)} />
         </Modal>
       )}

@@ -359,21 +359,21 @@ function CustomerProfile({ id, onBack }) {
       </div>
 
       {editOpen && (
-        <Modal title="Edit Customer" onClose={() => setEditOpen(false)}>
+        <Modal title="Edit Customer" subtitle="Update contact details, birthday or anniversary" onClose={() => setEditOpen(false)}>
           <EditCustomerModal customer={data} onClose={() => setEditOpen(false)}
             onSave={async (form) => { await api.updateCustomer(data.id, form); setEditOpen(false); load(); }} />
         </Modal>
       )}
 
       {loyaltyOpen && (
-        <Modal title="Loyalty Points" onClose={() => setLoyaltyOpen(false)}>
+        <Modal title="Loyalty Points" subtitle="Manually add or deduct points for this customer" onClose={() => setLoyaltyOpen(false)}>
           <LoyaltyModal customer={data} onClose={() => setLoyaltyOpen(false)}
             onDone={() => { setLoyaltyOpen(false); load(); }} />
         </Modal>
       )}
 
       {deleteOpen && (
-        <Modal title="Delete Customer" onClose={() => setDeleteOpen(false)}>
+        <Modal title="Delete Customer" subtitle="This will permanently remove the customer and all their history" onClose={() => setDeleteOpen(false)}>
           <DeleteCustomerModal customer={data} onClose={() => setDeleteOpen(false)}
             onDeleted={onBack} />
         </Modal>

@@ -235,7 +235,7 @@ export default function Services() {
       )}
 
       {modal && (
-        <Modal title={modal === 'new' ? 'Add Service' : 'Edit Service'} onClose={() => setModal(null)}>
+        <Modal title={modal === 'new' ? 'Add Service' : 'Edit Service'} subtitle={modal === 'new' ? 'Add a new treatment to your service menu' : 'Update service name, category or price'} onClose={() => setModal(null)}>
           <ServiceForm
             initial={modal !== 'new' ? modal : null}
             categories={categories}

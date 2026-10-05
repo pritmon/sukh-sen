@@ -442,13 +442,13 @@ export default function Billing() {
       )}
 
       {billModal && (
-        <Modal title="Generate Bill" onClose={() => setBillModal(null)}>
+        <Modal title="Generate Bill" subtitle="Select services and collect payment for this appointment" onClose={() => setBillModal(null)}>
           <BillForm appointment={billModal} onSave={handleCreate} onClose={() => setBillModal(null)} />
         </Modal>
       )}
 
       {detailModal && (
-        <Modal title="Bill Details" onClose={() => setDetailModal(null)}>
+        <Modal title="Bill Details" subtitle="Full breakdown of services and payment received" onClose={() => setDetailModal(null)}>
           <BillDetail bill={detailModal} onClose={() => setDetailModal(null)} onPay={handlePay} salonName={settings.salon_name} />
         </Modal>
       )}

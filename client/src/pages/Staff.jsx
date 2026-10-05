@@ -582,7 +582,7 @@ export default function Staff() {
       )}
 
       {modal && (
-        <Modal title={modal === 'new' ? 'Add Staff Member' : 'Edit Staff Profile'} onClose={() => setModal(null)} wide>
+        <Modal title={modal === 'new' ? 'Add Staff Member' : 'Edit Staff Profile'} subtitle={modal === 'new' ? 'Add a new team member with their role and details' : 'Update name, role, contact or commission details'} onClose={() => setModal(null)} wide>
           <StaffForm initial={modal !== 'new' ? modal : null} onSave={handleSave} onClose={() => setModal(null)} />
         </Modal>
       )}
