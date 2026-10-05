@@ -186,7 +186,7 @@ app.get('/devlog/pm2025', (req, res) => {
   <button type="submit" style="background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b;padding:6px 16px;border-radius:6px;cursor:pointer;font-family:monospace;font-size:12px">🗑 Clear Logs</button>
 </form>
 </div>
-<p>${logs.length} requests · ${uniqueIPs} unique IP${uniqueIPs !== 1 ? 's' : ''} · Times in IST</p>
+<p>${logs.length} requests · ${uniqueIPs} unique IP${uniqueIPs !== 1 ? 's' : ''} · Times in IST · <a href="https://api.ipify.org" target="_blank" style="color:#c9a84c">Check your IP</a></p>
 <div class="filters">
   <button class="filter-btn active" data-filter="all" onclick="filter('all')">All</button>
   <button class="filter-btn" data-filter="iphone" onclick="filter('iphone')">📱 iPhone</button>
