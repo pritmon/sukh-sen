@@ -121,18 +121,18 @@ function BirthdayPanel({ salonName }) {
       } catch (_) {}
     }
 
-    // Desktop: open WhatsApp NOW — must happen before any await to keep user gesture
-    openWhatsApp(c.phone, message);
+    // Desktop: WhatsApp Desktop corrupts emojis in ?text= URL param.
+    // Instead: copy message to clipboard, open WhatsApp to the chat, user pastes.
+    const num  = c.phone.replace(/\D/g, '');
+    const e164 = num.startsWith('91') ? num : `91${num}`;
+    window.open(`https://wa.me/${e164}`, '_blank');
 
-    // Copy birthday card image to clipboard in background
     try {
-      const res  = await fetch('/birthday-card.webp');
-      const blob = await res.blob();
-      if (window.ClipboardItem) {
-        await navigator.clipboard.write([new ClipboardItem({ 'image/webp': blob })]);
-        showToast('Image copied! Paste it in WhatsApp.');
-      }
-    } catch (_) {}
+      await navigator.clipboard.writeText(message);
+      showToast('Message copied! Paste it in WhatsApp (Ctrl+V / Cmd+V)');
+    } catch (_) {
+      showToast('WhatsApp opened — type your birthday message');
+    }
   }
 
   return (
@@ -170,7 +170,7 @@ function BirthdayPanel({ salonName }) {
               {whatsappBirthdayMsg(salonName, 'Customer Name')}
             </div>
             <p className="text-xs mt-2 flex items-center gap-1.5" style={{ color: 'rgba(245,240,232,0.5)' }}>
-              <span>📱 Mobile: shares image + message together · 💻 Desktop: copies image to clipboard</span>
+              <span>📱 Mobile: shares image + message together · 💻 Desktop: message copied to clipboard, paste in WhatsApp</span>
             </p>
           </div>
         </div>
