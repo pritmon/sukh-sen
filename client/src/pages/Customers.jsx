@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { fmtDate, fmtRupee, fmtTime, statusClass, statusLabel, openWhatsApp, whatsappConfirmMsg } from '../utils.js';
-import { Search, Phone, ChevronRight, ArrowLeft, Star, Gift, Heart, MessageCircle, Pencil, Award, Trash2, AlertTriangle } from 'lucide-react';
+import { Search, Phone, ChevronRight, ArrowLeft, Star, Gift, Heart, MessageCircle, Pencil, Award, Trash2, AlertTriangle, Plus, Users, SortAsc } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 import DatePicker from '../components/DatePicker.jsx';
 
@@ -25,13 +25,13 @@ function MembershipBadge({ tier }) {
 
 function EditCustomerModal({ customer, onSave, onClose }) {
   const [form, setForm] = useState({
-    name:            customer.name,
-    phone:           customer.phone || '',
-    email:           customer.email || '',
-    gender:          customer.gender || '',
-    birthday:        customer.birthday || '',
-    anniversary:     customer.anniversary || '',
-    membership_tier: customer.membership_tier || 'none',
+    name:            customer?.name || '',
+    phone:           customer?.phone || '',
+    email:           customer?.email || '',
+    gender:          customer?.gender || '',
+    birthday:        customer?.birthday || '',
+    anniversary:     customer?.anniversary || '',
+    membership_tier: customer?.membership_tier || 'none',
   });
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -394,12 +394,26 @@ function CustomerProfile({ id, onBack }) {
   );
 }
 
+const SORT_OPTIONS = [
+  { value: 'name',   label: 'Name A–Z' },
+  { value: 'points', label: 'Most Points' },
+  { value: 'visits', label: 'Most Visits' },
+  { value: 'latest', label: 'Latest First' },
+];
+
+const TIER_FILTERS = ['All', 'gold', 'silver', 'bronze', 'none'];
+const TIER_FILTER_LABEL = { All: 'All', gold: 'Gold', silver: 'Silver', bronze: 'Bronze', none: 'No Tier' };
+
 export default function Customers() {
-  const [customers, setCustomers] = useState([]);
-  const [loading,   setLoading]   = useState(true);
-  const [error,     setError]     = useState(null);
-  const [q,         setQ]         = useState('');
-  const [selected,  setSelected]  = useState(null);
+  const [customers,  setCustomers]  = useState([]);
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState(null);
+  const [q,          setQ]          = useState('');
+  const [selected,   setSelected]   = useState(null);
+  const [tierFilter, setTierFilter] = useState('All');
+  const [sort,       setSort]       = useState('latest');
+  const [addOpen,    setAddOpen]    = useState(false);
+  const [showSort,   setShowSort]   = useState(false);
 
   async function load(query = '') {
     setLoading(true);
@@ -417,14 +431,100 @@ export default function Customers() {
 
   if (selected) return <CustomerProfile id={selected} onBack={() => setSelected(null)} />;
 
+  const filtered = customers.filter(c =>
+    tierFilter === 'All' ? true : (c.membership_tier || 'none') === tierFilter
+  );
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === 'name')   return a.name.localeCompare(b.name);
+    if (sort === 'points') return (b.loyalty_points || 0) - (a.loyalty_points || 0);
+    if (sort === 'visits') return (b.visit_count || 0) - (a.visit_count || 0);
+    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+  });
+
+  const goldCount   = customers.filter(c => c.membership_tier === 'gold').length;
+  const silverCount = customers.filter(c => c.membership_tier === 'silver').length;
+  const bronzeCount = customers.filter(c => c.membership_tier === 'bronze').length;
+
   return (
     <div className="space-y-4 max-w-2xl">
-      <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(201,168,76,0.7)' }} />
-        <input className="input pl-10" placeholder="Search by name or phone…"
-          value={q} onChange={e => setQ(e.target.value)} />
+      {/* Stats strip */}
+      {customers.length > 0 && (
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { label: 'Total', value: customers.length, color: '#C9A84C' },
+            { label: 'Gold', value: goldCount, color: '#E8C96D' },
+            { label: 'Silver', value: silverCount, color: '#94a3b8' },
+            { label: 'Bronze', value: bronzeCount, color: '#cd7f32' },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="rounded-xl px-3 py-2.5 text-center"
+              style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.12)' }}>
+              <p className="text-lg font-bold font-serif" style={{ color }}>{value}</p>
+              <p className="text-xs" style={{ color: 'rgba(245,240,232,0.62)' }}>{label}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Search + Add + Sort */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(201,168,76,0.7)' }} />
+          <input className="input pl-10" placeholder="Search by name or phone…"
+            value={q} onChange={e => setQ(e.target.value)} />
+        </div>
+        {/* Sort dropdown */}
+        <div className="relative">
+          <button onClick={() => setShowSort(v => !v)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+            style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.2)', color: 'rgba(245,240,232,0.85)' }}>
+            <SortAsc className="w-4 h-4" style={{ color: '#C9A84C' }} />
+            <span className="hidden sm:inline">{SORT_OPTIONS.find(o => o.value === sort)?.label}</span>
+          </button>
+          {showSort && (
+            <div className="absolute right-0 top-full mt-1 z-20 rounded-xl overflow-hidden shadow-xl"
+              style={{ background: '#141414', border: '1px solid rgba(201,168,76,0.2)', minWidth: 150 }}>
+              {SORT_OPTIONS.map(o => (
+                <button key={o.value} onClick={() => { setSort(o.value); setShowSort(false); }}
+                  className="w-full px-4 py-2.5 text-sm text-left transition-colors"
+                  style={{
+                    color: sort === o.value ? '#E8C96D' : 'rgba(245,240,232,0.8)',
+                    background: sort === o.value ? 'rgba(201,168,76,0.1)' : 'transparent',
+                  }}
+                  onMouseEnter={e => { if (sort !== o.value) e.currentTarget.style.background = 'rgba(201,168,76,0.06)'; }}
+                  onMouseLeave={e => { if (sort !== o.value) e.currentTarget.style.background = 'transparent'; }}>
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <button onClick={() => setAddOpen(true)} className="btn-primary flex items-center gap-1.5 flex-shrink-0 text-sm">
+          <Plus className="w-4 h-4" /> Add
+        </button>
       </div>
 
+      {/* Tier filter chips */}
+      <div className="flex gap-2 flex-wrap">
+        {TIER_FILTERS.map(t => (
+          <button key={t} onClick={() => setTierFilter(t)}
+            className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+            style={tierFilter === t
+              ? { background: 'rgba(201,168,76,0.18)', color: '#E8C96D', border: '1px solid rgba(201,168,76,0.4)' }
+              : { background: '#111111', color: 'rgba(245,240,232,0.75)', border: '1px solid rgba(201,168,76,0.15)' }}>
+            {TIER_FILTER_LABEL[t]}
+            {t !== 'All' && customers.length > 0 && (
+              <span className="ml-1.5 opacity-60">
+                {t === 'none'
+                  ? customers.filter(c => !c.membership_tier || c.membership_tier === 'none').length
+                  : customers.filter(c => c.membership_tier === t).length}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* List */}
       <div className="rounded-xl overflow-hidden" style={{ background: '#111111', border: '1px solid rgba(201,168,76,0.15)' }}>
         {loading ? (
           <div className="flex items-center justify-center h-24">
@@ -432,14 +532,19 @@ export default function Customers() {
           </div>
         ) : error ? (
           <p className="text-center text-sm py-10" style={{ color: '#f87171' }}>{error}</p>
-        ) : customers.length === 0 ? (
-          <p className="text-center text-sm py-10" style={{ color: 'rgba(245,240,232,0.62)' }}>No customers found</p>
+        ) : sorted.length === 0 ? (
+          <div className="py-12 text-center">
+            <Users className="w-8 h-8 mx-auto mb-2" style={{ color: 'rgba(201,168,76,0.2)' }} />
+            <p className="text-sm" style={{ color: 'rgba(245,240,232,0.62)' }}>
+              {q ? 'No customers match your search' : tierFilter !== 'All' ? `No ${TIER_FILTER_LABEL[tierFilter]} members` : 'No customers yet'}
+            </p>
+          </div>
         ) : (
           <div>
-            {customers.map((c, idx) => (
+            {sorted.map((c, idx) => (
               <button key={c.id} onClick={() => setSelected(c.id)}
                 className="w-full px-5 py-3.5 flex items-center gap-3 text-left transition-colors"
-                style={{ borderBottom: idx < customers.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
+                style={{ borderBottom: idx < sorted.length - 1 ? '1px solid rgba(201,168,76,0.06)' : 'none' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.04)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
@@ -451,23 +556,42 @@ export default function Customers() {
                     <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{c.name}</p>
                     <MembershipBadge tier={c.membership_tier} />
                   </div>
-                  <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'rgba(245,240,232,0.62)' }}>
-                    <Phone className="w-3 h-3" /> {c.phone || 'No phone'}
+                  <p className="text-xs flex items-center gap-1 mt-0.5" style={{ color: 'rgba(245,240,232,0.55)' }}>
+                    <Phone className="w-3 h-3" />
+                    {c.phone || 'No phone'}
+                    {c.visit_count > 0 && (
+                      <span className="ml-2" style={{ color: 'rgba(245,240,232,0.45)' }}>· {c.visit_count} visit{c.visit_count !== 1 ? 's' : ''}</span>
+                    )}
                   </p>
                 </div>
                 {(c.loyalty_points > 0) && (
-                  <span className="flex items-center gap-1 text-xs font-semibold rounded-lg px-2 py-1"
+                  <span className="flex items-center gap-1 text-xs font-semibold rounded-lg px-2 py-1 flex-shrink-0"
                     style={{ color: '#C9A84C', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
                     <Star className="w-3 h-3" /> {c.loyalty_points}
                   </span>
                 )}
-                <p className="hidden sm:block text-xs" style={{ color: 'rgba(245,240,232,0.75)' }}>{fmtDate(c.created_at?.split('T')[0])}</p>
-                <ChevronRight className="w-4 h-4" style={{ color: 'rgba(201,168,76,0.3)' }} />
+                <p className="hidden sm:block text-xs flex-shrink-0" style={{ color: 'rgba(245,240,232,0.42)' }}>{fmtDate(c.created_at?.split('T')[0])}</p>
+                <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(201,168,76,0.3)' }} />
               </button>
             ))}
           </div>
         )}
       </div>
+
+      {addOpen && (
+        <Modal title="Add Customer" subtitle="Create a new customer profile" onClose={() => setAddOpen(false)}>
+          <EditCustomerModal
+            customer={null}
+            onClose={() => setAddOpen(false)}
+            onSave={async (form) => {
+              await api.createCustomer(form);
+              setAddOpen(false);
+              load(q);
+            }} />
+        </Modal>
+      )}
+
+      {showSort && <div className="fixed inset-0 z-10" onClick={() => setShowSort(false)} />}
     </div>
   );
 }

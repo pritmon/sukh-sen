@@ -32,6 +32,7 @@ export const api = {
   customers:        (q)    => req(`/customers${q ? `?q=${encodeURIComponent(q)}` : ''}`),
   customer:         (id)   => req(`/customers/${id}`),
   customerLookup:   (phone)=> req(`/customers/lookup?phone=${encodeURIComponent(phone)}`),
+  createCustomer:   (d)    => post(`/customers`, d),
   updateCustomer:   (id,d) => put(`/customers/${id}`, d),
   deleteCustomer:   (id,d) => req(`/customers/${id}`, { method: 'DELETE', body: JSON.stringify(d) }),
   addLoyaltyPoints: (id,d) => post(`/customers/${id}/loyalty`, d),

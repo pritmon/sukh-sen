@@ -121,6 +121,21 @@ router.get('/:id', (req, res) => {
 });
 
 // PUT /api/customers/:id
+// POST /api/customers  — create new customer
+router.post('/', (req, res) => {
+  try {
+    const { name, phone, email, birthday, anniversary, membership_tier, gender } = req.body;
+    if (!name?.trim()) return res.status(400).json({ error: 'Name is required' });
+    const result = db.prepare(
+      `INSERT INTO customers (name, phone, email, birthday, anniversary, membership_tier, gender)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).run(name.trim(), phone || null, email || null, birthday || null, anniversary || null, membership_tier || 'none', gender || null);
+    res.json(db.prepare('SELECT * FROM customers WHERE id=?').get(result.lastInsertRowid));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.put('/:id', (req, res) => {
   try {
     const { name, phone, email, birthday, anniversary, membership_tier, gender } = req.body;
