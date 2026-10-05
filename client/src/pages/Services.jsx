@@ -9,31 +9,41 @@ const EMPTY = { name: '', price: '', duration: 30, category: "Women's Styling" }
 function ServiceForm({ initial, categories, onSave, onClose }) {
   const [form,   setForm]   = useState(initial || { ...EMPTY, category: categories[0] || EMPTY.category });
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const setField = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErrors(e => ({ ...e, [k]: '' })); };
 
   async function submit(e) {
     e.preventDefault();
-    if (!form.name || form.category === '__new__' || !form.category) return;
+    const errs = {};
+    if (!form.name?.trim())                         errs.name     = 'Service name is required';
+    if (!form.price && form.price !== 0)            errs.price    = 'Price is required';
+    else if (Number(form.price) < 0)                errs.price    = 'Price cannot be negative';
+    if (!form.category || form.category === '__new__') errs.category = 'Select or type a category';
+    if (Object.keys(errs).length) { setErrors(errs); return; }
     setSaving(true);
     try {
       await onSave({ ...form, price: Number(form.price), duration: Number(form.duration) });
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   }
 
   return (
     <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="label">Service Name *</label>
-        <input className="input" value={form.name} required
-          onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-          placeholder="e.g. Haircut" />
+        <input className="input" value={form.name}
+          onChange={e => setField('name', e.target.value)}
+          placeholder="e.g. Haircut"
+          style={errors.name ? { borderColor: '#ef4444' } : {}} />
+        {errors.name && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.name}</p>}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="label">Price (₹) *</label>
-          <input className="input" type="number" min="0" step="1" value={form.price} required
-            onChange={e => setForm(f => ({ ...f, price: e.target.value }))} />
+          <input className="input" type="number" min="0" step="1" value={form.price}
+            onChange={e => setField('price', e.target.value)}
+            style={errors.price ? { borderColor: '#ef4444' } : {}} />
+          {errors.price && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.price}</p>}
         </div>
         <div>
           <label className="label">Duration (min)</label>
@@ -44,14 +54,16 @@ function ServiceForm({ initial, categories, onSave, onClose }) {
       <div>
         <label className="label">Category</label>
         <select className="input" value={form.category}
-          onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+          onChange={e => setField('category', e.target.value)}
+          style={errors.category ? { borderColor: '#ef4444' } : {}}>
           {categories.map(c => <option key={c}>{c}</option>)}
           <option value="__new__">+ New category…</option>
         </select>
         {form.category === '__new__' && (
           <input className="input mt-2" placeholder="Type new category name"
-            onChange={e => setForm(f => ({ ...f, category: e.target.value === '__new__' ? '' : e.target.value }))} />
+            onChange={e => setField('category', e.target.value === '__new__' ? '' : e.target.value)} />
         )}
+        {errors.category && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.category}</p>}
       </div>
       <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
         style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>

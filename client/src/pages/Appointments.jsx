@@ -10,6 +10,7 @@ function AppointmentForm({ onSave, onClose, walkin }) {
   const [services,     setServices]     = useState([]);
   const [staff,        setStaff]        = useState([]);
   const [saving,       setSaving]       = useState(false);
+  const [formErrors,   setFormErrors]   = useState({});
   const [recognized,   setRecognized]   = useState(null);
   const [nameSuggests, setNameSuggests] = useState([]);
   const [showSuggests, setShowSuggests] = useState(false);
@@ -99,7 +100,11 @@ function AppointmentForm({ onSave, onClose, walkin }) {
 
   async function submit(e) {
     e.preventDefault();
-    if (!form.customerName.trim()) return;
+    const errs = {};
+    if (!form.customerName.trim()) errs.customerName = 'Customer name is required';
+    const digits = (form.customerPhone || '').replace(/\D/g, '');
+    if (digits && digits.length !== 10) errs.customerPhone = 'Must be a 10-digit number';
+    if (Object.keys(errs).length) { setFormErrors(errs); return; }
     setSaving(true);
     try { await onSave(form); } finally { setSaving(false); }
   }
@@ -131,9 +136,11 @@ function AppointmentForm({ onSave, onClose, walkin }) {
         <div className="relative" ref={nameRef}>
           <label className="label">Customer Name *</label>
           <input className="input" value={form.customerName}
-            onChange={e => handleNameChange(e.target.value)}
+            onChange={e => { handleNameChange(e.target.value); setFormErrors(er => ({ ...er, customerName: '' })); }}
             onFocus={() => nameSuggests.length > 0 && setShowSuggests(true)}
-            required placeholder="Type name to search…" autoComplete="off" />
+            placeholder="Type name to search…" autoComplete="off"
+            style={formErrors.customerName ? { borderColor: '#ef4444' } : {}} />
+          {formErrors.customerName && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{formErrors.customerName}</p>}
           {showSuggests && nameSuggests.length > 0 && (
             <div className="absolute z-50 w-full mt-1 rounded-lg overflow-hidden shadow-xl"
               style={{ background: '#1A1A1A', border: '1px solid rgba(201,168,76,0.25)' }}>
@@ -158,8 +165,10 @@ function AppointmentForm({ onSave, onClose, walkin }) {
         <div>
           <label className="label">Phone</label>
           <input className="input" value={form.customerPhone}
-            onChange={e => handlePhoneChange(e.target.value)}
-            placeholder="10-digit number" type="tel" />
+            onChange={e => { handlePhoneChange(e.target.value.replace(/\D/g, '').slice(0,10)); setFormErrors(er => ({ ...er, customerPhone: '' })); }}
+            placeholder="10-digit number" type="tel" maxLength={10}
+            style={formErrors.customerPhone ? { borderColor: '#ef4444' } : {}} />
+          {formErrors.customerPhone && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{formErrors.customerPhone}</p>}
         </div>
       </div>
 

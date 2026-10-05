@@ -29,19 +29,21 @@ function BillForm({ appointment, onSave, onClose }) {
     setExtra({ name: '', price: '' });
   }
 
+  const [billError, setBillError] = useState('');
+
   async function submit(e) {
     e.preventDefault();
-    setSaving(true);
     const selectedItems = items.filter(i => i.selected).map(i => ({
       serviceId:   i.id || null,
       serviceName: i.name,
       price:       Number(i.price),
     }));
+    if (!selectedItems.length) { setBillError('Select at least one service to generate a bill'); return; }
+    setBillError('');
+    setSaving(true);
     try {
       await onSave({ appointmentId: appointment.id, items: selectedItems, paymentMethod: method, applyGst, gstRate });
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   }
 
   return (
@@ -132,10 +134,13 @@ function BillForm({ appointment, onSave, onClose }) {
         </div>
       </div>
 
+      {billError && (
+        <p className="text-xs text-center" style={{ color: '#f87171' }}>{billError}</p>
+      )}
       <div className="sticky bottom-0 -mx-6 -mb-5 px-6 py-4 flex justify-end gap-2"
         style={{ background: '#141414', borderTop: '1px solid rgba(201,168,76,0.1)' }}>
         <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
-        <button type="submit" className="btn-primary" disabled={saving || !items.some(i => i.selected)}>
+        <button type="submit" className="btn-primary" disabled={saving}>
           {saving ? 'Generating…' : 'Generate Bill'}
         </button>
       </div>

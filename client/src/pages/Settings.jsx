@@ -35,6 +35,7 @@ export default function SalonSettings() {
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
   const [saved,   setSaved]   = useState(false);
+  const [errors,  setErrors]  = useState({});
 
   useEffect(() => {
     api.settings().then(s => { setForm(s); setLoading(false); }).catch(() => setLoading(false));
@@ -42,6 +43,14 @@ export default function SalonSettings() {
 
   async function handleSave(e) {
     e.preventDefault();
+    const errs = {};
+    if (!form.salon_name?.trim()) errs.salon_name = 'Salon name is required';
+    const phoneD = (form.salon_phone || '').replace(/\D/g, '');
+    if (phoneD && phoneD.length !== 10) errs.salon_phone = 'Must be a 10-digit number';
+    const waD = (form.salon_whatsapp || '').replace(/\D/g, '');
+    if (waD && waD.length !== 10) errs.salon_whatsapp = 'Must be a 10-digit number';
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+    setErrors({});
     setSaving(true);
     try {
       await api.saveSettings(form);
@@ -75,7 +84,9 @@ export default function SalonSettings() {
             <div className="p-5 space-y-4">
               <Field icon={Store} label="Salon Name">
                 <input className="input" value={form.salon_name}
-                  onChange={e => setForm(f => ({ ...f, salon_name: e.target.value }))} />
+                  onChange={e => { setForm(f => ({ ...f, salon_name: e.target.value })); setErrors(er => ({ ...er, salon_name: '' })); }}
+                  style={errors.salon_name ? { borderColor: '#ef4444' } : {}} />
+                {errors.salon_name && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.salon_name}</p>}
               </Field>
               <Field icon={MapPin} label="Address">
                 <input className="input" value={form.salon_address}
@@ -84,8 +95,10 @@ export default function SalonSettings() {
               </Field>
               <Field icon={Phone} label="Phone">
                 <input className="input" value={form.salon_phone} type="tel"
-                  onChange={e => setForm(f => ({ ...f, salon_phone: e.target.value }))}
-                  placeholder="10-digit mobile number" />
+                  onChange={e => { setForm(f => ({ ...f, salon_phone: e.target.value.replace(/\D/g, '').slice(0,10) })); setErrors(er => ({ ...er, salon_phone: '' })); }}
+                  placeholder="10-digit mobile number" maxLength={10}
+                  style={errors.salon_phone ? { borderColor: '#ef4444' } : {}} />
+                {errors.salon_phone && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.salon_phone}</p>}
               </Field>
             </div>
           </div>
@@ -104,9 +117,11 @@ export default function SalonSettings() {
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm select-none"
                     style={{ color: 'rgba(245,240,232,0.62)' }}>+91</span>
                   <input className="input pl-10" value={form.salon_whatsapp} type="tel"
-                    onChange={e => setForm(f => ({ ...f, salon_whatsapp: e.target.value }))}
-                    placeholder="98765 43210" />
+                    onChange={e => { setForm(f => ({ ...f, salon_whatsapp: e.target.value.replace(/\D/g, '').slice(0,10) })); setErrors(er => ({ ...er, salon_whatsapp: '' })); }}
+                    placeholder="9876543210" maxLength={10}
+                    style={errors.salon_whatsapp ? { borderColor: '#ef4444' } : {}} />
                 </div>
+                {errors.salon_whatsapp && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.salon_whatsapp}</p>}
                 {waNumber && (
                   <a href={`https://wa.me/${waE164}`} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 mt-1 text-xs" style={{ color: '#22c55e' }}>

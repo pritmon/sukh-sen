@@ -9,9 +9,17 @@ const CATEGORIES = ['Hair Care', 'Hair Colour', 'Skin Care', 'Shaving', 'Waxing'
 function InventoryForm({ initial, onSave, onClose }) {
   const [form,   setForm]   = useState(initial || EMPTY);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const setField = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErrors(e => ({ ...e, [k]: '' })); };
 
   async function submit(e) {
     e.preventDefault();
+    const errs = {};
+    if (!form.name?.trim())          errs.name     = 'Product name is required';
+    if (Number(form.quantity) < 0)   errs.quantity = 'Quantity cannot be negative';
+    if (Number(form.threshold) < 0)  errs.threshold = 'Threshold cannot be negative';
+    if (Object.keys(errs).length) { setErrors(errs); return; }
     setSaving(true);
     try { await onSave({ ...form, quantity: Number(form.quantity), threshold: Number(form.threshold) }); }
     finally { setSaving(false); }
@@ -21,9 +29,11 @@ function InventoryForm({ initial, onSave, onClose }) {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="label">Product Name *</label>
-        <input className="input" value={form.name} required
-          onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-          placeholder="e.g. Shampoo 500ml" />
+        <input className="input" value={form.name}
+          onChange={e => setField('name', e.target.value)}
+          placeholder="e.g. Shampoo 500ml"
+          style={errors.name ? { borderColor: '#ef4444' } : {}} />
+        {errors.name && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{errors.name}</p>}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
