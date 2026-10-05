@@ -103,7 +103,9 @@ export default function Sidebar({ open, onClose }) {
 
         {/* Footer */}
         <div className="px-6 py-4" style={{ borderTop: '1px solid rgba(201, 168, 76, 0.12)' }}>
-          <p className="text-xs" style={{ color: 'rgba(201, 168, 76, 0.65)' }}>Salon Management · v1.0</p>
+          <p className="text-xs font-medium" style={{ color: 'rgba(201, 168, 76, 0.7)' }}>
+            {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+          </p>
         </div>
       </aside>
     </>

@@ -78,7 +78,9 @@ export default function Dashboard() {
       {/* Date + social row */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#C9A84C' }}>Today</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#C9A84C' }}>
+            {new Date().toLocaleDateString('en-IN', { weekday: 'long' })}
+          </p>
           <p className="font-serif text-xl font-semibold" style={{ color: '#F5F0E8' }}>{fmtDate(todayISO())}</p>
         </div>
         {(ig || fb) && (

@@ -22,6 +22,7 @@ export default function Layout({ onLogout }) {
   const title = titles[location.pathname] || 'Sukh&Sen';
 
   useEffect(() => { document.title = `${title} · Sukh&Sen`; }, [title]);
+  useEffect(() => { document.querySelector('main')?.scrollTo(0, 0); }, [location.pathname]);
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#0A0A0A' }}>
