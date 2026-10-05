@@ -1,12 +1,11 @@
 const express = require('express');
-const db      = require('../db');
+const { prepare } = require('../db');
 const router  = express.Router();
 
-// GET /api/reports/staff-performance?date=YYYY-MM-DD
-router.get('/staff-performance', (req, res) => {
+router.get('/staff-performance', async (req, res) => {
   try {
     const date = req.query.date || new Date().toISOString().split('T')[0];
-    const rows = db.prepare(`
+    const rows = await prepare(`
       SELECT
         st.id,
         st.name,
@@ -32,11 +31,10 @@ router.get('/staff-performance', (req, res) => {
   }
 });
 
-// GET /api/reports/monthly?month=YYYY-MM
-router.get('/monthly', (req, res) => {
+router.get('/monthly', async (req, res) => {
   try {
     const month = req.query.month || new Date().toISOString().slice(0, 7);
-    const summary = db.prepare(`
+    const summary = await prepare(`
       SELECT
         a.date,
         COUNT(DISTINCT a.id)                                         AS appointments,
@@ -47,8 +45,8 @@ router.get('/monthly', (req, res) => {
       GROUP BY a.date
       ORDER BY a.date ASC
     `).all(`${month}%`);
-    const totalRevenue = summary.reduce((s, r) => s + r.revenue, 0);
-    const totalAppts   = summary.reduce((s, r) => s + r.appointments, 0);
+    const totalRevenue = summary.reduce((s, r) => s + Number(r.revenue), 0);
+    const totalAppts   = summary.reduce((s, r) => s + Number(r.appointments), 0);
     res.json({ month, days: summary, totalRevenue, totalAppts });
   } catch (err) {
     res.status(500).json({ error: err.message });

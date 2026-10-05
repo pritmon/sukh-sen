@@ -1,5 +1,5 @@
 const express = require('express');
-const db      = require('../db');
+const { prepare } = require('../db');
 const router  = express.Router();
 
 const FIELDS = `id, name, phone, role, active, dob, address,
@@ -7,20 +7,17 @@ const FIELDS = `id, name, phone, role, active, dob, address,
   years_experience, skills, education, previous_work, family_details,
   pan_number, aadhar_number, driving_license, voter_id, photo, created_at`;
 
-// GET /api/staff
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const rows = db.prepare(`SELECT ${FIELDS} FROM staff WHERE active=1 ORDER BY name`).all();
-    res.json(rows);
+    res.json(await prepare(`SELECT ${FIELDS} FROM staff WHERE active=1 ORDER BY name`).all());
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET /api/staff/:id
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const row = db.prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(req.params.id);
+    const row = await prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(req.params.id);
     if (!row) return res.status(404).json({ error: 'Not found' });
     res.json(row);
   } catch (err) {
@@ -28,18 +25,16 @@ router.get('/:id', (req, res) => {
   }
 });
 
-// POST /api/staff
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const {
-      name, phone, role,
-      dob, address,
+      name, phone, role, dob, address,
       emergency_name, emergency_phone, emergency_relation,
       years_experience, skills, education, previous_work, family_details,
       pan_number, aadhar_number, driving_license, voter_id, photo,
     } = req.body;
     if (!name) return res.status(400).json({ error: 'name required' });
-    const r = db.prepare(`
+    const r = await prepare(`
       INSERT INTO staff (name, phone, role, dob, address,
         emergency_name, emergency_phone, emergency_relation,
         years_experience, skills, education, previous_work, family_details,
@@ -54,23 +49,21 @@ router.post('/', (req, res) => {
       pan_number || null, aadhar_number || null, driving_license || null,
       voter_id || null, photo || null,
     );
-    res.status(201).json(db.prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(r.lastInsertRowid));
+    res.status(201).json(await prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(r.lastInsertRowid));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// PUT /api/staff/:id  — full update including CV fields
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const {
-      name, phone, role,
-      dob, address,
+      name, phone, role, dob, address,
       emergency_name, emergency_phone, emergency_relation,
       years_experience, skills, education, previous_work, family_details,
       pan_number, aadhar_number, driving_license, voter_id, photo,
     } = req.body;
-    db.prepare(`
+    await prepare(`
       UPDATE staff SET
         name=?, phone=?, role=?,
         dob=?, address=?,
@@ -86,16 +79,15 @@ router.put('/:id', (req, res) => {
       pan_number || null, aadhar_number || null, driving_license || null, voter_id || null, photo || null,
       req.params.id
     );
-    res.json(db.prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(req.params.id));
+    res.json(await prepare(`SELECT ${FIELDS} FROM staff WHERE id=?`).get(req.params.id));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// DELETE /api/staff/:id  (soft delete)
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    db.prepare('UPDATE staff SET active=0 WHERE id=?').run(req.params.id);
+    await prepare('UPDATE staff SET active=0 WHERE id=?').run(req.params.id);
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

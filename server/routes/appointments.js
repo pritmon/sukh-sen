@@ -1,5 +1,5 @@
 const express = require('express');
-const db      = require('../db');
+const { prepare } = require('../db');
 const router  = express.Router();
 
 const apptQuery = `
@@ -31,14 +31,14 @@ function parseServices(raw) {
 }
 
 // GET /api/appointments?date=YYYY-MM-DD
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { date } = req.query;
     let rows;
     if (date) {
-      rows = db.prepare(apptQuery + ' WHERE a.date = ? GROUP BY a.id ORDER BY a.time ASC').all(date);
+      rows = await prepare(apptQuery + ' WHERE a.date = ? GROUP BY a.id ORDER BY a.time ASC').all(date);
     } else {
-      rows = db.prepare(apptQuery + ' GROUP BY a.id ORDER BY a.date DESC, a.time ASC').all();
+      rows = await prepare(apptQuery + ' GROUP BY a.id ORDER BY a.date DESC, a.time ASC').all();
     }
     res.json(rows.map(r => ({ ...r, services: parseServices(r.svc_raw), svc_raw: undefined })));
   } catch (err) {
@@ -47,9 +47,9 @@ router.get('/', (req, res) => {
 });
 
 // GET /api/appointments/:id
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const row = db.prepare(apptQuery + ' WHERE a.id = ? GROUP BY a.id').get(req.params.id);
+    const row = await prepare(apptQuery + ' WHERE a.id = ? GROUP BY a.id').get(req.params.id);
     if (!row) return res.status(404).json({ error: 'Not found' });
     res.json({ ...row, services: parseServices(row.svc_raw), svc_raw: undefined });
   } catch (err) {
@@ -58,35 +58,33 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/appointments
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { customerName, customerPhone, serviceIds, staffId, date, time, notes, isWalkin } = req.body;
     if (!customerName || !date || !time) {
       return res.status(400).json({ error: 'customerName, date, and time are required' });
     }
 
-    // Upsert customer
     let customer = customerPhone
-      ? db.prepare('SELECT * FROM customers WHERE phone = ?').get(customerPhone)
+      ? await prepare('SELECT * FROM customers WHERE phone = ?').get(customerPhone)
       : null;
     if (!customer) {
-      const ins = db.prepare('INSERT INTO customers (name, phone) VALUES (?, ?)');
-      const result = ins.run(customerName, customerPhone || null);
+      const result = await prepare('INSERT INTO customers (name, phone) VALUES (?, ?)').run(customerName, customerPhone || null);
       customer = { id: result.lastInsertRowid };
     }
 
-    const insAppt = db.prepare(
+    const appt = await prepare(
       'INSERT INTO appointments (customer_id, staff_id, date, time, notes, is_walkin) VALUES (?,?,?,?,?,?)'
-    );
-    const appt = insAppt.run(customer.id, staffId || null, date, time, notes || null, isWalkin ? 1 : 0);
+    ).run(customer.id, staffId || null, date, time, notes || null, isWalkin ? 1 : 0);
     const apptId = appt.lastInsertRowid;
 
     if (Array.isArray(serviceIds)) {
-      const insAS = db.prepare('INSERT INTO appointment_services (appointment_id, service_id) VALUES (?,?)');
-      for (const sid of serviceIds) insAS.run(apptId, sid);
+      for (const sid of serviceIds) {
+        await prepare('INSERT INTO appointment_services (appointment_id, service_id) VALUES (?,?)').run(apptId, sid);
+      }
     }
 
-    const row = db.prepare(apptQuery + ' WHERE a.id = ? GROUP BY a.id').get(apptId);
+    const row = await prepare(apptQuery + ' WHERE a.id = ? GROUP BY a.id').get(apptId);
     res.status(201).json({ ...row, services: parseServices(row.svc_raw), svc_raw: undefined });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -94,14 +92,14 @@ router.post('/', (req, res) => {
 });
 
 // PATCH /api/appointments/:id/status
-router.patch('/:id/status', (req, res) => {
+router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
     if (!['pending', 'done', 'cancelled'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
-    db.prepare('UPDATE appointments SET status = ? WHERE id = ?').run(status, req.params.id);
-    const row = db.prepare(apptQuery + ' WHERE a.id = ? GROUP BY a.id').get(req.params.id);
+    await prepare('UPDATE appointments SET status = ? WHERE id = ?').run(status, req.params.id);
+    const row = await prepare(apptQuery + ' WHERE a.id = ? GROUP BY a.id').get(req.params.id);
     res.json({ ...row, services: parseServices(row.svc_raw), svc_raw: undefined });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -109,10 +107,10 @@ router.patch('/:id/status', (req, res) => {
 });
 
 // DELETE /api/appointments/:id
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    db.prepare('DELETE FROM appointment_services WHERE appointment_id = ?').run(req.params.id);
-    db.prepare('DELETE FROM appointments WHERE id = ?').run(req.params.id);
+    await prepare('DELETE FROM appointment_services WHERE appointment_id = ?').run(req.params.id);
+    await prepare('DELETE FROM appointments WHERE id = ?').run(req.params.id);
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

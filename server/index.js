@@ -7,7 +7,6 @@ const jwt     = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'sukhandsen-fallback-secret-2025';
 
-// Init DB (runs migrations + seed)
 const db = require('./db');
 
 const app = express();
@@ -24,11 +23,10 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/devlog')) return next();
   const skip = ['.js', '.css', '.ico', '.png', '.map', '.woff', '.svg'];
   if (skip.some(ext => req.path.endsWith(ext))) return next();
-  try {
-    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || '';
-    db.prepare('INSERT INTO access_logs (ip, user_agent, device_info, path, method, referer) VALUES (?,?,?,?,?,?)')
-      .run(ip, req.headers['user-agent'] || '', req.headers['x-device-fp'] || '', req.path, req.method, req.headers['referer'] || '');
-  } catch (_) {}
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || '';
+  db.prepare('INSERT INTO access_logs (ip, user_agent, device_info, path, method, referer) VALUES (?,?,?,?,?,?)')
+    .run(ip, req.headers['user-agent'] || '', req.headers['x-device-fp'] || '', req.path, req.method, req.headers['referer'] || '')
+    .catch(() => {});
   next();
 });
 
@@ -53,18 +51,18 @@ const toIST = utc => {
 };
 
 // ─── Hidden dev log page ─────────────────────────────────────────────────────
-app.post('/devlog/pm2025/clear', (req, res) => {
+app.post('/devlog/pm2025/clear', async (req, res) => {
   try {
-    db.prepare('DELETE FROM access_logs').run();
+    await db.prepare('DELETE FROM access_logs').run();
     res.redirect('/devlog/pm2025');
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
 });
 
-app.get('/devlog/pm2025', (req, res) => {
+app.get('/devlog/pm2025', async (req, res) => {
   try {
-    const logs = db.prepare(
+    const logs = await db.prepare(
       'SELECT * FROM access_logs ORDER BY created_at DESC LIMIT 1000'
     ).all();
 
@@ -247,6 +245,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Sukh Sen Salon server running on port ${PORT}`);
-});
+db.init()
+  .then(() => app.listen(PORT, () => console.log(`Sukh&Sen server running on port ${PORT}`)))
+  .catch(err => { console.error('DB init failed:', err); process.exit(1); });

@@ -1,9 +1,9 @@
 const express = require('express');
-const db      = require('../db');
+const { prepare } = require('../db');
 const router  = express.Router();
 
-function getBillWithItems(billId) {
-  const bill = db.prepare(`
+async function getBillWithItems(billId) {
+  const bill = await prepare(`
     SELECT b.*, a.date, a.time, c.name AS customer_name, c.phone AS customer_phone, st.name AS staff_name
     FROM bills b
     JOIN appointments a ON a.id = b.appointment_id
@@ -12,14 +12,14 @@ function getBillWithItems(billId) {
     WHERE b.id = ?
   `).get(billId);
   if (!bill) return null;
-  bill.items = db.prepare('SELECT * FROM bill_items WHERE bill_id = ?').all(billId);
+  bill.items = await prepare('SELECT * FROM bill_items WHERE bill_id = ?').all(billId);
   return bill;
 }
 
 // GET /api/bills
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const bills = db.prepare(`
+    const bills = await prepare(`
       SELECT b.*, a.date, a.time, c.name AS customer_name, st.name AS staff_name
       FROM bills b
       JOIN appointments a ON a.id = b.appointment_id
@@ -34,10 +34,10 @@ router.get('/', (req, res) => {
 });
 
 // GET /api/bills/summary?date=YYYY-MM-DD
-router.get('/summary', (req, res) => {
+router.get('/summary', async (req, res) => {
   try {
     const date = req.query.date || new Date().toISOString().split('T')[0];
-    const summary = db.prepare(`
+    const summary = await prepare(`
       SELECT
         COUNT(*) as billCount,
         COALESCE(SUM(CASE WHEN paid=1 THEN total ELSE 0 END), 0) AS paidRevenue,
@@ -55,10 +55,10 @@ router.get('/summary', (req, res) => {
   }
 });
 
-// GET /api/bills/unbilled  — done appointments without a bill
-router.get('/unbilled', (req, res) => {
+// GET /api/bills/unbilled
+router.get('/unbilled', async (req, res) => {
   try {
-    const rows = db.prepare(`
+    const rows = await prepare(`
       SELECT
         a.id, a.date, a.time,
         c.name AS customer_name,
@@ -93,9 +93,9 @@ router.get('/unbilled', (req, res) => {
 });
 
 // GET /api/bills/:id
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const bill = getBillWithItems(req.params.id);
+    const bill = await getBillWithItems(req.params.id);
     if (!bill) return res.status(404).json({ error: 'Not found' });
     res.json(bill);
   } catch (err) {
@@ -104,8 +104,7 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/bills
-// body: { appointmentId, items: [{serviceId?, serviceName, price}], paymentMethod, applyGst, gstRate }
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { appointmentId, items, paymentMethod, applyGst, gstRate } = req.body;
     if (!appointmentId || !items?.length) {
@@ -118,19 +117,17 @@ router.post('/', (req, res) => {
     const gstAmount  = applyGst ? Math.round(subtotal * rate / 100 * 100) / 100 : 0;
     const total      = subtotal + gstAmount;
 
-    const billRes = db.prepare(
+    const billRes = await prepare(
       'INSERT INTO bills (appointment_id, subtotal, total, payment_method, paid, gst_applied, gst_rate, gst_amount) VALUES (?,?,?,?,0,?,?,?)'
     ).run(appointmentId, subtotal, total, paymentMethod || 'cash', gstApplied, rate, gstAmount);
     const billId = billRes.lastInsertRowid;
 
-    const insItem = db.prepare(
-      'INSERT INTO bill_items (bill_id, service_id, service_name, price) VALUES (?,?,?,?)'
-    );
     for (const item of items) {
-      insItem.run(billId, item.serviceId || null, item.serviceName, item.price);
+      await prepare('INSERT INTO bill_items (bill_id, service_id, service_name, price) VALUES (?,?,?,?)')
+        .run(billId, item.serviceId || null, item.serviceName, item.price);
     }
 
-    res.status(201).json(getBillWithItems(billId));
+    res.status(201).json(await getBillWithItems(billId));
   } catch (err) {
     if (err.message.includes('UNIQUE')) {
       return res.status(409).json({ error: 'Bill already exists for this appointment' });
@@ -140,12 +137,12 @@ router.post('/', (req, res) => {
 });
 
 // PATCH /api/bills/:id/pay
-router.patch('/:id/pay', (req, res) => {
+router.patch('/:id/pay', async (req, res) => {
   try {
     const { paymentMethod } = req.body;
-    db.prepare('UPDATE bills SET paid=1, payment_method=? WHERE id=?')
+    await prepare('UPDATE bills SET paid=1, payment_method=? WHERE id=?')
       .run(paymentMethod || 'cash', req.params.id);
-    res.json(getBillWithItems(req.params.id));
+    res.json(await getBillWithItems(req.params.id));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
