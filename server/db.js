@@ -343,20 +343,14 @@ async function seed() {
   }
 
   const demoCustomers = [
-    { name: 'Rima Biswas',     phone: '9831111001', gender: 'female', birthday: mmdd(0),  anniversary: mmdd(5),  membership_tier: 'gold',   loyalty_points: 320 },
-    { name: 'Kakoli Mondal',   phone: '9732222002', gender: 'female', birthday: mmdd(1),  anniversary: null,     membership_tier: 'silver', loyalty_points: 150 },
-    { name: 'Sunita Bera',     phone: '9051333003', gender: 'female', birthday: mmdd(2),  anniversary: mmdd(6),  membership_tier: 'none',   loyalty_points: 60  },
-    { name: 'Puja Das',        phone: '8420444004', gender: 'female', birthday: mmdd(3),  anniversary: null,     membership_tier: 'silver', loyalty_points: 210 },
-    { name: 'Ananya Roy',      phone: '7001555005', gender: 'female', birthday: mmdd(4),  anniversary: mmdd(1),  membership_tier: 'none',   loyalty_points: 40  },
-    { name: 'Debasree Halder', phone: '9831666006', gender: 'female', birthday: mmdd(5),  anniversary: mmdd(3),  membership_tier: 'gold',   loyalty_points: 480 },
-    { name: 'Suparna Naskar',  phone: '9732777007', gender: 'female', birthday: mmdd(6),  anniversary: mmdd(0),  membership_tier: 'silver', loyalty_points: 190 },
-    { name: 'Mita Sen',        phone: '9051888008', gender: 'female', birthday: mmdd(14), anniversary: mmdd(2),  membership_tier: 'none',   loyalty_points: 75  },
-    { name: 'Priti Ghosh',     phone: '8420999009', gender: 'female', birthday: mmdd(20), anniversary: mmdd(4),  membership_tier: 'gold',   loyalty_points: 560 },
-    { name: 'Subhash Halder',  phone: '9831000011', gender: 'male',   birthday: mmdd(10), anniversary: null,     membership_tier: 'none',   loyalty_points: 30  },
-    { name: 'Bikash Roy',      phone: '9051000033', gender: 'male',   birthday: mmdd(18), anniversary: null,     membership_tier: 'none',   loyalty_points: 50  },
+    { name: 'Rima Biswas Test',    phone: '9831111001', gender: 'female', birthday: mmdd(0),  anniversary: mmdd(5), membership_tier: 'gold',   loyalty_points: 320 },
+    { name: 'Suparna Naskar Test', phone: '9732777007', gender: 'female', birthday: mmdd(3),  anniversary: mmdd(0), membership_tier: 'silver', loyalty_points: 190 },
+    { name: 'Mita Sen Test',       phone: '9051888008', gender: 'female', birthday: mmdd(14), anniversary: mmdd(2), membership_tier: 'none',   loyalty_points: 75  },
+    { name: 'Priti Ghosh Test',    phone: '8420999009', gender: 'female', birthday: mmdd(20), anniversary: mmdd(4), membership_tier: 'gold',   loyalty_points: 560 },
+    { name: 'Subhash Halder Test', phone: '9831000011', gender: 'male',   birthday: mmdd(10), anniversary: null,    membership_tier: 'none',   loyalty_points: 30  },
   ];
 
-  const deletedRows  = await prepare('SELECT phone FROM deleted_seeds').all();
+  const deletedRows   = await prepare('SELECT phone FROM deleted_seeds').all();
   const deletedPhones = new Set(deletedRows.map(r => r.phone));
 
   for (const c of demoCustomers) {
@@ -364,7 +358,8 @@ async function seed() {
     await prepare(
       'INSERT OR IGNORE INTO customers (name, phone, gender, birthday, anniversary, membership_tier, loyalty_points) VALUES (?,?,?,?,?,?,?)'
     ).run(c.name, c.phone, c.gender, c.birthday, c.anniversary, c.membership_tier, c.loyalty_points);
-    await prepare('UPDATE customers SET birthday=?, anniversary=? WHERE phone=?')
+    // Only update birthday/anniversary if not yet set — prevents overwriting on every restart
+    await prepare('UPDATE customers SET birthday=?, anniversary=? WHERE phone=? AND birthday IS NULL')
       .run(c.birthday, c.anniversary, c.phone);
   }
 
@@ -383,16 +378,11 @@ async function seed() {
     const sMita    = await staffId('Mita Roy');
 
     const custId = async phone => (await prepare('SELECT id FROM customers WHERE phone=?').get(phone))?.id;
-    const cRima     = await custId('9831111001');
-    const cKakoli   = await custId('9732222002');
-    const cSunita   = await custId('9051333003');
-    const cPuja     = await custId('8420444004');
-    const cAnanya   = await custId('7001555005');
-    const cDebasree = await custId('9831666006');
-    const cSubhash  = await custId('9831000011');
-    const cBikash   = await custId('9051000033');
-    const cMitaS    = await custId('9051888008');
-    const cPriti    = await custId('8420999009');
+    const cRima    = await custId('9831111001');
+    const cSuparna = await custId('9732777007');
+    const cMitaS   = await custId('9051888008');
+    const cPriti   = await custId('8420999009');
+    const cSubhash = await custId('9831000011');
 
     const svcByName = async prefix => (await prepare("SELECT id FROM services WHERE name LIKE ? LIMIT 1").get(`${prefix}%`))?.id ?? 1;
     const svcWomCut    = await svcByName("Women's Cut");
@@ -400,39 +390,30 @@ async function seed() {
     const svcBlowDry   = await svcByName('Straight Blow');
     const svcThreading = await svcByName('Threading');
     const svcFacial    = await svcByName('Clean & Clear');
-    const svcWax       = await svcByName('Waxing - Full Arms');
     const svcColour    = await svcByName("Women's All Over Colour");
     const svcBeard     = await svcByName('Beard Design');
     const svcManicure  = await svcByName('Regular Manicure');
     const svcHeadMassage = await svcByName('Olive Massager');
 
     const addAppt = async (cid, sid, date, time, status, svcId) => {
+      if (!cid) return;
       const r = await prepare('INSERT INTO appointments (customer_id, staff_id, date, time, status) VALUES (?,?,?,?,?)').run(cid, sid, date, time, status);
       await prepare('INSERT INTO appointment_services (appointment_id, service_id) VALUES (?,?)').run(r.lastInsertRowid, svcId);
     };
 
-    await addAppt(cRima,    sOwner,    today, '09:30', 'done',    svcWomCut);
-    await addAppt(cKakoli,  sPriya,    today, '10:30', 'done',    svcColour);
-    await addAppt(cSunita,  sRekha,    today, '11:00', 'done',    svcThreading);
-    await addAppt(cSubhash, sSourav,   today, '11:30', 'pending', svcBeard);
-    await addAppt(cPuja,    sSuchitra, today, '12:00', 'pending', svcBlowDry);
-    await addAppt(cAnanya,  sMita,     today, '13:00', 'pending', svcFacial);
-    await addAppt(cDebasree,sPriya,    today, '14:00', 'pending', svcWomCut);
-    await addAppt(cBikash,  sOwner,    today, '14:30', 'pending', svcMenCut);
-    await addAppt(cPriti,   sMita,     today, '15:30', 'pending', svcManicure);
-    await addAppt(cMitaS,   sRekha,    yday1, '09:00', 'done',    svcWax);
-    await addAppt(cRima,    sPriya,    yday1, '10:00', 'done',    svcBlowDry);
-    await addAppt(cPuja,    sMita,     yday1, '12:30', 'done',    svcFacial);
-    await addAppt(cSubhash, sOwner,    yday1, '14:00', 'done',    svcHeadMassage);
-    await addAppt(cKakoli,  sSuchitra, yday1, '15:00', 'done',    svcThreading);
-    await addAppt(cDebasree,sMita,     yday2, '09:30', 'done',    svcWomCut);
-    await addAppt(cAnanya,  sRekha,    yday2, '10:30', 'done',    svcThreading);
-    await addAppt(cBikash,  sSourav,   yday2, '11:00', 'done',    svcMenCut);
-    await addAppt(cSunita,  sPriya,    yday2, '13:00', 'done',    svcColour);
-    await addAppt(cPriti,   sOwner,    yday2, '14:30', 'done',    svcWomCut);
-    await addAppt(cMitaS,   sSuchitra, yday3, '10:00', 'done',    svcBlowDry);
-    await addAppt(cRima,    sMita,     yday3, '11:30', 'done',    svcFacial);
-    await addAppt(cKakoli,  sRekha,    yday3, '14:00', 'done',    svcWax);
+    // Today
+    await addAppt(cRima,    sOwner,   today, '09:30', 'done',    svcWomCut);
+    await addAppt(cSuparna, sRekha,   today, '11:00', 'done',    svcThreading);
+    await addAppt(cSubhash, sSourav,  today, '11:30', 'pending', svcBeard);
+    await addAppt(cPriti,   sMita,    today, '15:30', 'pending', svcManicure);
+    await addAppt(cMitaS,   sPriya,   today, '16:00', 'pending', svcFacial);
+    // Yesterday
+    await addAppt(cRima,    sPriya,   yday1, '10:00', 'done',    svcBlowDry);
+    await addAppt(cSuparna, sSuchitra,yday1, '12:00', 'done',    svcColour);
+    await addAppt(cSubhash, sOwner,   yday1, '14:00', 'done',    svcHeadMassage);
+    // 2 days ago
+    await addAppt(cPriti,   sOwner,   yday2, '14:30', 'done',    svcWomCut);
+    await addAppt(cMitaS,   sSuchitra,yday2, '10:00', 'done',    svcBlowDry);
 
     await client.batch([
       { sql: 'INSERT INTO inventory (name, quantity, threshold, unit, category) VALUES (?,?,?,?,?)', args: ['Shampoo (500ml)',       8, 3, 'bottles', 'Hair Care'] },
