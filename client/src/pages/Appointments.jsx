@@ -333,12 +333,20 @@ export default function Appointments() {
         <button onClick={() => setDate(todayISO())} className="btn-secondary text-xs px-3 py-2">Today</button>
         <div className="ml-auto flex gap-2">
           <button onClick={() => setShowWalkin(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all active:scale-[0.97]"
-            style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.25)' }}>
-            <Zap className="w-4 h-4" /> Walk-in
+            className="flex flex-col items-start px-4 py-2 rounded-xl transition-all active:scale-[0.97]"
+            style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.22)' }}>
+            <span className="flex items-center gap-1.5 text-sm font-semibold leading-tight" style={{ color: '#C9A84C' }}>
+              <Zap className="w-3.5 h-3.5" /> Walk-in
+            </span>
+            <span className="text-xs leading-tight mt-0.5" style={{ color: 'rgba(201,168,76,0.55)' }}>drop-in, pay now</span>
           </button>
-          <button onClick={() => setShowNew(true)} className="btn-primary flex items-center gap-1.5">
-            <Plus className="w-4 h-4" /> New
+          <button onClick={() => setShowNew(true)}
+            className="flex flex-col items-start px-4 py-2 rounded-xl transition-all active:scale-[0.97]"
+            style={{ background: 'linear-gradient(135deg,#C9A84C,#E8C96D)', color: '#0D0D0D' }}>
+            <span className="flex items-center gap-1.5 text-sm font-semibold leading-tight">
+              <Plus className="w-3.5 h-3.5" /> Book Ahead
+            </span>
+            <span className="text-xs leading-tight mt-0.5" style={{ color: 'rgba(13,13,13,0.6)' }}>schedule in advance</span>
           </button>
         </div>
       </div>
