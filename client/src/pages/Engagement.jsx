@@ -106,25 +106,33 @@ function BirthdayPanel({ salonName }) {
   async function handleWish(c) {
     const message = whatsappBirthdayMsg(salonName, c.name);
 
+    // Check Web Share (file) capability synchronously — no fetch needed
+    const probe = new File([''], 'x.webp', { type: 'image/webp' });
+    const canFileShare = !!(navigator.share && navigator.canShare?.({ files: [probe] }));
+
+    if (canFileShare) {
+      // Mobile: share image + message together via native share sheet
+      try {
+        const res  = await fetch('/birthday-card.webp');
+        const blob = await res.blob();
+        const file = new File([blob], 'birthday-card.webp', { type: 'image/webp' });
+        await navigator.share({ files: [file], text: message });
+        return;
+      } catch (_) {}
+    }
+
+    // Desktop: open WhatsApp NOW — must happen before any await to keep user gesture
+    openWhatsApp(c.phone, message);
+
+    // Copy birthday card image to clipboard in background
     try {
       const res  = await fetch('/birthday-card.webp');
       const blob = await res.blob();
-      const file = new File([blob], 'birthday-card.webp', { type: 'image/webp' });
-
-      // Mobile: Web Share API — opens native share sheet (pick WhatsApp directly)
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], text: message });
-        return;
-      }
-
-      // Desktop fallback: copy image to clipboard, then open WhatsApp
       if (window.ClipboardItem) {
         await navigator.clipboard.write([new ClipboardItem({ 'image/webp': blob })]);
-        showToast('Image copied! Paste it in WhatsApp after it opens.');
+        showToast('Image copied! Paste it in WhatsApp.');
       }
     } catch (_) {}
-
-    openWhatsApp(c.phone, message);
   }
 
   return (
