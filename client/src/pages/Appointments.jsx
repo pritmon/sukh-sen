@@ -4,6 +4,7 @@ import { fmtDate, fmtRupee, fmtTime, todayISO, statusClass, statusLabel, openWha
 import { Plus, Zap, Check, X, Trash2, ChevronLeft, ChevronRight, MessageCircle, UserCheck } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 import DatePicker from '../components/DatePicker.jsx';
+import TimePicker from '../components/TimePicker.jsx';
 
 function AppointmentForm({ onSave, onClose, walkin }) {
   const [services,     setServices]     = useState([]);
@@ -174,8 +175,7 @@ function AppointmentForm({ onSave, onClose, walkin }) {
         </div>
         <div>
           <label className="label">{walkin ? 'Time (now)' : 'Time *'}</label>
-          <input className="input" type="time" value={form.time}
-            onChange={e => setForm(f => ({ ...f, time: e.target.value }))} required />
+          <TimePicker value={form.time} onChange={t => setForm(f => ({ ...f, time: t }))} />
         </div>
       </div>
 
