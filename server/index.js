@@ -1,9 +1,10 @@
 require('dotenv').config();
-const express = require('express');
-const cors    = require('cors');
-const path    = require('path');
-const fs      = require('fs');
-const jwt     = require('jsonwebtoken');
+const express     = require('express');
+const cors        = require('cors');
+const path        = require('path');
+const fs          = require('fs');
+const jwt         = require('jsonwebtoken');
+const compression = require('compression');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'sukhandsen-fallback-secret-2025';
 
@@ -11,6 +12,7 @@ const db = require('./db');
 
 const app = express();
 
+app.use(compression());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
     ? false
