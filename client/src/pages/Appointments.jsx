@@ -331,22 +331,48 @@ export default function Appointments() {
           </button>
         </div>
         <button onClick={() => setDate(todayISO())} className="btn-secondary text-xs px-3 py-2">Today</button>
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex gap-2.5">
           <button onClick={() => setShowWalkin(true)}
-            className="flex flex-col items-start px-4 py-2 rounded-xl transition-all active:scale-[0.97]"
-            style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.22)' }}>
-            <span className="flex items-center gap-1.5 text-sm font-semibold leading-tight" style={{ color: '#C9A84C' }}>
-              <Zap className="w-3.5 h-3.5" /> Walk-in
+            className="group flex flex-col items-start px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-[0.96]"
+            style={{
+              background: 'rgba(201,168,76,0.07)',
+              border: '1px solid rgba(201,168,76,0.28)',
+              boxShadow: '0 0 0 0 rgba(201,168,76,0)',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(201,168,76,0.13)';
+              e.currentTarget.style.borderColor = 'rgba(201,168,76,0.55)';
+              e.currentTarget.style.boxShadow = '0 0 16px rgba(201,168,76,0.18)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(201,168,76,0.07)';
+              e.currentTarget.style.borderColor = 'rgba(201,168,76,0.28)';
+              e.currentTarget.style.boxShadow = '0 0 0 0 rgba(201,168,76,0)';
+            }}>
+            <span className="flex items-center gap-1.5 text-sm font-bold leading-tight tracking-wide" style={{ color: '#E8C96D' }}>
+              <Zap className="w-4 h-4" style={{ filter: 'drop-shadow(0 0 4px rgba(232,201,109,0.6))' }} /> Walk-in
             </span>
-            <span className="text-xs leading-tight mt-0.5" style={{ color: 'rgba(201,168,76,0.55)' }}>drop-in, pay now</span>
+            <span className="text-xs leading-tight mt-0.5 font-medium" style={{ color: 'rgba(201,168,76,0.5)' }}>drop-in · pay now</span>
           </button>
           <button onClick={() => setShowNew(true)}
-            className="flex flex-col items-start px-4 py-2 rounded-xl transition-all active:scale-[0.97]"
-            style={{ background: 'linear-gradient(135deg,#C9A84C,#E8C96D)', color: '#0D0D0D' }}>
-            <span className="flex items-center gap-1.5 text-sm font-semibold leading-tight">
-              <Plus className="w-3.5 h-3.5" /> Book Ahead
+            className="flex flex-col items-start px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-[0.96]"
+            style={{
+              background: 'linear-gradient(135deg, #B8922E 0%, #C9A84C 40%, #E8C96D 100%)',
+              boxShadow: '0 4px 20px rgba(201,168,76,0.35), inset 0 1px 0 rgba(255,255,255,0.15)',
+              color: '#0D0D0D',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.boxShadow = '0 6px 28px rgba(201,168,76,0.55), inset 0 1px 0 rgba(255,255,255,0.2)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(201,168,76,0.35), inset 0 1px 0 rgba(255,255,255,0.15)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}>
+            <span className="flex items-center gap-1.5 text-sm font-bold leading-tight tracking-wide">
+              <Plus className="w-4 h-4" /> Book Ahead
             </span>
-            <span className="text-xs leading-tight mt-0.5" style={{ color: 'rgba(13,13,13,0.6)' }}>schedule in advance</span>
+            <span className="text-xs leading-tight mt-0.5 font-medium" style={{ color: 'rgba(13,13,13,0.55)' }}>schedule in advance</span>
           </button>
         </div>
       </div>
