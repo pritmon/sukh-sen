@@ -146,26 +146,23 @@ function BirthdayPanel({ salonName }) {
             <Gift className="w-4 h-4" style={{ color: '#ec4899' }} />
             <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'rgba(236,72,153,0.7)' }}>Birthday Card</span>
           </div>
-          <a href="/birthday-card.webp" download="birthday-card.webp"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
-            style={{ background: 'rgba(236,72,153,0.08)', color: '#ec4899', border: '1px solid rgba(236,72,153,0.2)' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(236,72,153,0.15)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(236,72,153,0.08)'}>
-            ⬇ Download Image
-          </a>
+          <span className="text-xs font-medium px-2.5 py-1 rounded-full"
+            style={{ background: 'rgba(236,72,153,0.08)', color: 'rgba(236,72,153,0.7)', border: '1px solid rgba(236,72,153,0.15)' }}>
+            Sent with Wish button
+          </span>
         </div>
         <div className="p-4 flex gap-4 items-start">
           <img src="/birthday-card.webp" alt="Birthday card"
             className="w-28 rounded-xl flex-shrink-0 object-cover"
             style={{ border: '1px solid rgba(236,72,153,0.15)' }} />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium mb-2" style={{ color: 'rgba(245,240,232,0.75)' }}>Message preview:</p>
-            <p className="text-xs leading-relaxed whitespace-pre-line"
-              style={{ color: 'rgba(245,240,232,0.65)', fontFamily: 'monospace' }}>
-              {`🎂 H A P P Y  B I R T H D A Y 🎉\n\nToday, we celebrate the incredible journey of YOU. 🥂🌟\n\nMay the year ahead be filled with:\n 🌸 Divine blessings & good health\n 🌸 Moments that take your breath away\n 🌸 Infinite laughter & peace\n\n~ Warmly, ${salonName} 💕`}
-            </p>
-            <p className="text-xs mt-2" style={{ color: 'rgba(245,240,232,0.75)' }}>
-              On mobile: Wish opens share sheet — pick WhatsApp to send image + message together. On desktop: image is copied to clipboard, then paste it in WhatsApp.
+            <p className="text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: 'rgba(236,72,153,0.8)' }}>Message Preview</p>
+            <div className="rounded-xl p-3 text-xs leading-relaxed whitespace-pre-line"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(245,240,232,0.82)' }}>
+              {whatsappBirthdayMsg(salonName, 'Customer Name')}
+            </div>
+            <p className="text-xs mt-2 flex items-center gap-1.5" style={{ color: 'rgba(245,240,232,0.5)' }}>
+              <span>📱 Mobile: shares image + message together · 💻 Desktop: copies image to clipboard</span>
             </p>
           </div>
         </div>
