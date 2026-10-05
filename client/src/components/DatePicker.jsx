@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -26,13 +27,41 @@ export default function DatePicker({ value, onChange, readOnly, placeholder = 'S
   const [open,    setOpen]    = useState(false);
   const [viewY,   setViewY]   = useState(parsed?.y  ?? today.y);
   const [viewM,   setViewM]   = useState(parsed?.m  ?? today.m);
-  const ref = useRef(null);
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef(null);
+  const dropRef    = useRef(null);
 
+  // Close on outside click
   useEffect(() => {
-    function handler(e) { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }
+    function handler(e) {
+      if (
+        triggerRef.current && !triggerRef.current.contains(e.target) &&
+        dropRef.current    && !dropRef.current.contains(e.target)
+      ) setOpen(false);
+    }
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Recalculate position whenever dropdown opens or window scrolls/resizes
+  useEffect(() => {
+    if (!open) return;
+    function calcPos() {
+      if (!triggerRef.current) return;
+      const rect = triggerRef.current.getBoundingClientRect();
+      const dropW = 280;
+      const spaceRight = window.innerWidth - rect.left;
+      const left = spaceRight >= dropW ? rect.left : rect.right - dropW;
+      setDropPos({ top: rect.bottom + 6, left: Math.max(8, left) });
+    }
+    calcPos();
+    window.addEventListener('scroll', calcPos, true);
+    window.addEventListener('resize', calcPos);
+    return () => {
+      window.removeEventListener('scroll', calcPos, true);
+      window.removeEventListener('resize', calcPos);
+    };
+  }, [open]);
 
   function prevMonth() {
     if (viewM === 1) { setViewM(12); setViewY(y => y - 1); }
@@ -49,21 +78,133 @@ export default function DatePicker({ value, onChange, readOnly, placeholder = 'S
   }
 
   // Build calendar grid
-  const firstDow  = new Date(viewY, viewM - 1, 1).getDay();
+  const firstDow    = new Date(viewY, viewM - 1, 1).getDay();
   const daysInMonth = new Date(viewY, viewM, 0).getDate();
   const daysInPrev  = new Date(viewY, viewM - 1, 0).getDate();
   const cells = [];
-  for (let i = firstDow - 1; i >= 0; i--)   cells.push({ d: daysInPrev - i, cur: false });
-  for (let d = 1; d <= daysInMonth; d++)      cells.push({ d, cur: true });
-  while (cells.length % 7 !== 0)              cells.push({ d: cells.length - daysInMonth - firstDow + 1, cur: false });
+  for (let i = firstDow - 1; i >= 0; i--)  cells.push({ d: daysInPrev - i, cur: false });
+  for (let d = 1; d <= daysInMonth; d++)    cells.push({ d, cur: true });
+  while (cells.length % 7 !== 0)            cells.push({ d: cells.length - daysInMonth - firstDow + 1, cur: false });
 
   const displayVal = parsed
     ? `${String(parsed.d).padStart(2,'0')} ${MONTHS[parsed.m - 1].slice(0,3)} ${parsed.y}`
     : '';
 
+  const dropdown = open && createPortal(
+    <div
+      ref={dropRef}
+      style={{
+        position: 'fixed',
+        top: dropPos.top,
+        left: dropPos.left,
+        zIndex: 9999,
+        background: '#0E0E0E',
+        border: '1px solid rgba(201,168,76,0.22)',
+        borderRadius: 16,
+        boxShadow: '0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.08)',
+        width: 280,
+        overflow: 'hidden',
+      }}>
+
+      {/* Month nav */}
+      <div className="flex items-center justify-between px-4 py-3"
+        style={{ borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
+        <button type="button" onClick={prevMonth}
+          className="p-1.5 rounded-lg transition-colors"
+          style={{ color: 'rgba(201,168,76,0.6)' }}
+          onMouseEnter={e => { e.currentTarget.style.color='#C9A84C'; e.currentTarget.style.background='rgba(201,168,76,0.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color='rgba(201,168,76,0.6)'; e.currentTarget.style.background='transparent'; }}>
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <p className="text-sm font-semibold font-serif" style={{ color: '#E8C96D' }}>
+          {MONTHS[viewM - 1]} {viewY}
+        </p>
+        <button type="button" onClick={nextMonth}
+          className="p-1.5 rounded-lg transition-colors"
+          style={{ color: 'rgba(201,168,76,0.6)' }}
+          onMouseEnter={e => { e.currentTarget.style.color='#C9A84C'; e.currentTarget.style.background='rgba(201,168,76,0.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color='rgba(201,168,76,0.6)'; e.currentTarget.style.background='transparent'; }}>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Day names */}
+      <div className="grid grid-cols-7 px-3 pt-3 pb-1">
+        {DAYS.map(d => (
+          <div key={d} className="text-center text-xs font-semibold uppercase tracking-widest py-1"
+            style={{ color: 'rgba(201,168,76,0.45)' }}>{d}</div>
+        ))}
+      </div>
+
+      {/* Cells */}
+      <div className="grid grid-cols-7 px-3 pb-3 gap-y-0.5">
+        {cells.map((cell, i) => {
+          const isToday    = cell.cur && cell.d === today.d && viewM === today.m && viewY === today.y;
+          const isSelected = cell.cur && parsed && cell.d === parsed.d && viewM === parsed.m && viewY === parsed.y;
+          return (
+            <button
+              key={i}
+              type="button"
+              disabled={!cell.cur}
+              onClick={() => cell.cur && selectDay(cell.d)}
+              className="relative flex items-center justify-center rounded-xl text-sm font-medium transition-all"
+              style={{
+                height: 34,
+                color: isSelected
+                  ? '#0D0D0D'
+                  : isToday
+                  ? '#E8C96D'
+                  : cell.cur
+                  ? 'rgba(245,240,232,0.85)'
+                  : 'rgba(245,240,232,0.18)',
+                background: isSelected
+                  ? 'linear-gradient(135deg,#C9A84C,#E8C96D)'
+                  : isToday
+                  ? 'rgba(201,168,76,0.1)'
+                  : 'transparent',
+                boxShadow: isSelected
+                  ? '0 2px 12px rgba(201,168,76,0.4)'
+                  : isToday
+                  ? '0 0 0 1px rgba(201,168,76,0.35)'
+                  : 'none',
+                fontWeight: isSelected || isToday ? 700 : 500,
+                cursor: cell.cur ? 'pointer' : 'default',
+              }}
+              onMouseEnter={e => {
+                if (!isSelected && cell.cur) {
+                  e.currentTarget.style.background = 'rgba(201,168,76,0.1)';
+                  e.currentTarget.style.color = '#E8C96D';
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isSelected && cell.cur) {
+                  e.currentTarget.style.background = isToday ? 'rgba(201,168,76,0.1)' : 'transparent';
+                  e.currentTarget.style.color = isToday ? '#E8C96D' : 'rgba(245,240,232,0.85)';
+                }
+              }}>
+              {cell.d}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Today shortcut */}
+      <div className="px-3 pb-3 flex justify-end">
+        <button type="button"
+          onClick={() => { setViewY(today.y); setViewM(today.m); selectDay(today.d); }}
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+          style={{ color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.18)' }}
+          onMouseEnter={e => e.currentTarget.style.background='rgba(201,168,76,0.15)'}
+          onMouseLeave={e => e.currentTarget.style.background='rgba(201,168,76,0.08)'}>
+          Today
+        </button>
+      </div>
+    </div>,
+    document.body
+  );
+
   return (
-    <div className="relative" ref={ref}>
-      {/* Trigger */}
+    <div className="relative" ref={triggerRef}>
       <button
         type="button"
         disabled={readOnly}
@@ -75,113 +216,7 @@ export default function DatePicker({ value, onChange, readOnly, placeholder = 'S
         </span>
         <Calendar className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(201,168,76,0.55)' }} />
       </button>
-
-      {/* Dropdown */}
-      {open && (
-        <div
-          className="absolute z-50 mt-1.5 rounded-2xl overflow-hidden shadow-2xl"
-          style={{
-            background: '#0E0E0E',
-            border: '1px solid rgba(201,168,76,0.22)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,168,76,0.08)',
-            width: 280,
-          }}>
-
-          {/* Month nav */}
-          <div className="flex items-center justify-between px-4 py-3"
-            style={{ borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
-            <button type="button" onClick={prevMonth}
-              className="p-1.5 rounded-lg transition-colors"
-              style={{ color: 'rgba(201,168,76,0.6)' }}
-              onMouseEnter={e => { e.currentTarget.style.color='#C9A84C'; e.currentTarget.style.background='rgba(201,168,76,0.08)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color='rgba(201,168,76,0.6)'; e.currentTarget.style.background='transparent'; }}>
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <p className="text-sm font-semibold font-serif" style={{ color: '#E8C96D' }}>
-              {MONTHS[viewM - 1]} {viewY}
-            </p>
-            <button type="button" onClick={nextMonth}
-              className="p-1.5 rounded-lg transition-colors"
-              style={{ color: 'rgba(201,168,76,0.6)' }}
-              onMouseEnter={e => { e.currentTarget.style.color='#C9A84C'; e.currentTarget.style.background='rgba(201,168,76,0.08)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color='rgba(201,168,76,0.6)'; e.currentTarget.style.background='transparent'; }}>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Day names */}
-          <div className="grid grid-cols-7 px-3 pt-3 pb-1">
-            {DAYS.map(d => (
-              <div key={d} className="text-center text-xs font-semibold uppercase tracking-widest py-1"
-                style={{ color: 'rgba(201,168,76,0.45)' }}>{d}</div>
-            ))}
-          </div>
-
-          {/* Cells */}
-          <div className="grid grid-cols-7 px-3 pb-3 gap-y-0.5">
-            {cells.map((cell, i) => {
-              const isToday    = cell.cur && cell.d === today.d && viewM === today.m && viewY === today.y;
-              const isSelected = cell.cur && parsed && cell.d === parsed.d && viewM === parsed.m && viewY === parsed.y;
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  disabled={!cell.cur}
-                  onClick={() => cell.cur && selectDay(cell.d)}
-                  className="relative flex items-center justify-center rounded-xl text-sm font-medium transition-all"
-                  style={{
-                    height: 34,
-                    color: isSelected
-                      ? '#0D0D0D'
-                      : isToday
-                      ? '#E8C96D'
-                      : cell.cur
-                      ? 'rgba(245,240,232,0.85)'
-                      : 'rgba(245,240,232,0.18)',
-                    background: isSelected
-                      ? 'linear-gradient(135deg,#C9A84C,#E8C96D)'
-                      : isToday
-                      ? 'rgba(201,168,76,0.1)'
-                      : 'transparent',
-                    boxShadow: isSelected
-                      ? '0 2px 12px rgba(201,168,76,0.4)'
-                      : isToday
-                      ? '0 0 0 1px rgba(201,168,76,0.35)'
-                      : 'none',
-                    fontWeight: isSelected || isToday ? 700 : 500,
-                    cursor: cell.cur ? 'pointer' : 'default',
-                  }}
-                  onMouseEnter={e => {
-                    if (!isSelected && cell.cur) {
-                      e.currentTarget.style.background = 'rgba(201,168,76,0.1)';
-                      e.currentTarget.style.color = '#E8C96D';
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (!isSelected && cell.cur) {
-                      e.currentTarget.style.background = isToday ? 'rgba(201,168,76,0.1)' : 'transparent';
-                      e.currentTarget.style.color = isToday ? '#E8C96D' : 'rgba(245,240,232,0.85)';
-                    }
-                  }}>
-                  {cell.d}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Today shortcut */}
-          <div className="px-3 pb-3 flex justify-end">
-            <button type="button"
-              onClick={() => { setViewY(today.y); setViewM(today.m); selectDay(today.d); }}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
-              style={{ color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.18)' }}
-              onMouseEnter={e => e.currentTarget.style.background='rgba(201,168,76,0.15)'}
-              onMouseLeave={e => e.currentTarget.style.background='rgba(201,168,76,0.08)'}>
-              Today
-            </button>
-          </div>
-        </div>
-      )}
+      {dropdown}
     </div>
   );
 }
