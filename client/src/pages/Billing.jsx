@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { fmtDate, fmtRupee, fmtTime, todayISO, openWhatsApp, whatsappBillMsg } from '../utils.js';
-import { Plus, Check, Banknote, Smartphone, Eye, MessageCircle, Receipt, TrendingUp, CalendarDays, Printer, Tag } from 'lucide-react';
+import { Plus, Check, Banknote, Smartphone, CreditCard, Eye, MessageCircle, Receipt, TrendingUp, CalendarDays, Printer, Tag } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 import DatePicker from '../components/DatePicker.jsx';
 
@@ -142,13 +142,17 @@ function BillForm({ appointment, onSave, onClose }) {
       <div>
         <label className="label">Payment Method</label>
         <div className="flex gap-2">
-          {['cash', 'upi'].map(m => (
-            <button key={m} type="button" onClick={() => setMethod(m)}
+          {[
+            { id: 'cash', label: 'Cash', icon: <Banknote className="w-4 h-4" /> },
+            { id: 'upi',  label: 'UPI',  icon: <Smartphone className="w-4 h-4" /> },
+            { id: 'card', label: 'Card', icon: <CreditCard className="w-4 h-4" /> },
+          ].map(({ id, label, icon }) => (
+            <button key={id} type="button" onClick={() => setMethod(id)}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97]"
-              style={method === m
+              style={method === id
                 ? { background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A', borderColor: '#C9A84C' }
                 : { background: '#1A1A1A', color: 'rgba(245,240,232,0.75)', borderColor: 'rgba(201,168,76,0.15)' }}>
-              {m === 'cash' ? <><Banknote className="w-4 h-4" /> Cash</> : <><Smartphone className="w-4 h-4" /> UPI</>}
+              {icon} {label}
             </button>
           ))}
         </div>
@@ -281,18 +285,22 @@ ${bill.staff_name ? `<p style="text-align:left"><b>Staff:</b> ${bill.staff_name}
         <div className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium"
           style={{ background: 'rgba(34,197,94,0.08)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.15)' }}>
           <Check className="w-4 h-4" />
-          Paid via {bill.payment_method === 'upi' ? 'UPI' : 'Cash'}
+          Paid via {{ cash: 'Cash', upi: 'UPI', card: 'Card' }[bill.payment_method] || 'Cash'}
         </div>
       ) : (
         <div className="space-y-3">
           <div className="flex gap-2">
-            {['cash', 'upi'].map(m => (
-              <button key={m} type="button" onClick={() => setMethod(m)}
+            {[
+              { id: 'cash', label: 'Cash', icon: <Banknote className="w-4 h-4" /> },
+              { id: 'upi',  label: 'UPI',  icon: <Smartphone className="w-4 h-4" /> },
+              { id: 'card', label: 'Card', icon: <CreditCard className="w-4 h-4" /> },
+            ].map(({ id, label, icon }) => (
+              <button key={id} type="button" onClick={() => setMethod(id)}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97]"
-                style={method === m
+                style={method === id
                   ? { background: 'linear-gradient(135deg, #C9A84C, #E8C96D)', color: '#0A0A0A', borderColor: '#C9A84C' }
                   : { background: '#1A1A1A', color: 'rgba(245,240,232,0.75)', borderColor: 'rgba(201,168,76,0.15)' }}>
-                {m === 'cash' ? <><Banknote className="w-4 h-4" /> Cash</> : <><Smartphone className="w-4 h-4" /> UPI</>}
+                {icon} {label}
               </button>
             ))}
           </div>
