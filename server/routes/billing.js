@@ -106,20 +106,21 @@ router.get('/:id', async (req, res) => {
 // POST /api/bills
 router.post('/', async (req, res) => {
   try {
-    const { appointmentId, items, paymentMethod, applyGst, gstRate } = req.body;
+    const { appointmentId, items, paymentMethod, applyGst, gstRate, discount } = req.body;
     if (!appointmentId || !items?.length) {
       return res.status(400).json({ error: 'appointmentId and items required' });
     }
 
     const subtotal   = items.reduce((s, i) => s + Number(i.price), 0);
+    const discountAmt = Math.min(Number(discount) || 0, subtotal);
     const gstApplied = applyGst ? 1 : 0;
     const rate       = applyGst ? (Number(gstRate) || 18) : 0;
-    const gstAmount  = applyGst ? Math.round(subtotal * rate / 100 * 100) / 100 : 0;
-    const total      = subtotal + gstAmount;
+    const gstAmount  = applyGst ? Math.round((subtotal - discountAmt) * rate / 100 * 100) / 100 : 0;
+    const total      = subtotal - discountAmt + gstAmount;
 
     const billRes = await prepare(
-      'INSERT INTO bills (appointment_id, subtotal, total, payment_method, paid, gst_applied, gst_rate, gst_amount) VALUES (?,?,?,?,0,?,?,?)'
-    ).run(appointmentId, subtotal, total, paymentMethod || 'cash', gstApplied, rate, gstAmount);
+      'INSERT INTO bills (appointment_id, subtotal, total, payment_method, paid, gst_applied, gst_rate, gst_amount, discount) VALUES (?,?,?,?,0,?,?,?,?)'
+    ).run(appointmentId, subtotal, total, paymentMethod || 'cash', gstApplied, rate, gstAmount, discountAmt);
     const billId = billRes.lastInsertRowid;
 
     for (const item of items) {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { fmtDate, fmtRupee, fmtTime, todayISO, openWhatsApp, whatsappBillMsg } from '../utils.js';
-import { Plus, Check, Banknote, Smartphone, Eye, MessageCircle, Receipt, TrendingUp, CalendarDays } from 'lucide-react';
+import { Plus, Check, Banknote, Smartphone, Eye, MessageCircle, Receipt, TrendingUp, CalendarDays, Printer, Tag } from 'lucide-react';
 import Modal from '../components/Modal.jsx';
 import DatePicker from '../components/DatePicker.jsx';
 
@@ -13,11 +13,14 @@ function BillForm({ appointment, onSave, onClose }) {
   const [method,   setMethod]   = useState('cash');
   const [applyGst, setApplyGst] = useState(false);
   const [gstRate,  setGstRate]  = useState(18);
+  const [discount, setDiscount] = useState('');
   const [saving,   setSaving]   = useState(false);
 
-  const subtotal = items.filter(i => i.selected).reduce((s, i) => s + Number(i.price), 0);
-  const gstAmt   = applyGst ? Math.round(subtotal * gstRate / 100 * 100) / 100 : 0;
-  const total    = subtotal + gstAmt;
+  const subtotal     = items.filter(i => i.selected).reduce((s, i) => s + Number(i.price), 0);
+  const discountAmt  = Math.min(Number(discount) || 0, subtotal);
+  const taxable      = subtotal - discountAmt;
+  const gstAmt       = applyGst ? Math.round(taxable * gstRate / 100 * 100) / 100 : 0;
+  const total        = taxable + gstAmt;
 
   function toggle(idx) {
     setItems(prev => prev.map((item, i) => i === idx ? { ...item, selected: !item.selected } : item));
@@ -42,7 +45,7 @@ function BillForm({ appointment, onSave, onClose }) {
     setBillError('');
     setSaving(true);
     try {
-      await onSave({ appointmentId: appointment.id, items: selectedItems, paymentMethod: method, applyGst, gstRate });
+      await onSave({ appointmentId: appointment.id, items: selectedItems, paymentMethod: method, applyGst, gstRate, discount: discountAmt });
     } finally { setSaving(false); }
   }
 
@@ -81,6 +84,20 @@ function BillForm({ appointment, onSave, onClose }) {
         </div>
       </div>
 
+      {/* Discount */}
+      <div>
+        <label className="label flex items-center gap-1.5"><Tag className="w-3.5 h-3.5" style={{ color: '#C9A84C' }} />Discount (₹)</label>
+        <input
+          className="input w-full"
+          type="number"
+          min={0}
+          max={subtotal}
+          placeholder="0"
+          value={discount}
+          onChange={e => setDiscount(e.target.value)}
+        />
+      </div>
+
       <div className="space-y-2">
         <label className="flex items-center gap-3 cursor-pointer">
           <div className="w-9 h-5 rounded-full relative cursor-pointer transition-colors"
@@ -102,17 +119,20 @@ function BillForm({ appointment, onSave, onClose }) {
       </div>
 
       <div className="rounded-xl px-4 py-3.5 space-y-1" style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.2)' }}>
-        {applyGst && (
-          <>
-            <div className="flex justify-between text-sm" style={{ color: 'rgba(245,240,232,0.75)' }}>
-              <span>Subtotal</span><span>{fmtRupee(subtotal)}</span>
-            </div>
-            <div className="flex justify-between text-sm" style={{ color: 'rgba(245,240,232,0.75)' }}>
-              <span>GST ({gstRate}%)</span><span>{fmtRupee(gstAmt)}</span>
-            </div>
-            <div className="my-1" style={{ borderTop: '1px solid rgba(201,168,76,0.15)' }} />
-          </>
+        <div className="flex justify-between text-sm" style={{ color: 'rgba(245,240,232,0.75)' }}>
+          <span>Subtotal</span><span>{fmtRupee(subtotal)}</span>
+        </div>
+        {discountAmt > 0 && (
+          <div className="flex justify-between text-sm" style={{ color: '#4ade80' }}>
+            <span>Discount</span><span>− {fmtRupee(discountAmt)}</span>
+          </div>
         )}
+        {applyGst && (
+          <div className="flex justify-between text-sm" style={{ color: 'rgba(245,240,232,0.75)' }}>
+            <span>GST ({gstRate}%)</span><span>{fmtRupee(gstAmt)}</span>
+          </div>
+        )}
+        <div className="my-1" style={{ borderTop: '1px solid rgba(201,168,76,0.15)' }} />
         <div className="flex items-center justify-between">
           <span className="font-semibold" style={{ color: '#F5F0E8' }}>Total</span>
           <span className="text-xl font-bold font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(total)}</span>
@@ -165,6 +185,42 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
     );
   }
 
+  function printReceipt() {
+    const lines = (bill.items || []).map(i =>
+      `<tr><td>${i.service_name}</td><td style="text-align:right">${fmtRupee(i.price)}</td></tr>`
+    ).join('');
+    const discountRow = Number(bill.discount) > 0
+      ? `<tr><td style="color:#16a34a">Discount</td><td style="text-align:right;color:#16a34a">− ${fmtRupee(bill.discount)}</td></tr>` : '';
+    const gstRow = bill.gst_applied
+      ? `<tr><td>GST (${bill.gst_rate}%)</td><td style="text-align:right">${fmtRupee(bill.gst_amount)}</td></tr>` : '';
+    const w = window.open('', '_blank', 'width=400,height=600');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Receipt</title>
+<style>
+  body{font-family:Arial,sans-serif;font-size:13px;margin:0;padding:20px;color:#111}
+  h2{margin:0 0 4px;font-size:16px;text-align:center}
+  p{margin:2px 0;text-align:center;font-size:12px;color:#555}
+  hr{border:none;border-top:1px dashed #aaa;margin:10px 0}
+  table{width:100%;border-collapse:collapse}
+  td{padding:4px 2px}
+  .total td{font-weight:bold;font-size:14px;border-top:1px solid #111;padding-top:8px}
+  .paid{text-align:center;margin-top:12px;font-size:12px;color:#16a34a;font-weight:bold}
+  @media print{body{padding:10px}}
+</style></head><body>
+<h2>${salonName || 'Sukh&Sen Unisex Salon'}</h2>
+<p>Kakdwip, West Bengal</p>
+<hr>
+<p style="text-align:left"><b>Guest:</b> ${bill.customer_name}</p>
+<p style="text-align:left"><b>Date:</b> ${fmtDate(bill.date)} ${fmtTime(bill.time)}</p>
+${bill.staff_name ? `<p style="text-align:left"><b>Staff:</b> ${bill.staff_name}</p>` : ''}
+<hr>
+<table>${lines}${discountRow}${gstRow}<tr class="total"><td>Total</td><td style="text-align:right">${fmtRupee(bill.total)}</td></tr></table>
+<p class="paid">${bill.paid ? `✓ Paid via ${bill.payment_method === 'upi' ? 'UPI' : 'Cash'}` : 'UNPAID'}</p>
+<hr><p style="font-size:11px;color:#aaa">Thank you for visiting!</p>
+<script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}</script>
+</body></html>`);
+    w.document.close();
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-xl p-4 text-sm" style={{ background: '#0D0D0D', border: '1px solid rgba(201,168,76,0.12)' }}>
@@ -174,13 +230,20 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
             <p className="mt-0.5" style={{ color: 'rgba(245,240,232,0.68)' }}>{fmtDate(bill.date)} at {fmtTime(bill.time)}</p>
             {bill.staff_name && <p style={{ color: 'rgba(245,240,232,0.55)' }}>by {bill.staff_name}</p>}
           </div>
-          {bill.customer_phone && (
-            <button onClick={shareWhatsApp}
+          <div className="flex gap-2">
+            <button onClick={printReceipt}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-              style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.2)' }}>
-              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+              style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' }}>
+              <Printer className="w-3.5 h-3.5" /> Print
             </button>
-          )}
+            {bill.customer_phone && (
+              <button onClick={shareWhatsApp}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.2)' }}>
+                <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -192,19 +255,24 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
             <span className="font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(item.price)}</span>
           </div>
         ))}
-        {bill.gst_applied === 1 && (
-          <>
-            <div className="flex justify-between text-sm py-1.5" style={{ color: 'rgba(245,240,232,0.68)' }}>
-              <span>Subtotal</span><span>{fmtRupee(bill.subtotal)}</span>
-            </div>
-            <div className="flex justify-between text-sm py-1.5" style={{ color: 'rgba(245,240,232,0.68)' }}>
-              <span>GST ({bill.gst_rate}%)</span><span>{fmtRupee(bill.gst_amount)}</span>
-            </div>
-            <div className="my-1" style={{ borderTop: '1px solid rgba(201,168,76,0.15)' }} />
-          </>
+        {(Number(bill.discount) > 0 || bill.gst_applied === 1) && (
+          <div className="flex justify-between text-sm py-1.5" style={{ color: 'rgba(245,240,232,0.68)' }}>
+            <span>Subtotal</span><span>{fmtRupee(bill.subtotal)}</span>
+          </div>
         )}
+        {Number(bill.discount) > 0 && (
+          <div className="flex justify-between text-sm py-1.5" style={{ color: '#4ade80' }}>
+            <span>Discount</span><span>− {fmtRupee(bill.discount)}</span>
+          </div>
+        )}
+        {bill.gst_applied === 1 && (
+          <div className="flex justify-between text-sm py-1.5" style={{ color: 'rgba(245,240,232,0.68)' }}>
+            <span>GST ({bill.gst_rate}%)</span><span>{fmtRupee(bill.gst_amount)}</span>
+          </div>
+        )}
+        <div className="my-1" style={{ borderTop: '1px solid rgba(201,168,76,0.15)' }} />
         <div className="flex justify-between font-bold text-base pt-2">
-          <span style={{ color: '#F5F0E8' }}>Total{bill.gst_applied === 1 ? ' (incl. GST)' : ''}</span>
+          <span style={{ color: '#F5F0E8' }}>Total</span>
           <span className="font-serif" style={{ color: '#C9A84C' }}>{fmtRupee(bill.total)}</span>
         </div>
       </div>

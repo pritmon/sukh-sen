@@ -173,6 +173,7 @@ async function initSchema() {
   await addCol('bills', 'gst_applied',         'INTEGER DEFAULT 0');
   await addCol('bills', 'gst_rate',            'REAL DEFAULT 0');
   await addCol('bills', 'gst_amount',          'REAL DEFAULT 0');
+  await addCol('bills', 'discount',            'REAL DEFAULT 0');
 }
 
 // ─── Seed ─────────────────────────────────────────────────────────────────────
