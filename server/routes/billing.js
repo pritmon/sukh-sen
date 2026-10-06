@@ -36,15 +36,20 @@ router.get('/', async (req, res) => {
 // GET /api/bills/summary?date=YYYY-MM-DD
 router.get('/summary', async (req, res) => {
   try {
-    const date = req.query.date || new Date().toISOString().split('T')[0];
+    // Use local date parts — toISOString() gives UTC which is wrong for IST users
+    const d    = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const date  = req.query.date || today;
+
     const summary = await prepare(`
       SELECT
         COUNT(*) as billCount,
         COALESCE(SUM(CASE WHEN paid=1 THEN total ELSE 0 END), 0) AS paidRevenue,
         COALESCE(SUM(CASE WHEN paid=0 THEN total ELSE 0 END), 0) AS unpaidRevenue,
-        COALESCE(SUM(total), 0) AS totalRevenue,
+        COALESCE(SUM(total), 0)                                  AS totalRevenue,
         SUM(CASE WHEN payment_method='cash' AND paid=1 THEN total ELSE 0 END) AS cashRevenue,
-        SUM(CASE WHEN payment_method='upi'  AND paid=1 THEN total ELSE 0 END) AS upiRevenue
+        SUM(CASE WHEN payment_method='upi'  AND paid=1 THEN total ELSE 0 END) AS upiRevenue,
+        SUM(CASE WHEN payment_method='card' AND paid=1 THEN total ELSE 0 END) AS cardRevenue
       FROM bills b
       JOIN appointments a ON a.id = b.appointment_id
       WHERE a.date = ?

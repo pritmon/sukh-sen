@@ -5,10 +5,13 @@ const client = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN   || undefined,
 });
 
-// ─── Async wrappers ──────────────────────────────────────────────────────────
+// ─── Query helpers ────────────────────────────────────────────────────────────
+// prepare(sql) works like SQLite's prepare — chain .get(), .all(), or .run()
+// so all route files can do: await prepare('SELECT ...').get(id)
 
 function prepare(sql) {
   return {
+    // Returns the first row as an object, or null if no rows
     async get(...args) {
       const r = await client.execute({ sql, args: args.flat() });
       if (!r.rows.length) return null;
@@ -16,6 +19,7 @@ function prepare(sql) {
       r.columns.forEach((c, i) => { obj[c] = r.rows[0][i]; });
       return obj;
     },
+    // Returns all rows as an array of objects
     async all(...args) {
       const r = await client.execute({ sql, args: args.flat() });
       return r.rows.map(row => {
@@ -24,6 +28,7 @@ function prepare(sql) {
         return obj;
       });
     },
+    // Runs INSERT / UPDATE / DELETE — returns { lastInsertRowid, changes }
     async run(...args) {
       const r = await client.execute({ sql, args: args.flat() });
       return { lastInsertRowid: Number(r.lastInsertRowid), changes: r.rowsAffected };
@@ -31,13 +36,7 @@ function prepare(sql) {
   };
 }
 
-async function exec(sql) {
-  const stmts = sql.split(';').map(s => s.trim()).filter(Boolean);
-  for (const stmt of stmts) {
-    await client.execute(stmt);
-  }
-}
-
+// Safe migration helper — silently skips if the column already exists
 async function addCol(table, col, type) {
   try { await client.execute(`ALTER TABLE ${table} ADD COLUMN ${col} ${type}`); } catch (_) {}
 }
@@ -337,6 +336,8 @@ async function seed() {
     }
   }
 
+  // Returns a birthday/anniversary in "2000-MM-DD" format, offset by daysOffset from today.
+  // Year 2000 is used so birthday/anniversary reminders fire relative to today's calendar date.
   function mmdd(daysOffset) {
     const d = new Date();
     d.setDate(d.getDate() + daysOffset);
@@ -448,4 +449,4 @@ async function init() {
   console.log('DB ready (Turso)');
 }
 
-module.exports = { prepare, exec, init, client };
+module.exports = { prepare, init, client };

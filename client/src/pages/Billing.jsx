@@ -5,6 +5,20 @@ import { Plus, Check, Banknote, Smartphone, CreditCard, Eye, MessageCircle, Rece
 import Modal from '../components/Modal.jsx';
 import DatePicker from '../components/DatePicker.jsx';
 
+// Defined once — used in both BillForm (new bill) and BillDetail (mark paid)
+const PAYMENT_METHODS = [
+  { id: 'cash', label: 'Cash', icon: <Banknote className="w-4 h-4" /> },
+  { id: 'upi',  label: 'UPI',  icon: <Smartphone className="w-4 h-4" /> },
+  { id: 'card', label: 'Card', icon: <CreditCard className="w-4 h-4" /> },
+];
+
+// Badge styles for each payment method shown in bill history list
+const METHOD_BADGE = {
+  cash: { background: 'rgba(34,197,94,0.1)',   color: '#4ade80' },
+  upi:  { background: 'rgba(99,102,241,0.12)', color: '#818cf8' },
+  card: { background: 'rgba(251,191,36,0.12)', color: '#fbbf24' },
+};
+
 function BillForm({ appointment, onSave, onClose }) {
   const [items,    setItems]    = useState(
     (appointment.services || []).map(s => ({ ...s, selected: true }))
@@ -142,11 +156,7 @@ function BillForm({ appointment, onSave, onClose }) {
       <div>
         <label className="label">Payment Method</label>
         <div className="flex gap-2">
-          {[
-            { id: 'cash', label: 'Cash', icon: <Banknote className="w-4 h-4" /> },
-            { id: 'upi',  label: 'UPI',  icon: <Smartphone className="w-4 h-4" /> },
-            { id: 'card', label: 'Card', icon: <CreditCard className="w-4 h-4" /> },
-          ].map(({ id, label, icon }) => (
+          {PAYMENT_METHODS.map(({ id, label, icon }) => (
             <button key={id} type="button" onClick={() => setMethod(id)}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97]"
               style={method === id
@@ -290,11 +300,7 @@ ${bill.staff_name ? `<p style="text-align:left"><b>Staff:</b> ${bill.staff_name}
       ) : (
         <div className="space-y-3">
           <div className="flex gap-2">
-            {[
-              { id: 'cash', label: 'Cash', icon: <Banknote className="w-4 h-4" /> },
-              { id: 'upi',  label: 'UPI',  icon: <Smartphone className="w-4 h-4" /> },
-              { id: 'card', label: 'Card', icon: <CreditCard className="w-4 h-4" /> },
-            ].map(({ id, label, icon }) => (
+            {PAYMENT_METHODS.map(({ id, label, icon }) => (
               <button key={id} type="button" onClick={() => setMethod(id)}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-semibold transition-all active:scale-[0.97]"
                 style={method === id
@@ -497,9 +503,7 @@ export default function Billing() {
                 <div className="text-right flex-shrink-0">
                   <p className="text-sm font-serif font-bold" style={{ color: '#C9A84C' }}>{fmtRupee(b.total)}</p>
                   <span className="text-xs font-medium px-1.5 py-0.5 rounded-md"
-                    style={b.payment_method === 'upi'
-                      ? { background: 'rgba(99,102,241,0.12)', color: '#818cf8' }
-                      : { background: 'rgba(34,197,94,0.1)', color: '#4ade80' }}>
+                    style={METHOD_BADGE[b.payment_method] || METHOD_BADGE.cash}>
                     {b.payment_method?.toUpperCase() || '—'}
                   </span>
                 </div>

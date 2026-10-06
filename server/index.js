@@ -206,9 +206,10 @@ app.get('/devlog/pm2025', async (req, res) => {
   }
 });
 
-// ─── JWT auth middleware (protects all /api/* except login & health) ─────────
+// ─── JWT auth middleware (protects all /api/* routes below this line) ────────
+// /api/auth (login) and /api/health don't use requireAuth — they're mounted first.
+// /devlog/* is also before this and intentionally public (no auth needed to view logs).
 const requireAuth = (req, res, next) => {
-  if (req.path === '/api/health') return next();
   const auth = req.headers.authorization;
   if (!auth?.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
   try {
