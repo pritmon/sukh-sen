@@ -218,7 +218,7 @@ function BillDetail({ bill, onClose, onPay, salonName }) {
 ${bill.staff_name ? `<p style="text-align:left"><b>Staff:</b> ${bill.staff_name}</p>` : ''}
 <hr>
 <table>${lines}${discountRow}${gstRow}<tr class="total"><td>Total</td><td style="text-align:right">${fmtRupee(bill.total)}</td></tr></table>
-<p class="paid">${bill.paid ? `✓ Paid via ${bill.payment_method === 'upi' ? 'UPI' : 'Cash'}` : 'UNPAID'}</p>
+<p class="paid">${bill.paid ? `✓ Paid via ${{ cash: 'Cash', upi: 'UPI', card: 'Card' }[bill.payment_method] || 'Cash'}` : 'UNPAID'}</p>
 <hr><p style="font-size:11px;color:#aaa">Thank you for visiting!</p>
 <script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}</script>
 </body></html>`);
